@@ -1,5 +1,9 @@
 package com.britishheritage.android.britishheritage.Main;
 
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
@@ -9,6 +13,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
 import com.britishheritage.android.britishheritage.Home.HomeFragment;
 import com.britishheritage.android.britishheritage.Maps.ArchaeologyMapFragment;
 import com.britishheritage.android.britishheritage.Maps.ListedBuildingsMapFragment;
@@ -87,14 +92,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // construct a new instance of SimpleLocation
-        SimpleLocation location = new SimpleLocation(this);
 
-        // if we can't access the location yet
-        if (!location.hasLocationEnabled()) {
-            // ask the user to enable location access
-            SimpleLocation.openSettings(this);
-        }
+        Location location = MyLocationProvider.getLastLocation(this);
+
 
 
         frameLayout = findViewById(R.id.main_frame_layout);

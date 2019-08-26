@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -61,20 +63,16 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
         super.onViewCreated(view, savedInstanceState);
         mViewModel = ViewModelProviders.of(getActivity()).get(MapViewModel.class);
 
+
+
         supportMapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_listed_buildings);
         supportMapFragment.getMapAsync(this);
         // construct a new instance of SimpleLocation
-        SimpleLocation location = new SimpleLocation(getActivity());
+        //todo SimpleLocation not working as advertised
 
-        // if we can't access the location yet
-        if (!location.hasLocationEnabled()) {
-            // ask the user to enable location access
-            SimpleLocation.openSettings(getActivity());
-        }
 
-        currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-
+        currentLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
         //setting up icon size
         BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_museum_medium);
         buildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 30, 30, false);
