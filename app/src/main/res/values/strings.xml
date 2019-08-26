@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">British Heritage</string>
+    <string name="unable_to_find_location">Unable to find your location. Please ensure location services are enabled.
+    </string>
+    <string name="please_install_maps">Please Install a Maps Application.</string>
+    <string name="park">Park or Garden</string>
+    <string name="listedbuilding">Listed Building</string>
+    <string name="battlefield">Battlefield</string>
+    <string name="scheduled_monument">Scheduled Monument</string>
+    <string name="hilfort">Hillfort</string>
+    <string name="arch_map">Monuments</string>
+    <string name="listed_building_string">Buildings</string>
+    <string name="home">Home</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

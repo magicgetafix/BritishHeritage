@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+    android:id="@+id/home"
+    android:title="@string/home"
+    android:icon="@drawable/home"
+
+    />
+
+    <item
+ android:id="@+id/arch_map"
+ android:title="@string/arch_map"
+ android:icon="@drawable/icon_menhir"
+ />
+
+    <item
+            android:id="@+id/listed_buildings_map"
+            android:title="@string/listed_building_string"
+            android:icon="@drawable/icon_museum_small"
+    />
+
+</menu>
