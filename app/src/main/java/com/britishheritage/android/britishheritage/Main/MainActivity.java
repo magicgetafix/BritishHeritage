@@ -18,10 +18,22 @@ import com.britishheritage.android.britishheritage.Home.HomeFragment;
 import com.britishheritage.android.britishheritage.Maps.ArchaeologyMapFragment;
 import com.britishheritage.android.britishheritage.Maps.ListedBuildingsMapFragment;
 import com.britishheritage.android.britishheritage.Maps.MapViewModel;
+import com.britishheritage.android.britishheritage.Model.Landmark;
+import com.britishheritage.android.britishheritage.Model.LandmarkList;
 import com.britishheritage.android.britishheritage.R;
 import com.firebase.geofire.GeoFire;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonReader;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
+
 import im.delight.android.location.SimpleLocation;
 
 public class MainActivity extends AppCompatActivity {
@@ -100,6 +112,20 @@ public class MainActivity extends AppCompatActivity {
         frameLayout = findViewById(R.id.main_frame_layout);
         navigationView = findViewById(R.id.main_navigation);
         progressBar = findViewById(R.id.main_progress_bar);
+
+        Runnable setUpDatabaseRunnable = new Runnable() {
+            @Override
+            public void run() {
+
+                String jsonDatabaseString = loadJSONFromAsset();
+                Gson gson = new Gson();
+                LandmarkList landmarkList = gson.fromJson(jsonDatabaseString, LandmarkList.class);
+
+            }
+        };
+
+
+
         //set up view model
         //mapViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
 
@@ -164,4 +190,22 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+    public String loadJSONFromAsset() {
+        String json = null;
+        try {
+            InputStream is = getAssets().open("heritage_data.json");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return json;
+    }
+
+
 }
