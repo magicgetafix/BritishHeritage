@@ -4,6 +4,8 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.Handler;
+import android.provider.ContactsContract;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
@@ -13,6 +15,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
 import com.britishheritage.android.britishheritage.Home.HomeFragment;
 import com.britishheritage.android.britishheritage.Maps.ArchaeologyMapFragment;
@@ -106,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Location location = MyLocationProvider.getLastLocation(this);
-
+        final DatabaseInteractor databaseInteractor = DatabaseInteractor.getInstance(getApplicationContext());
 
 
         frameLayout = findViewById(R.id.main_frame_layout);
@@ -120,9 +123,14 @@ public class MainActivity extends AppCompatActivity {
                 String jsonDatabaseString = loadJSONFromAsset();
                 Gson gson = new Gson();
                 LandmarkList landmarkList = gson.fromJson(jsonDatabaseString, LandmarkList.class);
-
+                if (landmarkList!=null) {
+                    databaseInteractor.addAllLandmarks(landmarkList.getLandmarks());
+                }
             }
         };
+
+        Handler handler = new Handler();
+        handler.post(setUpDatabaseRunnable);
 
 
 

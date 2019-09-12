@@ -12,4 +12,5 @@ public class Constants {
 
     public final static String GEO_FIRE_DATABASE_REF = "geo_location";
     public final static String LANDMARK_REF = "landmarks";
+    public final static String DATABASE_NAME = "landmark_database";
 }

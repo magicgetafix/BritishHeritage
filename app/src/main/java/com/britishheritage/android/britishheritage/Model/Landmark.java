@@ -1,7 +1,12 @@
 package com.britishheritage.android.britishheritage.Model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "landmarks")
 public class Landmark {
 
+  @PrimaryKey
   private String id;
   private Double latitude;
   private Double longitude;

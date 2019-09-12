@@ -50,4 +50,8 @@ dependencies {
     implementation 'com.github.delight-im:Android-SimpleLocation:v1.0.1'
     //Gson
     implementation 'com.google.code.gson:gson:2.8.5'
+    //Room
+    def room_version = "2.2.0-rc01"
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-rxjava2:$room_version"
 }
