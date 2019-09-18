@@ -5,8 +5,10 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.ContactsContract;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
@@ -38,6 +40,12 @@ import java.io.Reader;
 import java.io.StringReader;
 
 import im.delight.android.location.SimpleLocation;
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -116,21 +124,17 @@ public class MainActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.main_navigation);
         progressBar = findViewById(R.id.main_progress_bar);
 
-        Runnable setUpDatabaseRunnable = new Runnable() {
-            @Override
-            public void run() {
 
-                String jsonDatabaseString = loadJSONFromAsset();
-                Gson gson = new Gson();
-                LandmarkList landmarkList = gson.fromJson(jsonDatabaseString, LandmarkList.class);
-                if (landmarkList!=null) {
-                    databaseInteractor.addAllLandmarks(landmarkList.getLandmarks());
-                }
+        String jsonDatabaseString = loadJSONFromAsset();
+        Gson gson = new Gson();
+        LandmarkList landmarkList = gson.fromJson(jsonDatabaseString, LandmarkList.class);
+            if (landmarkList!=null) {
+                databaseInteractor.addAllLandmarks(landmarkList.getLandmarks());
             }
-        };
 
-        Handler handler = new Handler();
-        handler.post(setUpDatabaseRunnable);
+
+
+
 
 
 
@@ -193,10 +197,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         */
-
-
-
-
     }
 
     public String loadJSONFromAsset() {

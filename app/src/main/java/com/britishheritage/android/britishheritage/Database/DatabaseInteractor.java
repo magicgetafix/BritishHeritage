@@ -1,7 +1,9 @@
 package com.britishheritage.android.britishheritage.Database;
 
 import android.content.Context;
+import android.os.AsyncTask;
 
+import com.britishheritage.android.britishheritage.Daos.LandmarkDao;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 
@@ -29,6 +31,21 @@ public class DatabaseInteractor {
     }
 
     public void addAllLandmarks(List<Landmark> landmarks){
-        db.landmarkDao().insertAll(landmarks);
+        new insertLandmarkAsyncTask(db.landmarkDao()).execute(landmarks);
+    }
+
+    private static class insertLandmarkAsyncTask extends AsyncTask<List<Landmark>, Void, Void>{
+
+        private LandmarkDao landmarkDao;
+
+        insertLandmarkAsyncTask(LandmarkDao landmarkDao){
+            this.landmarkDao = landmarkDao;
+        }
+
+        @Override
+        protected Void doInBackground(List<Landmark>... lists) {
+            landmarkDao.insert(lists[0]);
+            return null;
+        }
     }
 }

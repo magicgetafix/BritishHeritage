@@ -1,19 +1,33 @@
 package com.britishheritage.android.britishheritage.Model;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "landmarks")
+@Entity
 public class Landmark {
 
   @PrimaryKey
-  private String id;
-  private Double latitude;
-  private Double longitude;
-  private String name;
-  private String type;
+  @NonNull
+  public String id = "";
+  @ColumnInfo(name = "latitude")
+  public Double latitude;
+  @ColumnInfo(name = "longitude")
+  public Double longitude;
+  @ColumnInfo(name = "name")
+  public String name;
+  @ColumnInfo(name = "type")
+  public String type;
 
-  public Landmark(String id, Double latitude, Double longitude, String name, String type){
+  //Room requires empty constructor
+  public Landmark(){
+
+  }
+
+  @Ignore
+  public Landmark(@NonNull String id, Double latitude, Double longitude, String name, String type){
     this.id = id;
     this.latitude = latitude;
     this.longitude = longitude;
@@ -39,5 +53,25 @@ public class Landmark {
 
   public String getType() {
     return type;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setLatitude(Double latitude) {
+    this.latitude = latitude;
+  }
+
+  public void setLongitude(Double longitude) {
+    this.longitude = longitude;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 }
