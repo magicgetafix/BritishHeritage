@@ -6,15 +6,16 @@ import android.os.AsyncTask;
 import com.britishheritage.android.britishheritage.Daos.LandmarkDao;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Model.Landmark;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Room;
 
 public class DatabaseInteractor {
 
     private static DatabaseInteractor instance;
-
     private Context context;
     private LandmarkDatabase db;
 
@@ -47,5 +48,24 @@ public class DatabaseInteractor {
             landmarkDao.insert(lists[0]);
             return null;
         }
+    }
+
+    public LiveData<Integer> getDatabaseSize(){
+        return db.landmarkDao().getNumberOfEntries();
+    }
+
+    /**A method which returns a LiveData<List>of Landmarks
+     *
+     * @param topRightLatLng the top right or north east coordinates of the map
+     * @param bottomLeftLatLng the bottom left or south west coordinates of the map
+     * @return
+     */
+    public LiveData<List<Landmark>> getLandmarksInBox(LatLng topRightLatLng, LatLng bottomLeftLatLng){
+
+        double maxLat = topRightLatLng.latitude;
+        double minLat = bottomLeftLatLng.latitude;
+        double maxLong = topRightLatLng.longitude;
+        double minLong = bottomLeftLatLng.longitude;
+        return db.landmarkDao().getNearestLandmarks(maxLat, minLat, maxLong, minLong);
     }
 }

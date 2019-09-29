@@ -7,6 +7,7 @@ import android.location.LocationProvider;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.ContactsContract;
+import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -15,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
@@ -55,8 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private Fragment archMapFragment;
     private Fragment listedBuildingFragment;
     private Fragment homeFragment;
-    private boolean databaseIsCreated;
+    private DatabaseInteractor databaseInteractor;
     private ProgressBar progressBar;
+    private LiveData<Integer> databaseSizeLiveData;
     //private FirebaseDatabase database;
     //private MapViewModel mapViewModel;
 
@@ -115,88 +118,41 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Location location = MyLocationProvider.getLastLocation(this);
-        final DatabaseInteractor databaseInteractor = DatabaseInteractor.getInstance(getApplicationContext());
-
-
         frameLayout = findViewById(R.id.main_frame_layout);
         navigationView = findViewById(R.id.main_navigation);
         progressBar = findViewById(R.id.main_progress_bar);
 
+        Location location = MyLocationProvider.getLastLocation(this);
+        databaseInteractor = DatabaseInteractor.getInstance(getApplicationContext());
+        databaseSizeLiveData = databaseInteractor.getDatabaseSize();
+        databaseSizeLiveData.observe(this, this::populateDatabase);
 
-        String jsonDatabaseString = loadJSONFromAsset();
-        Gson gson = new Gson();
-        LandmarkList landmarkList = gson.fromJson(jsonDatabaseString, LandmarkList.class);
+    }
+
+
+    private void populateDatabase(int databaseSize){
+        Timber.d("Database size is: "+databaseSize);
+        if (databaseSize == 0){
+            String jsonDatabaseString = loadJSONFromAsset();
+            Gson gson = new Gson();
+            LandmarkList landmarkList = gson.fromJson(jsonDatabaseString, LandmarkList.class);
             if (landmarkList!=null) {
                 databaseInteractor.addAllLandmarks(landmarkList.getLandmarks());
             }
 
-
-
-
-
-
-
-        //set up view model
-        //mapViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
-
-        //database = FirebaseDatabase.getInstance();
-        //if (database == null){
-        //    System.out.print("Database is null");
-        //}
-
-        //DatabaseReference landmarkRef = database.getReference("landmarks");
-        //if (landmarkRef == null){
-
-          //  System.out.println("landmark ref is null");
-        //}
-        //System.out.println(landmarkRef.toString());
-
-        //DatabaseReference geoFireRef = database.getReference("geo_location");
-        //GeoFire geoFire = new GeoFire(geoFireRef);
-        navigationView.setOnNavigationItemSelectedListener(navListener);
-
-        /*landmarkRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                Iterable<DataSnapshot> children = dataSnapshot.getChildren();
-                Iterator<DataSnapshot> iterator = children.iterator();
-                while (iterator.hasNext()){
-                    DataSnapshot next = iterator.next();
-                    DataSnapshot idDataShot = next.child("id");
-                    String id = idDataShot.getValue(String.class);
-                    DataSnapshot latitudeDatashot = next.child("latitude");
-                    DataSnapshot longitudeDatashot = next.child("longitude");
-
-                    Double latitude = latitudeDatashot.getValue(Double.class);
-                    Double longitude = longitudeDatashot.getValue(Double.class);
-
-                    if (latitude!=null && longitude!=null && id!=null){
-                        System.out.print(id+" lat: "+latitude+" long: "+longitude);
-                        GeoLocation location = new GeoLocation(latitude, longitude);
-                        geoFire.setLocation(id, location, new GeoFire.CompletionListener() {
-
-                            @Override
-                            public void onComplete(String key, DatabaseError error) {
-                                System.out.println("Geofire complete for "+ key);
-                            }
-                        } );
-                    }
-
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    navigationView.setOnNavigationItemSelectedListener(navListener);
                 }
+            }, 5000);
+        }
+        else{
+            progressBar.setVisibility(View.INVISIBLE);
+            navigationView.setOnNavigationItemSelectedListener(navListener);
+        }
 
-                progressBar.setVisibility(View.INVISIBLE);
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        */
     }
 
     public String loadJSONFromAsset() {

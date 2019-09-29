@@ -17,8 +17,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.britishheritage.android.britishheritage.Global.Constants;
+import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
+import com.britishheritage.android.britishheritage.Maps.MapAdapters.MapInfoWindow;
 import com.britishheritage.android.britishheritage.Model.*;
 import com.britishheritage.android.britishheritage.R;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -41,9 +44,6 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
     private static Bitmap monumentIcon;
     private static Bitmap battleIcon;
 
-    private HashMap<String, MapEntity> archaeologyHashMap = new HashMap<>();
-
-
     public static ArchaeologyMapFragment newInstance(LatLng targetLatLng) {
         newLatLng = targetLatLng;
         return new ArchaeologyMapFragment();
@@ -63,67 +63,36 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
         supportMapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_archaeology);
         supportMapFragment.getMapAsync(this);
-        SimpleLocation location = new SimpleLocation(getActivity());
-        // if we can't access the location yet
-        if (!location.hasLocationEnabled()) {
-            // ask the user to enable location access
-            SimpleLocation.openSettings(getActivity());
+        Location location = MyLocationProvider.getLastLocation(getActivity());
+        if (newLatLng==null) {
+            currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
         }
-        currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        else{
+            currentLatLng = newLatLng;
+        }
 
         //setting up icon size
         BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_hill_silhouette_small);
-        hillIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 30, 30, false);
+        hillIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 50, 50, false);
         bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_battlefield);
-        battleIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 30, 30, false);
+        battleIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 50, 50, false);
         bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_menhir);
-        monumentIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 30, 30, false);
+        monumentIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 50, 50, false);
 
     }
 
+    /**
+     *
+     * @param googleMap
+     * @return an array of two LatLng, the first value is the NorthEast corner of the map,
+     * the second value is the SouthWest corner of the map
+     */
+    private LatLng[] getMapCorners(GoogleMap googleMap) {
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        SimpleLocation location = new SimpleLocation(getActivity());
-        // if we can't access the location yet
-        if (!location.hasLocationEnabled()) {
-            // ask the user to enable location access
-            SimpleLocation.openSettings(getActivity());
-        }
-        currentLatLng = new LatLng(53.0, 1.0);
-
-    }
-
-    private double getMapVisibleRadius(GoogleMap googleMap) {
-        VisibleRegion visibleRegion = googleMap.getProjection().getVisibleRegion();
-
-        float[] distanceWidth = new float[1];
-        float[] distanceHeight = new float[1];
-
-        LatLng farRight = visibleRegion.farRight;
-        LatLng farLeft = visibleRegion.farLeft;
-        LatLng nearRight = visibleRegion.nearRight;
-        LatLng nearLeft = visibleRegion.nearLeft;
-
-        Location.distanceBetween(
-                (farLeft.latitude + nearLeft.latitude) / 2,
-                farLeft.longitude,
-                (farRight.latitude + nearRight.latitude) / 2,
-                farRight.longitude,
-                distanceWidth
-        );
-
-        Location.distanceBetween(
-                farRight.latitude,
-                (farRight.longitude + farLeft.longitude) / 2,
-                nearRight.latitude,
-                (nearRight.longitude + nearLeft.longitude) / 2,
-                distanceHeight
-        );
-
-        double radiusInMeters = Math.sqrt(Math.pow(distanceWidth[0], 2) + Math.pow(distanceHeight[0], 2)) / 2;
-        return radiusInMeters/1000;
+        LatLng[] latLngs = new LatLng[2];
+        latLngs[0] = googleMap.getProjection().getVisibleRegion().latLngBounds.northeast;
+        latLngs[1] = googleMap.getProjection().getVisibleRegion().latLngBounds.southwest;
+        return latLngs;
     }
 
 
@@ -131,27 +100,39 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
     public void onMapReady(GoogleMap googleMap) {
 
         gMap = googleMap;
-        gMap.setMaxZoomPreference(15);
+        gMap.setMinZoomPreference(11);
         gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        gMap.moveCamera(CameraUpdateFactory.zoomTo(12));
+        gMap.moveCamera(CameraUpdateFactory.zoomTo(14));
         //moves map camera to current location
         gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+        gMap.setInfoWindowAdapter(new MapInfoWindow(getContext()));
+
+        for (Landmark landmark: mViewModel.getBattleFieldSet()){
+            setUpMarker(landmark);
+        }
+        for (Landmark landmark: mViewModel.getHillfortsSet()){
+            setUpMarker(landmark);
+        }
+        for (Landmark landmark: mViewModel.getScheduledMonumentsSet()){
+            setUpMarker(landmark);
+        }
+
         setDragMapBehaviour(gMap);
-        //processMapHashMap(mViewModel.getBattleFieldsHashMap());
-        //processMapHashMap(mViewModel.getHillfortsHashMap());
-        //processMapHashMap(mViewModel.getScheduledMonumentHashMap());
 
-        double radius = getMapVisibleRadius(gMap);
-        //mViewModel.getData(currentLatLng, radius);
+        LatLng[] latLngs = getMapCorners(gMap);
+        mViewModel.getScheduledMonumentLiveData().observe(this, this::setUpMarker);
+        mViewModel.getHillfortLiveData().observe(this, this::setUpMarker);
+        mViewModel.getBattleFieldLiveData().observe(this, this::setUpMarker);
 
-        //mViewModel.getScheduledMonumentsKey().observe(this, this::processLiveData(o, Constants.SCHEDULED_MONUMENTS_ID));
-        //mViewModel.getBattleFieldsKey().observe(this, processLiveData(this., Constants.BATTLEFIELDS_ID));
-        //mViewModel.getHillfortsKey().observe(this, o->processLiveData(o, Constants.HILLFORTS_ID));
+        mViewModel.getLandmarks(latLngs[0], latLngs[1]);
+
 
         gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 marker.showInfoWindow();
+                newLatLng = marker.getPosition();
+                gMap.animateCamera(CameraUpdateFactory.newLatLng(newLatLng), 700, null);
                 return true;
             }
         });
@@ -199,18 +180,6 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
 
     }
 
-    public void processMapHashMap(HashMap<String, MapEntity> hashMap){
-
-        Iterator<Map.Entry<String, MapEntity>> mapIterator = hashMap.entrySet().iterator();
-        while (mapIterator.hasNext()){
-            Map.Entry<String, MapEntity> nextEntry = mapIterator.next();
-            if (archaeologyHashMap.get(nextEntry.getKey()) == null){
-                archaeologyHashMap.put(nextEntry.getKey(), nextEntry.getValue());
-                setUpMarker(nextEntry.getValue());
-            }
-        }
-
-    }
 
     public void setDragMapBehaviour(final GoogleMap gMap){
 
@@ -219,56 +188,31 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
             public void onCameraIdle() {
 
                 currentLatLng = gMap.getCameraPosition().target;
-                double radius = getMapVisibleRadius(gMap);
-          //      mViewModel.getData(currentLatLng, radius);
-
+                LatLng[] latLngs = getMapCorners(gMap);
+                mViewModel.getLandmarks(latLngs[0], latLngs[1]);
             }
         });
     }
 
+    private void setUpMarker(Landmark landmark){
 
-    private void processLiveData(String key, String type){
-
-        if (key!=null) {
-            MapEntity mapEntity = archaeologyHashMap.get(key);
-            if (mapEntity == null) {
-                if (type.equals(Constants.SCHEDULED_MONUMENTS_ID)){
-                    MapEntity smMapEntity = mViewModel.getScheduledMonumentHashMap().get(key);
-                    archaeologyHashMap.put(key, smMapEntity);
-                    setUpMarker(smMapEntity);
-                }
-
-                else if (type.equals(Constants.HILLFORTS_ID)){
-                    MapEntity hfMapEntity = mViewModel.getScheduledMonumentHashMap().get(key);
-                    archaeologyHashMap.put(key, hfMapEntity);
-                    setUpMarker(hfMapEntity);
-                }
-
-                else if (type.equals(Constants.BATTLEFIELDS_ID)){
-                    MapEntity bfMapEntity = mViewModel.getScheduledMonumentHashMap().get(key);
-                    archaeologyHashMap.put(key, bfMapEntity);
-                    setUpMarker(bfMapEntity);
-                }
-            }
+        if (landmark == null){
+            Timber.d("Landmark is null in ArchaeologyMapFragment");
+            return;
         }
-    }
 
-    private void setUpMarker(MapEntity mapEntity){
-
-
-        Double entityLat = mapEntity.getGeoMarker().getLatitude();
-        Double entityLong = mapEntity.getGeoMarker().getLongitude();
+        Double entityLat = landmark.getLatitude();
+        Double entityLong = landmark.getLongitude();
         LatLng entLatLng = new LatLng(entityLat, entityLong);
-        Landmark landmark = mapEntity.getLandmark();
 
-        if (landmark.getId().equals(Constants.SCHEDULED_MONUMENTS_ID)){
+        if (landmark.getType().equals(Constants.SCHEDULED_MONUMENTS_ID)){
 
             String name = landmark.getName();
             String latitude = entityLat.toString();
             String longitude = entityLong.toString();
             String type = getString(R.string.scheduled_monument);
 
-            String csvData = name+","+latitude+","+longitude+","+type;
+            String csvData = name+"//"+latitude+"//"+longitude+"//"+type;
 
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(monumentIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
@@ -276,14 +220,14 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
                     .snippet(csvData).draggable(false));
         }
 
-        else if (landmark.getId().equals(Constants.HILLFORTS_ID)){
+        else if (landmark.getType().equals(Constants.HILLFORTS_ID)){
 
             String name = landmark.getName();
             String latitude = entityLat.toString();
             String longitude = entityLong.toString();
             String type = getString(R.string.hilfort);
 
-            String csvData = name+","+latitude+","+longitude+","+type;
+            String csvData = name+"//"+latitude+"//"+longitude+"//"+type;
 
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(hillIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
@@ -291,14 +235,14 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
                     .snippet(csvData).draggable(false));
         }
 
-        else if (landmark.getId().equals(Constants.BATTLEFIELDS_ID)){
+        else if (landmark.getType().equals(Constants.BATTLEFIELDS_ID)){
 
             String name = landmark.getName();
             String latitude = entityLat.toString();
             String longitude = entityLong.toString();
             String type = getString(R.string.battlefield);
 
-            String csvData = name+","+latitude+","+longitude+","+type;
+            String csvData = name+"//"+latitude+"//"+longitude+"//"+type;
 
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(battleIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)

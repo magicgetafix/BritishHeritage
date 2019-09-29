@@ -6,8 +6,8 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity
-public class Landmark {
+@Entity(tableName = "LANDMARK_TABLE")
+public class Landmark implements Comparable{
 
   @PrimaryKey
   @NonNull
@@ -73,5 +73,25 @@ public class Landmark {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+
+    boolean isEqual = obj instanceof Landmark;
+    if (isEqual){
+      Landmark otherLandmark = (Landmark) obj;
+      isEqual = otherLandmark.getId().equalsIgnoreCase(this.getId());
+    }
+    return isEqual;
+  }
+
+  @Override
+  public int compareTo(@NonNull Object o) {
+    int value = 0;
+    if (o instanceof Landmark){
+      value = ((Landmark) o).getId().compareTo(this.getId());
+    }
+    return value;
   }
 }

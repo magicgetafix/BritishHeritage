@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import androidx.lifecycle.ViewModelProviders;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
+import com.britishheritage.android.britishheritage.Maps.MapAdapters.MapInfoWindow;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.MapEntity;
 import com.britishheritage.android.britishheritage.R;
@@ -43,8 +44,6 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
     private static Bitmap buildingIcon;
     private static Bitmap parkIcon;
 
-    private HashMap<String, MapEntity> archaeologyHashMap = new HashMap<>();
-
 
     public static ListedBuildingsMapFragment newInstance(LatLng targetLatLng) {
         newLatLng = targetLatLng;
@@ -62,71 +61,37 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mViewModel = ViewModelProviders.of(getActivity()).get(MapViewModel.class);
-
-
-
         supportMapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_listed_buildings);
         supportMapFragment.getMapAsync(this);
-        // construct a new instance of SimpleLocation
-        //todo SimpleLocation not working as advertised
 
-
-        currentLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
+        if (newLatLng==null) {
+            Location location = MyLocationProvider.getLastLocation(getActivity());
+            currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+        }
+        else{
+            currentLatLng = newLatLng;
+        }
         //setting up icon size
         BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_museum_medium);
-        buildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 30, 30, false);
+        buildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 50, 50, false);
         bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_park);
-        parkIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 30, 30, false);
+        parkIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 50, 50, false);
 
     }
 
+    /**
+     *
+     * @param googleMap
+     * @return an array of two LatLng, the first value is the NorthEast corner of the map,
+     * the second value is the SouthWest corner of the map
+     */
+    private LatLng[] getMapCorners(GoogleMap googleMap) {
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        SimpleLocation location = new SimpleLocation(getActivity());
-        // if we can't access the location yet
-        if (!location.hasLocationEnabled()) {
-            // ask the user to enable location access
-            SimpleLocation.openSettings(getActivity());
-        }
-        currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-        Timber.d("Center latlng: "+currentLatLng.toString());
-
-    }
-
-    //in km
-    private double getMapVisibleRadius(GoogleMap googleMap) {
-        VisibleRegion visibleRegion = googleMap.getProjection().getVisibleRegion();
-
-        float[] distanceWidth = new float[1];
-        float[] distanceHeight = new float[1];
-
-        LatLng farRight = visibleRegion.farRight;
-        LatLng farLeft = visibleRegion.farLeft;
-        LatLng nearRight = visibleRegion.nearRight;
-        LatLng nearLeft = visibleRegion.nearLeft;
-
-        Location.distanceBetween(
-                (farLeft.latitude + nearLeft.latitude) / 2,
-                farLeft.longitude,
-                (farRight.latitude + nearRight.latitude) / 2,
-                farRight.longitude,
-                distanceWidth
-        );
-
-        Location.distanceBetween(
-                farRight.latitude,
-                (farRight.longitude + farLeft.longitude) / 2,
-                nearRight.latitude,
-                (nearRight.longitude + nearLeft.longitude) / 2,
-                distanceHeight
-        );
-
-        double radiusInMeters = Math.sqrt(Math.pow(distanceWidth[0], 2) + Math.pow(distanceHeight[0], 2)) / 2;
-        Timber.d("radius in metres: "+radiusInMeters);
-        return radiusInMeters/1000;
+        LatLng[] latLngs = new LatLng[2];
+        latLngs[0] = googleMap.getProjection().getVisibleRegion().latLngBounds.northeast;
+        latLngs[1] = googleMap.getProjection().getVisibleRegion().latLngBounds.southwest;
+        return latLngs;
     }
 
 
@@ -134,26 +99,35 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
     public void onMapReady(GoogleMap googleMap) {
 
         gMap = googleMap;
-        gMap.setMaxZoomPreference(15);
-        gMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-        gMap.moveCamera(CameraUpdateFactory.zoomTo(12));
+        gMap.setMinZoomPreference(11);
+        gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        gMap.moveCamera(CameraUpdateFactory.zoomTo(14));
+        gMap.setInfoWindowAdapter(new MapInfoWindow(getContext()));
         //moves map camera to current location
         gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+
+        for (Landmark landmark: mViewModel.getPublicGardensSet()){
+            setUpMarker(landmark);
+        }
+        for (Landmark landmark: mViewModel.getListedBuildingsSet()){
+            setUpMarker(landmark);
+        }
+
         setDragMapBehaviour(gMap);
-        processMapHashMap(mViewModel.getListedBuildingsHashMap());
-        processMapHashMap(mViewModel.getPublicGardensHashMap());
 
-        double radius = getMapVisibleRadius(gMap);
-        //mViewModel.getData(currentLatLng, radius);
+        LatLng[] latLngs = getMapCorners(gMap);
+        mViewModel.getListedBuildingLiveData().observe(this, this::setUpMarker);
+        mViewModel.getPublicGardenLiveData().observe(this, this::setUpMarker);
 
-        //mViewModel.getListedBuildingsKey().observe(this, o->processLiveData(o, Constants.LISTED_BUILDINGS_ID));
-        //mViewModel.getPublicGardensKey().observe(this, o->processLiveData(o, Constants.PARKS_AND_GARDENS_ID));
+        mViewModel.getLandmarks(latLngs[0], latLngs[1]);
 
 
         gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 marker.showInfoWindow();
+                newLatLng = marker.getPosition();
+                gMap.animateCamera(CameraUpdateFactory.newLatLng(newLatLng), 700, null);
                 return true;
             }
         });
@@ -201,18 +175,7 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
 
     }
 
-    public void processMapHashMap(HashMap<String, MapEntity> hashMap){
 
-        Iterator<Map.Entry<String, MapEntity>> mapIterator = hashMap.entrySet().iterator();
-        while (mapIterator.hasNext()){
-            Map.Entry<String, MapEntity> nextEntry = mapIterator.next();
-            if (archaeologyHashMap.get(nextEntry.getKey()) == null){
-                archaeologyHashMap.put(nextEntry.getKey(), nextEntry.getValue());
-                setUpMarker(nextEntry.getValue());
-            }
-        }
-
-    }
 
     public void setDragMapBehaviour(final GoogleMap gMap){
 
@@ -221,49 +184,34 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
             public void onCameraIdle() {
 
                 currentLatLng = gMap.getCameraPosition().target;
-                double radius = getMapVisibleRadius(gMap);
-          //      mViewModel.getData(currentLatLng, radius);
+                LatLng[] latLngs = getMapCorners(gMap);
+                mViewModel.getLandmarks(latLngs[0], latLngs[1]);
             }
         });
     }
 
 
-    private void processLiveData(String key, String type){
 
-        if (key!=null) {
-            MapEntity mapEntity = archaeologyHashMap.get(key);
-            if (mapEntity == null) {
-                if (type.equals(Constants.LISTED_BUILDINGS_ID)){
-                    MapEntity lbMapEntity = mViewModel.getListedBuildingsHashMap().get(key);
-                    archaeologyHashMap.put(key, lbMapEntity);
-                    setUpMarker(lbMapEntity);
-                }
 
-                else if (type.equals(Constants.PARKS_AND_GARDENS_ID)){
-                    MapEntity pgMapEntity = mViewModel.getPublicGardensHashMap().get(key);
-                    archaeologyHashMap.put(key, pgMapEntity);
-                    setUpMarker(pgMapEntity);
-                }
-            }
+    private void setUpMarker(Landmark landmark){
+
+        if (landmark == null){
+            Timber.d("Landmark is null in ArchaeologyMapFragment");
+            return;
         }
-    }
 
-    private void setUpMarker(MapEntity mapEntity){
-
-
-        Double entityLat = mapEntity.getGeoMarker().getLatitude();
-        Double entityLong = mapEntity.getGeoMarker().getLongitude();
+        Double entityLat = landmark.getLatitude();
+        Double entityLong = landmark.getLongitude();
         LatLng entLatLng = new LatLng(entityLat, entityLong);
-        Landmark landmark = mapEntity.getLandmark();
 
-        if (landmark.getId().equals(Constants.LISTED_BUILDINGS_ID)){
+        if (landmark.getType().equals(Constants.LISTED_BUILDINGS_ID)){
 
             String name = landmark.getName();
             String latitude = entityLat.toString();
             String longitude = entityLong.toString();
             String type = getString(R.string.listed_building_string);
 
-            String csvData = name+","+latitude+","+longitude+","+type;
+            String csvData = name+"//"+latitude+"//"+longitude+"//"+type;
 
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(buildingIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
@@ -271,14 +219,14 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
                     .snippet(csvData).draggable(false));
         }
 
-        else if (landmark.getId().equals(Constants.PARKS_AND_GARDENS_ID)){
+        else if (landmark.getType().equals(Constants.PARKS_AND_GARDENS_ID)){
 
             String name = landmark.getName();
             String latitude = entityLat.toString();
             String longitude = entityLong.toString();
             String type = getString(R.string.park);
 
-            String csvData = name+","+latitude+","+longitude+","+type;
+            String csvData = name+"//"+latitude+"//"+longitude+"//"+type;
 
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(parkIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)

@@ -5,9 +5,8 @@ public class MapEntity {
   private GeoMarker geoMarker;
   private Landmark landmark;
 
-  public MapEntity(GeoMarker geoMarker, Landmark landmark){
+  public MapEntity(Landmark landmark){
 
-    this.geoMarker = geoMarker;
     this.landmark = landmark;
   }
 
