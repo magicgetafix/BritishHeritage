@@ -142,7 +142,7 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
             public void onInfoWindowClick(Marker marker) {
 
                 String snippetData = marker.getSnippet();
-                String[] snippetCSV = snippetData.split(",");
+                String[] snippetCSV = snippetData.split("//");
                 double latitude = 0.0;
                 double longitude = 0.0;
                 String name = "";
