@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.net.Uri;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.lifecycle.ViewModelProviders;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
+import com.britishheritage.android.britishheritage.Maps.LocationQueries.LatLngQuery;
 import com.britishheritage.android.britishheritage.Maps.MapAdapters.MapInfoWindow;
 import com.britishheritage.android.britishheritage.Model.*;
 import com.britishheritage.android.britishheritage.R;
@@ -32,7 +35,7 @@ import timber.log.Timber;
 
 import java.util.*;
 
-public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallback {
+public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallback, LatLngQuery.LatLngResultListener {
 
     private MapViewModel mViewModel;
     private SupportMapFragment supportMapFragment;
@@ -43,6 +46,10 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
     private static Bitmap hillIcon;
     private static Bitmap monumentIcon;
     private static Bitmap battleIcon;
+
+    private EditText searchText;
+    private ImageView searchIcon;
+    private LatLngQuery latLngQuery;
 
     public static ArchaeologyMapFragment newInstance(LatLng targetLatLng) {
         newLatLng = targetLatLng;
@@ -59,6 +66,8 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mViewModel = ViewModelProviders.of(getActivity()).get(MapViewModel.class);
+        searchIcon = view.findViewById(R.id.arch_search_button);
+        searchText = view.findViewById(R.id.arch_searchbar);
 
         supportMapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_archaeology);
@@ -79,6 +88,26 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
         bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_menhir);
         monumentIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 50, 50, false);
 
+        searchIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String searchString = searchText.getText().toString();
+                searchString = searchString.trim();
+                if (!searchString.isEmpty()) {
+                    searchForLatLng(searchString);
+                }
+                else{
+                    Toast.makeText(getContext(), "Please type a location name into the search bar", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    public void searchForLatLng(String cityQuery){
+        if (latLngQuery == null){
+            latLngQuery = LatLngQuery.getInstance();
+        }
+        latLngQuery.searchForCity(cityQuery, this);
     }
 
     /**
@@ -249,6 +278,18 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
                     .icon(bitmapDescriptor)
                     .snippet(csvData).draggable(false));
         }
+
+    }
+
+    @Override
+    public void foundLatLng(LatLng latLng) {
+        newLatLng = latLng;
+        gMap.animateCamera(CameraUpdateFactory.newLatLng(newLatLng), 700, null);
+    }
+
+    @Override
+    public void onError() {
+        Toast.makeText(getContext(), "Couldn't find any location which matched your search term", Toast.LENGTH_LONG).show();
 
     }
 }
