@@ -133,20 +133,20 @@ public class MainActivity extends AppCompatActivity {
     private void populateDatabase(int databaseSize){
         Timber.d("Database size is: "+databaseSize);
         if (databaseSize == 0){
-            String jsonDatabaseString = loadJSONFromAsset();
-            Gson gson = new Gson();
-            LandmarkList landmarkList = gson.fromJson(jsonDatabaseString, LandmarkList.class);
-            if (landmarkList!=null) {
-                databaseInteractor.addAllLandmarks(landmarkList.getLandmarks());
-            }
 
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    progressBar.setVisibility(View.INVISIBLE);
-                    navigationView.setOnNavigationItemSelectedListener(navListener);
+            Observable.just(0).doOnNext(o->{
+                String jsonDatabaseString = loadJSONFromAsset();
+                Gson gson = new Gson();
+                LandmarkList landmarkList = gson.fromJson(jsonDatabaseString, LandmarkList.class);
+                if (landmarkList!=null) {
+                    databaseInteractor.addAllLandmarks(landmarkList.getLandmarks());
+                    o++;
                 }
-            }, 5000);
+            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(finished->{
+                progressBar.setVisibility(View.INVISIBLE);
+                navigationView.setOnNavigationItemSelectedListener(navListener);
+            });
+
         }
         else{
             progressBar.setVisibility(View.INVISIBLE);

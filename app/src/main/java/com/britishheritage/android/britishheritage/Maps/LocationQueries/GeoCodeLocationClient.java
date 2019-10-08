@@ -27,7 +27,7 @@ public class GeoCodeLocationClient {
      */
     private String getFullUrl(String cityQuery){
 
-        return GOOGLE_MAP_BASE_URL+cityQuery+UK_COUNTRY_SUFFIX;
+        return GOOGLE_MAP_BASE_URL+cityQuery+UK_COUNTRY_SUFFIX+this.googleMapServicesKey;
 
     }
     /**     *

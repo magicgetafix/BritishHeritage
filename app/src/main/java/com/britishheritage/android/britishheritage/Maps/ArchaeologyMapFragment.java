@@ -82,11 +82,11 @@ public class ArchaeologyMapFragment extends Fragment implements OnMapReadyCallba
 
         //setting up icon size
         BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_hill_silhouette_small);
-        hillIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 50, 50, false);
+        hillIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 20, 20, false);
         bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_battlefield);
-        battleIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 50, 50, false);
+        battleIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 20, 20, false);
         bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_menhir);
-        monumentIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 50, 50, false);
+        monumentIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 20, 20, false);
 
         searchIcon.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -9,6 +9,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import androidx.lifecycle.ViewModelProviders;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
+import com.britishheritage.android.britishheritage.Maps.LocationQueries.LatLngQuery;
 import com.britishheritage.android.britishheritage.Maps.MapAdapters.MapInfoWindow;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.MapEntity;
@@ -33,7 +35,7 @@ import timber.log.Timber;
 
 import java.util.*;
 
-public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCallback {
+public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCallback, LatLngQuery.LatLngResultListener {
 
     private MapViewModel mViewModel;
     private SupportMapFragment supportMapFragment;
@@ -43,6 +45,9 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
 
     private static Bitmap buildingIcon;
     private static Bitmap parkIcon;
+    private View searchIcon;
+    private EditText searchText;
+    private LatLngQuery latLngQuery;
 
 
     public static ListedBuildingsMapFragment newInstance(LatLng targetLatLng) {
@@ -74,11 +79,36 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
         }
         //setting up icon size
         BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_museum_medium);
-        buildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 50, 50, false);
+        buildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 20, 20, false);
         bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_park);
-        parkIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 50, 50, false);
+        parkIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 20, 20, false);
+
+        searchIcon = view.findViewById(R.id.listed_buildings_search_button);
+        searchText = view.findViewById(R.id.listed_buildings_searchbar);
+
+        searchIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String searchString = searchText.getText().toString();
+                searchString = searchString.trim();
+                if (!searchString.isEmpty()) {
+                    searchForLatLng(searchString);
+                }
+                else{
+                    Toast.makeText(getContext(), "Please type a location name into the search bar", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
     }
+
+    public void searchForLatLng(String cityQuery){
+        if (latLngQuery == null){
+            latLngQuery = LatLngQuery.getInstance();
+        }
+        latLngQuery.searchForCity(cityQuery, this);
+    }
+
 
     /**
      *
@@ -236,175 +266,15 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
 
     }
 
-    /**@Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        listCounter = 0;
-        mViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
-
-        supportMapFragment =
-                (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_archaeology);
-        supportMapFragment.getMapAsync(this);
-        currentLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
-        if (newLatLng!=null){
-            currentLatLng = newLatLng;
-        }
-        newLatLng = null;
-
-        //setting up icon size
-        BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_museum_medium);
-        buildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 30, 30, false);
-        bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_park);
-        parkIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 30, 30, false);
-
+    @Override
+    public void foundLatLng(LatLng latLng) {
+        newLatLng = latLng;
+        gMap.animateCamera(CameraUpdateFactory.newLatLng(newLatLng), 700, null);
     }
-
 
     @Override
-    public void onResume() {
-        super.onResume();
-
+    public void onError() {
+        Toast.makeText(getContext(), "Couldn't find any location which matched your search term", Toast.LENGTH_LONG).show();
     }
 
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-
-        gMap = googleMap;
-        gMap.setMaxZoomPreference(15);
-        gMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-        gMap.moveCamera(CameraUpdateFactory.zoomTo(15));
-        //moves map camera to current location
-        gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
-        //subscribes to changes in ViewModel
-        mViewModel.getDBLiveData().observe(this, dataList-> processLiveData(dataList));
-
-        LatLngBounds boundsOfMap = gMap.getProjection().getVisibleRegion().latLngBounds;
-        LatLng southWest = boundsOfMap.southwest;
-        LatLng northEast = boundsOfMap.northeast;
-
-        //requests ViewModel to find locations from database
-        getMarkers(southWest, northEast);
-
-        setDragMapBehaviour(gMap);
-
-        gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                marker.showInfoWindow();
-                return true;
-            }
-        });
-
-        gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-
-                String snippetData = marker.getSnippet();
-                String[] snippetCSV = snippetData.split(",");
-                double latitude = 0.0;
-                double longitude = 0.0;
-                String name = "";
-                if (snippetCSV.length == 4){
-                    name = snippetCSV[0];
-                    latitude = Double.parseDouble(snippetCSV[1]);
-                    longitude = Double.parseDouble(snippetCSV[2]);
-                }
-                else{
-                    Timber.e("Snippet wrong format");
-                }
-
-                String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", latitude, longitude, name);
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                intent.setPackage("com.google.android.apps.maps");
-                try
-                {
-                    startActivity(intent);
-                }
-                catch(ActivityNotFoundException ex)
-                {
-                    try
-                    {
-                        Intent unrestrictedIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                        startActivity(unrestrictedIntent);
-                    }
-                    catch(ActivityNotFoundException innerEx)
-                    {
-                        Toast.makeText(getContext(), getResources().getString(R.string.please_install_maps), Toast.LENGTH_LONG).show();
-                    }
-                }
-
-            }
-        });
-
-    }
-
-    public void setDragMapBehaviour(final GoogleMap gMap){
-
-        gMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
-            @Override
-            public void onCameraIdle() {
-                LatLngBounds boundsOfMap = gMap.getProjection().getVisibleRegion().latLngBounds;
-                LatLng southWest = boundsOfMap.southwest;
-                LatLng northEast = boundsOfMap.northeast;
-
-                mViewModel.getData(southWest, northEast);
-            }
-        });
-    }
-
-    public void getMarkers(LatLng swLatLng, LatLng neLatLng){
-
-        mViewModel.getData(swLatLng, neLatLng);
-    }
-
-    private void processLiveData(List<DBEntity> liveDataList){
-
-        listOfBuildingsAndGardens.addAll(liveDataList);
-
-        for (int i = listCounter; i<listOfBuildingsAndGardens.size(); i++){
-
-            listCounter = i;
-            setUpMarker(listOfBuildingsAndGardens.get(i));
-        }
-    }
-
-    private void setUpMarker(DBEntity dbEntity){
-
-
-        Double entityLat = dbEntity.getLatitude();
-        Double entityLong = dbEntity.getLongitude();
-        LatLng entLatLng = new LatLng(entityLat, entityLong);
-
-        if (dbEntity.getId().equals(Constants.LISTED_BUILDINGS_ID)){
-
-            String name = dbEntity.getName();
-            String latitude = dbEntity.getLatitude().toString();
-            String longitude = dbEntity.getLongitude().toString();
-            String type = getString(R.string.listedbuilding);
-
-            String csvData = name+","+latitude+","+longitude+","+type;
-
-            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(buildingIcon);
-            gMap.addMarker(new MarkerOptions().position(entLatLng)
-                    .icon(bitmapDescriptor)
-                    .snippet(csvData).draggable(false));
-        }
-
-        else if (dbEntity.getId().equals(Constants.PARKS_AND_GARDENS_ID)){
-
-            String name = dbEntity.getName();
-            String latitude = dbEntity.getLatitude().toString();
-            String longitude = dbEntity.getLongitude().toString();
-            String type = getString(R.string.park);
-
-            String csvData = name+","+latitude+","+longitude+","+type;
-
-            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(parkIcon);
-            gMap.addMarker(new MarkerOptions().position(entLatLng)
-                    .icon(bitmapDescriptor)
-                    .snippet(csvData).draggable(false));
-        }
-
-    }**/
 }

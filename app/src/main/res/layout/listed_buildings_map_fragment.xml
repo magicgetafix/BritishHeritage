@@ -21,6 +21,8 @@
 
         <EditText android:layout_height="wrap_content"
                   android:layout_width="0dp"
+            android:inputType="text"
+                android:maxLines="1"
                   android:id="@+id/listed_buildings_searchbar"
                   style="@style/SearchBar" app:layout_constraintTop_toTopOf="parent"
                   app:layout_constraintStart_toStartOf="parent"
