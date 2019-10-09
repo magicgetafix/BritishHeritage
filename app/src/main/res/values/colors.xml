@@ -7,4 +7,5 @@
     <color name="semitranswhite">#c8ffffff</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="black">#050505</color>
+    <color name="grey">#7A7A7A</color>
 </resources>
