@@ -1,13 +1,9 @@
 package com.britishheritage.android.britishheritage.Main;
 
-import android.content.Context;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.os.Handler;
-import android.os.Looper;
-import android.provider.ContactsContract;
-import android.util.AttributeSet;
+import android.net.Uri;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -15,54 +11,50 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.Toast;
+
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
 import com.britishheritage.android.britishheritage.Home.HomeFragment;
-import com.britishheritage.android.britishheritage.Maps.ArchaeologyMapFragment;
-import com.britishheritage.android.britishheritage.Maps.ListedBuildingsMapFragment;
+import com.britishheritage.android.britishheritage.Main.Dialogs.BottomDialogFragment;
+import com.britishheritage.android.britishheritage.Maps.ArchMapFragment;
+import com.britishheritage.android.britishheritage.Maps.ListedBuildingMapFragment;
 import com.britishheritage.android.britishheritage.Maps.MapViewModel;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.LandmarkList;
 import com.britishheritage.android.britishheritage.R;
-import com.firebase.geofire.GeoFire;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.database.*;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
+import java.util.Locale;
 
-import im.delight.android.location.SimpleLocation;
+import androidx.lifecycle.ViewModelProviders;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BottomDialogFragment.ItemClickListener {
 
     private FrameLayout frameLayout;
     private BottomNavigationView navigationView;
     private Fragment selectedFragment;
     private Fragment archMapFragment;
     private Fragment listedBuildingFragment;
+    private Fragment previousFragment;
     private Fragment homeFragment;
+    private BottomDialogFragment bottomDialogFragment;
     private DatabaseInteractor databaseInteractor;
     private ProgressBar progressBar;
     private LiveData<Integer> databaseSizeLiveData;
     //private FirebaseDatabase database;
-    //private MapViewModel mapViewModel;
-
+    private MapViewModel mapViewModel;
 
     //To set up BottomNavigationView on select behaviour
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -81,7 +73,23 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (selectedFragment!= null) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.main_frame_layout, selectedFragment).commit();
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.setCustomAnimations(android.R.animator.fade_in,
+                        android.R.animator.fade_out);
+                if (selectedFragment.isHidden()){
+                    if (previousFragment!=null){
+                        fragmentTransaction.hide(previousFragment);
+                    }
+                    fragmentTransaction.show(selectedFragment);
+                }
+                else{
+                    if (previousFragment!=null){
+                        fragmentTransaction.hide(previousFragment);
+                    }
+                    fragmentTransaction.add(R.id.main_frame_layout, selectedFragment);
+                }
+                previousFragment = selectedFragment;
+                fragmentTransaction.commit();
             }
             return true;
         }
@@ -91,16 +99,15 @@ public class MainActivity extends AppCompatActivity {
     private Fragment getArchMapFragment(){
 
         if (archMapFragment==null){
-            archMapFragment = new ArchaeologyMapFragment();
+            archMapFragment = ArchMapFragment.newInstance();
         }
         return archMapFragment;
     }
 
     private Fragment getListedBuildingFragment(){
 
-
         if (listedBuildingFragment == null){
-            listedBuildingFragment = new ListedBuildingsMapFragment();
+            listedBuildingFragment = new ListedBuildingMapFragment();
         }
         return listedBuildingFragment;
     }
@@ -171,5 +178,51 @@ public class MainActivity extends AppCompatActivity {
         return json;
     }
 
+    public void showBottomSheet() {
+        bottomDialogFragment =
+                BottomDialogFragment.newInstance();
+        bottomDialogFragment.show(getSupportFragmentManager(),
+                BottomDialogFragment.TAG);
+    }
 
+
+    @Override
+    public void onViewDirectionsClick() {
+
+        mapViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
+        Landmark lastClickedLandMark = mapViewModel.getLastClickedLandMark();
+
+        if (lastClickedLandMark!=null) {
+
+            Double latitude = lastClickedLandMark.getLatitude();
+            Double longitude = lastClickedLandMark.getLongitude();
+            String name = lastClickedLandMark.getName();
+
+            String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", latitude, longitude, name);
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+            intent.setPackage("com.google.android.apps.maps");
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException ex) {
+                try {
+                    Intent unrestrictedIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                    startActivity(unrestrictedIntent);
+                } catch (ActivityNotFoundException innerEx) {
+                    Toast.makeText(this, getResources().getString(R.string.please_install_maps), Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
+
+    }
+
+    @Override
+    public void onAddToFavouritesClick() {
+
+    }
+
+    @Override
+    public void onViewDetailsClick() {
+
+    }
 }

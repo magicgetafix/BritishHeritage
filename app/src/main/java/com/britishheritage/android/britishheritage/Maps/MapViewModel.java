@@ -24,7 +24,7 @@ public class MapViewModel extends AndroidViewModel {
     private Set<Landmark> hillfortsSet = new TreeSet<>();
 
     private HashMap<String, Landmark> landmarksHashMap = new HashMap<>();
-
+    private Landmark lastClickedLandMark = null;
 
     private MutableLiveData<Landmark> scheduledMonumentLiveData = new MutableLiveData<>();
     private MutableLiveData<Landmark> listedBuildingLiveData = new MutableLiveData<>();
@@ -134,5 +134,13 @@ public class MapViewModel extends AndroidViewModel {
 
     public HashMap<String, Landmark> getLandmarksHashMap() {
         return landmarksHashMap;
+    }
+
+    public Landmark getLastClickedLandMark() {
+        return lastClickedLandMark;
+    }
+
+    public void setLastClickedLandMark(Landmark landMark){
+        this.lastClickedLandMark = landMark;
     }
 }

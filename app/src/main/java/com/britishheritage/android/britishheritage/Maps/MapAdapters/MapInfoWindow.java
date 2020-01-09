@@ -25,9 +25,9 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
       String[] dataCSV = marker.getSnippet().split("//");
       String locationName = "";
       String typeOfLocation = "";
-      if (dataCSV.length == 4){
-        locationName = dataCSV[0];
-        typeOfLocation = dataCSV[3];
+      if (dataCSV.length == 5){
+        locationName = dataCSV[1];
+        typeOfLocation = dataCSV[4];
       }
 
       if (typeOfLocation.equalsIgnoreCase("Buildings")){

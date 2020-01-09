@@ -1,41 +1,36 @@
 package com.britishheritage.android.britishheritage.Maps;
 
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
+
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
-import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.net.Uri;
-import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
+import androidx.lifecycle.ViewModelProviders;
+import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import androidx.lifecycle.ViewModelProviders;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
+import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.Maps.LocationQueries.LatLngQuery;
 import com.britishheritage.android.britishheritage.Maps.MapAdapters.MapInfoWindow;
-import com.britishheritage.android.britishheritage.Model.Landmark;
-import com.britishheritage.android.britishheritage.Model.MapEntity;
+import com.britishheritage.android.britishheritage.Model.*;
 import com.britishheritage.android.britishheritage.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
-import im.delight.android.location.SimpleLocation;
+
 import timber.log.Timber;
 
-import java.util.*;
-
-public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCallback, LatLngQuery.LatLngResultListener {
+public class BaseMapFragment extends Fragment implements OnMapReadyCallback, LatLngQuery.LatLngResultListener {
 
     private MapViewModel mViewModel;
     private SupportMapFragment supportMapFragment;
@@ -43,48 +38,65 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
     private LatLng currentLatLng;
     private static LatLng newLatLng;
 
+    private static Bitmap hillIcon;
+    private static Bitmap monumentIcon;
+    private static Bitmap battleIcon;
     private static Bitmap buildingIcon;
     private static Bitmap parkIcon;
-    private View searchIcon;
+
     private EditText searchText;
+    private ImageView searchIcon;
     private LatLngQuery latLngQuery;
+    private float pixelDensityScale = 1.0f;
+    private int iconBmapWidthHeight = 20;
 
 
-    public static ListedBuildingsMapFragment newInstance(LatLng targetLatLng) {
+    public static BaseMapFragment newInstance(LatLng targetLatLng) {
         newLatLng = targetLatLng;
-        return new ListedBuildingsMapFragment();
+        return new BaseMapFragment();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.listed_buildings_map_fragment, container, false);
+        return inflater.inflate(R.layout.archaeology_map_fragment, container, false);
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mViewModel = ViewModelProviders.of(getActivity()).get(MapViewModel.class);
-        supportMapFragment =
-                (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_listed_buildings);
-        supportMapFragment.getMapAsync(this);
+        mViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
+        searchIcon = view.findViewById(R.id.arch_search_button);
+        searchText = view.findViewById(R.id.arch_searchbar);
 
+        // Get the screen's density scale
+        pixelDensityScale = getResources().getDisplayMetrics().density;
+        iconBmapWidthHeight = (int)(pixelDensityScale * 20 + 0.5f);
+
+        supportMapFragment =
+                (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_archaeology);
+        supportMapFragment.getMapAsync(this);
+        Location location = MyLocationProvider.getLastLocation(getActivity());
         if (newLatLng==null) {
-            Location location = MyLocationProvider.getLastLocation(getActivity());
             currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
         }
         else{
             currentLatLng = newLatLng;
         }
-        //setting up icon size
-        BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_museum_medium);
-        buildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 20, 20, false);
-        bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_park);
-        parkIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 20, 20, false);
 
-        searchIcon = view.findViewById(R.id.listed_buildings_search_button);
-        searchText = view.findViewById(R.id.listed_buildings_searchbar);
+        //setting up icon size
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_hill_silhouette_small);
+
+        hillIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
+        bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_battlefield);
+        battleIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
+        bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_menhir);
+        monumentIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
+        bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_museum_medium);
+        buildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
+        bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_park);
+        parkIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
+
 
         searchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,7 +111,6 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
                 }
             }
         });
-
     }
 
     public void searchForLatLng(String cityQuery){
@@ -108,7 +119,6 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
         }
         latLngQuery.searchForCity(cityQuery, this);
     }
-
 
     /**
      *
@@ -132,22 +142,28 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
         gMap.setMinZoomPreference(11);
         gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         gMap.moveCamera(CameraUpdateFactory.zoomTo(14));
-        gMap.setInfoWindowAdapter(new MapInfoWindow(getContext()));
         //moves map camera to current location
         gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+        gMap.setInfoWindowAdapter(new MapInfoWindow(getContext()));
 
-        for (Landmark landmark: mViewModel.getPublicGardensSet()){
+        for (Landmark landmark: mViewModel.getBattleFieldSet()){
             setUpMarker(landmark);
         }
-        for (Landmark landmark: mViewModel.getListedBuildingsSet()){
+        for (Landmark landmark: mViewModel.getHillfortsSet()){
+            setUpMarker(landmark);
+        }
+        for (Landmark landmark: mViewModel.getScheduledMonumentsSet()){
             setUpMarker(landmark);
         }
 
         setDragMapBehaviour(gMap);
 
         LatLng[] latLngs = getMapCorners(gMap);
-        mViewModel.getListedBuildingLiveData().observe(this, this::setUpMarker);
+        mViewModel.getScheduledMonumentLiveData().observe(this, this::setUpMarker);
+        mViewModel.getHillfortLiveData().observe(this, this::setUpMarker);
+        mViewModel.getBattleFieldLiveData().observe(this, this::setUpMarker);
         mViewModel.getPublicGardenLiveData().observe(this, this::setUpMarker);
+        mViewModel.getListedBuildingLiveData().observe(this, this::setUpMarker);
 
         mViewModel.getLandmarks(latLngs[0], latLngs[1]);
 
@@ -171,40 +187,27 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
                 double latitude = 0.0;
                 double longitude = 0.0;
                 String name = "";
-                if (snippetCSV.length == 4){
-                    name = snippetCSV[0];
-                    latitude = Double.parseDouble(snippetCSV[1]);
-                    longitude = Double.parseDouble(snippetCSV[2]);
+                String id = "";
+                String type = "";
+                if (snippetCSV.length == 5){
+                    id = snippetCSV[0];
+                    name = snippetCSV[1];
+                    latitude = Double.parseDouble(snippetCSV[2]);
+                    longitude = Double.parseDouble(snippetCSV[3]);
+                    type = snippetCSV[4];
+
+                    Landmark landmark = new Landmark(id,latitude, longitude, name, type);
+                    mViewModel.setLastClickedLandMark(landmark);
+                    showBottomSheet();
+
                 }
                 else{
                     Timber.e("Snippet wrong format");
                 }
-
-                String uri = String.format(Locale.ENGLISH, "http://maps.google.com/maps?daddr=%f,%f (%s)", latitude, longitude, name);
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                intent.setPackage("com.google.android.apps.maps");
-                try
-                {
-                    startActivity(intent);
-                }
-                catch(ActivityNotFoundException ex)
-                {
-                    try
-                    {
-                        Intent unrestrictedIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                        startActivity(unrestrictedIntent);
-                    }
-                    catch(ActivityNotFoundException innerEx)
-                    {
-                        Toast.makeText(getContext(), getResources().getString(R.string.please_install_maps), Toast.LENGTH_LONG).show();
-                    }
-                }
-
             }
         });
 
     }
-
 
 
     public void setDragMapBehaviour(final GoogleMap gMap){
@@ -220,28 +223,52 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
         });
     }
 
-
-
-
     private void setUpMarker(Landmark landmark){
 
         if (landmark == null){
-            Timber.d("Landmark is null in ArchaeologyMapFragment");
+            Timber.d("Landmark is null in BaseMapFragment");
             return;
         }
 
         Double entityLat = landmark.getLatitude();
         Double entityLong = landmark.getLongitude();
         LatLng entLatLng = new LatLng(entityLat, entityLong);
+        String name = landmark.getName();
+        String latitude = entityLat.toString();
+        String longitude = entityLong.toString();
+        String type = getString(R.string.scheduled_monument);
+        String id = landmark.getId();
+        String csvData = id+"//"+name+"//"+latitude+"//"+longitude+"//"+type;
 
-        if (landmark.getType().equals(Constants.LISTED_BUILDINGS_ID)){
+        if (landmark.getType().equals(Constants.SCHEDULED_MONUMENTS_ID)
+            && this instanceof ArchMapFragment){
 
-            String name = landmark.getName();
-            String latitude = entityLat.toString();
-            String longitude = entityLong.toString();
-            String type = getString(R.string.listed_building_string);
+            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(monumentIcon);
+            gMap.addMarker(new MarkerOptions().position(entLatLng)
+                    .icon(bitmapDescriptor)
+                    .snippet(csvData).draggable(false));
+        }
 
-            String csvData = name+"//"+latitude+"//"+longitude+"//"+type;
+        else if (landmark.getType().equals(Constants.HILLFORTS_ID)
+        && this instanceof ArchMapFragment){
+
+            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(hillIcon);
+            gMap.addMarker(new MarkerOptions().position(entLatLng)
+                    .icon(bitmapDescriptor)
+                    .snippet(csvData).draggable(false));
+        }
+
+        else if (landmark.getType().equals(Constants.BATTLEFIELDS_ID)
+        && this instanceof ArchMapFragment){
+
+            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(battleIcon);
+            gMap.addMarker(new MarkerOptions().position(entLatLng)
+                    .icon(bitmapDescriptor)
+                    .snippet(csvData).draggable(false));
+        }
+
+        else if (landmark.getType().equals(Constants.LISTED_BUILDINGS_ID)
+        && this instanceof ListedBuildingMapFragment){
 
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(buildingIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
@@ -249,14 +276,8 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
                     .snippet(csvData).draggable(false));
         }
 
-        else if (landmark.getType().equals(Constants.PARKS_AND_GARDENS_ID)){
-
-            String name = landmark.getName();
-            String latitude = entityLat.toString();
-            String longitude = entityLong.toString();
-            String type = getString(R.string.park);
-
-            String csvData = name+"//"+latitude+"//"+longitude+"//"+type;
+        else if (landmark.getType().equals(Constants.PARKS_AND_GARDENS_ID)
+        && this instanceof ListedBuildingMapFragment){
 
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(parkIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
@@ -275,6 +296,14 @@ public class ListedBuildingsMapFragment extends Fragment implements OnMapReadyCa
     @Override
     public void onError() {
         Toast.makeText(getContext(), "Couldn't find any location which matched your search term", Toast.LENGTH_LONG).show();
+
     }
 
+    public void showBottomSheet(){
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity!=null) {
+            mainActivity.showBottomSheet();
+        }
+    }
 }
