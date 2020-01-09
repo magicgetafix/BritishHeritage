@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements BottomDialogFragm
     private LiveData<Integer> databaseSizeLiveData;
     //private FirebaseDatabase database;
     private MapViewModel mapViewModel;
+    public static Landmark lastClickedLandmark = null;
 
     //To set up BottomNavigationView on select behaviour
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -189,8 +190,7 @@ public class MainActivity extends AppCompatActivity implements BottomDialogFragm
     @Override
     public void onViewDirectionsClick() {
 
-        mapViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
-        Landmark lastClickedLandMark = mapViewModel.getLastClickedLandMark();
+        Landmark lastClickedLandMark = lastClickedLandmark;
 
         if (lastClickedLandMark!=null) {
 

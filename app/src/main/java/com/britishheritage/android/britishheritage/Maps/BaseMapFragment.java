@@ -197,7 +197,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
                     type = snippetCSV[4];
 
                     Landmark landmark = new Landmark(id,latitude, longitude, name, type);
-                    mViewModel.setLastClickedLandMark(landmark);
+                    MainActivity.lastClickedLandmark = landmark;
                     showBottomSheet();
 
                 }
