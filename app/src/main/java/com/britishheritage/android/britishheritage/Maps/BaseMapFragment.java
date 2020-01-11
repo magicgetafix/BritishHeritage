@@ -238,11 +238,13 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         String longitude = entityLong.toString();
         String type = getString(R.string.scheduled_monument);
         String id = landmark.getId();
-        String csvData = id+"//"+name+"//"+latitude+"//"+longitude+"//"+type;
+        String csvData = id+"//"+name+"//"+latitude+"//"+longitude+"//";
 
         if (landmark.getType().equals(Constants.SCHEDULED_MONUMENTS_ID)
             && this instanceof ArchMapFragment){
 
+            type = getString(R.string.scheduled_monument);
+            csvData +=type;
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(monumentIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
                     .icon(bitmapDescriptor)
@@ -252,6 +254,8 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         else if (landmark.getType().equals(Constants.HILLFORTS_ID)
         && this instanceof ArchMapFragment){
 
+            type = getString(R.string.hillfort);
+            csvData +=type;
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(hillIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
                     .icon(bitmapDescriptor)
@@ -261,6 +265,8 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         else if (landmark.getType().equals(Constants.BATTLEFIELDS_ID)
         && this instanceof ArchMapFragment){
 
+            type = getString(R.string.battlefield);
+            csvData +=type;
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(battleIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
                     .icon(bitmapDescriptor)
@@ -270,6 +276,8 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         else if (landmark.getType().equals(Constants.LISTED_BUILDINGS_ID)
         && this instanceof ListedBuildingMapFragment){
 
+            type = getString(R.string.listedbuilding);
+            csvData +=type;
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(buildingIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
                     .icon(bitmapDescriptor)
@@ -279,6 +287,8 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         else if (landmark.getType().equals(Constants.PARKS_AND_GARDENS_ID)
         && this instanceof ListedBuildingMapFragment){
 
+            type = getString(R.string.park);
+            csvData +=type;
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(parkIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
                     .icon(bitmapDescriptor)
