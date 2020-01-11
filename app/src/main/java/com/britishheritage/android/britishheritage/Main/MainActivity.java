@@ -28,6 +28,7 @@ import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.LandmarkList;
 import com.britishheritage.android.britishheritage.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -219,10 +220,19 @@ public class MainActivity extends AppCompatActivity implements BottomDialogFragm
     @Override
     public void onAddToFavouritesClick() {
 
+        if (lastClickedLandmark!=null) {
+            databaseInteractor.addFavourite(lastClickedLandmark);
+            showSnackbar(getString(R.string.added_to_favourites));
+        }
+
     }
 
     @Override
     public void onViewDetailsClick() {
 
+    }
+
+    public void showSnackbar(String message){
+        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
     }
 }

@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 
 import com.britishheritage.android.britishheritage.Daos.LandmarkDao;
 import com.britishheritage.android.britishheritage.Global.Constants;
+import com.britishheritage.android.britishheritage.Model.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -12,12 +13,16 @@ import java.util.List;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Room;
+import io.reactivex.Flowable;
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class DatabaseInteractor {
 
     private static DatabaseInteractor instance;
     private Context context;
     private LandmarkDatabase db;
+    private Realm realm;
 
     public static DatabaseInteractor getInstance(Context context){
         if (instance == null){
@@ -29,6 +34,7 @@ public class DatabaseInteractor {
     public DatabaseInteractor(Context context){
         this.context = context;
         db = Room.databaseBuilder(context, LandmarkDatabase.class, Constants.DATABASE_NAME).build();
+        realm = Realm.getDefaultInstance();
     }
 
     public void addAllLandmarks(List<Landmark> landmarks){
@@ -67,5 +73,20 @@ public class DatabaseInteractor {
         double maxLong = topRightLatLng.longitude;
         double minLong = bottomLeftLatLng.longitude;
         return db.landmarkDao().getNearestLandmarks(maxLat, minLat, maxLong, minLong);
+    }
+
+    public void addFavourite(Landmark landmark){
+
+        FavouriteLandmarkRealmObj favourite = new FavouriteLandmarkRealmObj(landmark);
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(favourite);
+
+    }
+
+    public Flowable<FavouriteLandmarkRealmObj> getFavourites(){
+
+        RealmResults<FavouriteLandmarkRealmObj> realmResults =
+                realm.where(FavouriteLandmarkRealmObj.class).findAllAsync();
+        return Flowable.fromIterable(realmResults);
     }
 }

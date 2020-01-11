@@ -7,9 +7,10 @@
     <string name="listedbuilding">Listed Building</string>
     <string name="battlefield">Battlefield</string>
     <string name="scheduled_monument">Scheduled Monument</string>
-    <string name="hilfort">Hillfort</string>
+    <string name="hillfort">Hillfort</string>
     <string name="arch_map">Monuments</string>
     <string name="listed_building_string">Buildings</string>
     <string name="home">Home</string>
+    <string name="added_to_favourites">Added to favourites</string>
 
 </resources>

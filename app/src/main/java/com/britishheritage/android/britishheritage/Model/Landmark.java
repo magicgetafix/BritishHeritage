@@ -24,6 +24,8 @@ public class Landmark implements Comparable{
   //Room requires empty constructor
   public Landmark(){
 
+    
+
   }
 
   @Ignore
