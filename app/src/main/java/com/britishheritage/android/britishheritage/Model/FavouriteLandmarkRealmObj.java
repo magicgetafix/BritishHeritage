@@ -1,7 +1,7 @@
 package com.britishheritage.android.britishheritage.Model;
 
-import androidx.room.PrimaryKey;
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 public class FavouriteLandmarkRealmObj extends RealmObject {
 

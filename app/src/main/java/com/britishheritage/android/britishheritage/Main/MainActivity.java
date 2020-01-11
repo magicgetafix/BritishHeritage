@@ -222,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements BottomDialogFragm
 
         if (lastClickedLandmark!=null) {
             databaseInteractor.addFavourite(lastClickedLandmark);
+            bottomDialogFragment.dismiss();
             showSnackbar(getString(R.string.added_to_favourites));
         }
 

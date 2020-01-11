@@ -34,6 +34,7 @@ public class DatabaseInteractor {
     public DatabaseInteractor(Context context){
         this.context = context;
         db = Room.databaseBuilder(context, LandmarkDatabase.class, Constants.DATABASE_NAME).build();
+        Realm.init(context);
         realm = Realm.getDefaultInstance();
     }
 
@@ -80,6 +81,7 @@ public class DatabaseInteractor {
         FavouriteLandmarkRealmObj favourite = new FavouriteLandmarkRealmObj(landmark);
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(favourite);
+        realm.commitTransaction();
 
     }
 
