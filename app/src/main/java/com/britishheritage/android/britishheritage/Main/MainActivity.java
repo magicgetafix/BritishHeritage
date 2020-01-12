@@ -162,12 +162,14 @@ public class MainActivity extends AppCompatActivity implements BottomDialogFragm
             }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(finished->{
                 progressBar.setVisibility(View.INVISIBLE);
                 navigationView.setOnNavigationItemSelectedListener(navListener);
+                navigationView.setSelectedItemId(R.id.home);
             });
 
         }
         else{
             progressBar.setVisibility(View.INVISIBLE);
             navigationView.setOnNavigationItemSelectedListener(navListener);
+            navigationView.setSelectedItemId(R.id.home);
         }
 
     }
