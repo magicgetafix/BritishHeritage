@@ -3,9 +3,12 @@
     <color name="colorPrimary">#04c4ce</color>
     <color name="colorPrimaryDark">#027e84</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="transColorAccent">#83D81B60</color>
+    <color name="transColorAccent">#80D81B60</color>
+    <color name="trans_overlay">#4DD81B60</color>
     <color name="semitranswhite">#c8ffffff</color>
     <color name="transparent">#00FFFFFF</color>
     <color name="black">#050505</color>
     <color name="grey">#7A7A7A</color>
+    <color name="trans_white">#B3FFFFFF</color>
+    <color name="white">#FFFFFF</color>
 </resources>

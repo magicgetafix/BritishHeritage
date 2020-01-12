@@ -16,6 +16,7 @@ import androidx.room.Room;
 import io.reactivex.Flowable;
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class DatabaseInteractor {
 
@@ -85,10 +86,9 @@ public class DatabaseInteractor {
 
     }
 
-    public Flowable<FavouriteLandmarkRealmObj> getFavourites(){
-
-        RealmResults<FavouriteLandmarkRealmObj> realmResults =
-                realm.where(FavouriteLandmarkRealmObj.class).findAllAsync();
-        return Flowable.fromIterable(realmResults);
+    public RealmResults<FavouriteLandmarkRealmObj> getFavourites(){
+        return realm.where(FavouriteLandmarkRealmObj.class)
+                .sort("latitude", Sort.DESCENDING)
+                .findAllAsync();
     }
 }

@@ -5,12 +5,20 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import io.reactivex.FlowableSubscriber;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
+
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
+import com.britishheritage.android.britishheritage.Model.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.GeoMarker;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.google.android.gms.maps.model.LatLng;
 
+
+import org.reactivestreams.Subscription;
 
 import java.util.*;
 
@@ -32,12 +40,17 @@ public class MapViewModel extends AndroidViewModel {
     private MutableLiveData<Landmark> battleFieldLiveData = new MutableLiveData<>();
     private MutableLiveData<Landmark> hillfortLiveData = new MutableLiveData<>();
 
+    private List<FavouriteLandmarkRealmObj> favouritesList;
+    private MutableLiveData<List<FavouriteLandmarkRealmObj>> favouritesListLiveData = new MutableLiveData<>();
+
 
     private DatabaseInteractor databaseInteractor;
 
     public MapViewModel(@NonNull Application application) {
         super(application);
         databaseInteractor = DatabaseInteractor.getInstance(getApplication().getApplicationContext());
+        favouritesList = new ArrayList<>();
+
 
     }
 
@@ -136,11 +149,5 @@ public class MapViewModel extends AndroidViewModel {
         return landmarksHashMap;
     }
 
-    public Landmark getLastClickedLandMark() {
-        return lastClickedLandMark;
-    }
 
-    public void setLastClickedLandMark(Landmark landMark){
-        this.lastClickedLandMark = landMark;
-    }
 }

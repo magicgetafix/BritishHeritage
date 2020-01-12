@@ -24,8 +24,14 @@ public class Landmark implements Comparable{
   //Room requires empty constructor
   public Landmark(){
 
-    
+  }
 
+  public Landmark(FavouriteLandmarkRealmObj favouriteLandmark){
+    this.id = favouriteLandmark.getId();
+    this.latitude = favouriteLandmark.getLatitude();
+    this.longitude = favouriteLandmark.getLongitude();
+    this.type = favouriteLandmark.getType();
+    this.name = favouriteLandmark.getName();
   }
 
   @Ignore

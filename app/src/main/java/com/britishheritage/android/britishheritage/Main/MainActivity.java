@@ -6,6 +6,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
@@ -24,6 +25,7 @@ import com.britishheritage.android.britishheritage.Main.Dialogs.BottomDialogFrag
 import com.britishheritage.android.britishheritage.Maps.ArchMapFragment;
 import com.britishheritage.android.britishheritage.Maps.ListedBuildingMapFragment;
 import com.britishheritage.android.britishheritage.Maps.MapViewModel;
+import com.britishheritage.android.britishheritage.Model.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.LandmarkList;
 import com.britishheritage.android.britishheritage.R;
@@ -33,12 +35,18 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Locale;
 
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.realm.RealmChangeListener;
+import io.realm.RealmObject;
+import io.realm.RealmResults;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements BottomDialogFragment.ItemClickListener {
@@ -55,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements BottomDialogFragm
     private ProgressBar progressBar;
     private LiveData<Integer> databaseSizeLiveData;
     //private FirebaseDatabase database;
-    private MapViewModel mapViewModel;
     public static Landmark lastClickedLandmark = null;
 
     //To set up BottomNavigationView on select behaviour
@@ -130,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements BottomDialogFragm
         frameLayout = findViewById(R.id.main_frame_layout);
         navigationView = findViewById(R.id.main_navigation);
         progressBar = findViewById(R.id.main_progress_bar);
+
 
         Location location = MyLocationProvider.getLastLocation(this);
         databaseInteractor = DatabaseInteractor.getInstance(getApplicationContext());
@@ -234,6 +242,7 @@ public class MainActivity extends AppCompatActivity implements BottomDialogFragm
     }
 
     public void showSnackbar(String message){
-        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(findViewById(R.id.main_frame_layout), message, Snackbar.LENGTH_SHORT).show();
     }
+
 }

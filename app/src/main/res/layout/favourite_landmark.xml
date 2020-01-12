@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.card.MaterialCardView
+        android:clipChildren="true"
+        app:cardCornerRadius="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/favourites_constraint_layout"
+            android:layout_width="160dp"
+            android:layout_height="120dp"
+            android:background="@color/transColorAccent">
+
+            <View
+                android:id="@+id/park_garden_background"
+                android:background="@drawable/park_sunset"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <View
+                android:id="@+id/battlefield_background"
+                android:background="@drawable/civil_war"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <View
+                android:id="@+id/hillfort_background"
+                android:background="@drawable/hillfort_background"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <View
+                android:id="@+id/monument_background"
+                android:background="@drawable/brodgar_standing_stones"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <View
+                android:id="@+id/listed_building_background"
+                android:background="@drawable/chester_clock"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <View
+                android:background="@color/trans_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <TextView
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"
+                android:shadowColor="@color/black"
+                android:id="@+id/favourites_text_view"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                tools:text="Round Cairn and Kerbed Cairn 300m North East of Blackrock Farm"
+                android:textColor="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="0dp"
+                android:maxLines="4"
+                android:ellipsize="end"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</android.support.constraint.ConstraintLayout>
