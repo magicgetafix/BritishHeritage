@@ -36,6 +36,7 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
 
     @Override
     public void onChange(RealmResults<FavouriteLandmarkRealmObj> favouriteLandmarkRealmObjs) {
+        favouriteLandmarkList.clear();
         Iterator<FavouriteLandmarkRealmObj> favouriteObjIterator = favouriteLandmarkRealmObjs.iterator();
         while (favouriteObjIterator.hasNext()){
             FavouriteLandmarkRealmObj favouriteLandmarkRealmObj = favouriteObjIterator.next();

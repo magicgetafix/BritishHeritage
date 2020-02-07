@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LandmarkDetails.LandmarkActivity">
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <fragment
+                android:id="@+id/landmark_map"
+                class="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/landmark_check_in_button"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_marginTop="220dp"
+                android:layout_marginEnd="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:elevation="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/landmark_check_in_button_text"
+                app:srcCompat="@color/colorAccent" />
+
+            <TextView
+                android:text="@string/press_the_button_to_check_in"
+                android:id="@+id/landmark_check_in_button_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/landmark_map"
+                app:layout_constraintStart_toStartOf="parent"
+                android:background="@drawable/color_accent_gradient_long"
+                android:padding="10dp"
+                android:paddingEnd="100dp"
+                android:paddingStart="40dp"
+                />
+
+            <TextView
+                android:id="@+id/landmark_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                style="@style/MainTextStyle"
+                tools:text="Church Cross; in Churchyard; 10 Metres South of Church of St Andrew"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/landmark_check_in_button_text" />
+
+            <TextView
+                android:text="@string/point_of_interest"
+                android:id="@+id/landmark_point_of_interest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/landmark_title"
+                app:layout_constraintStart_toStartOf="parent"
+                android:background="@drawable/color_accent_gradient2"
+                android:padding="10dp"
+                android:paddingEnd="100dp"
+                android:paddingStart="40dp"
+                />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/landmark_geonames_recylerview"
+                app:layout_constraintTop_toBottomOf="@id/landmark_point_of_interest"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <TextView
+                android:text="@string/landmark_user_description"
+                android:id="@+id/landmark_suggestions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/landmark_geonames_recylerview"
+                app:layout_constraintStart_toStartOf="parent"
+                android:background="@drawable/color_accent_gradient"
+                android:padding="10dp"
+                android:paddingEnd="100dp"
+                android:paddingStart="40dp"
+                />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/landmark_user_descriptions_recylerview"
+                app:layout_constraintTop_toBottomOf="@id/landmark_suggestions"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

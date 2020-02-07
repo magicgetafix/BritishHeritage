@@ -1,5 +1,8 @@
 package com.britishheritage.android.britishheritage.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -7,7 +10,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "LANDMARK_TABLE")
-public class Landmark implements Comparable{
+public class Landmark implements Comparable, Parcelable {
 
   @PrimaryKey
   @NonNull
@@ -32,6 +35,15 @@ public class Landmark implements Comparable{
     this.longitude = favouriteLandmark.getLongitude();
     this.type = favouriteLandmark.getType();
     this.name = favouriteLandmark.getName();
+  }
+
+
+  protected Landmark(Parcel in) {
+    id = in.readString();
+    latitude = in.readByte() == 0x00 ? null : in.readDouble();
+    longitude = in.readByte() == 0x00 ? null : in.readDouble();
+    name = in.readString();
+    type = in.readString();
   }
 
   @Ignore
@@ -102,4 +114,41 @@ public class Landmark implements Comparable{
     }
     return value;
   }
+
+  @Override
+  public int describeContents() {
+    return 0;
+  }
+
+  @Override
+  public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(id);
+    if (latitude == null) {
+      dest.writeByte((byte) (0x00));
+    } else {
+      dest.writeByte((byte) (0x01));
+      dest.writeDouble(latitude);
+    }
+    if (longitude == null) {
+      dest.writeByte((byte) (0x00));
+    } else {
+      dest.writeByte((byte) (0x01));
+      dest.writeDouble(longitude);
+    }
+    dest.writeString(name);
+    dest.writeString(type);
+  }
+
+  @SuppressWarnings("unused")
+  public static final Parcelable.Creator<Landmark> CREATOR = new Parcelable.Creator<Landmark>() {
+    @Override
+    public Landmark createFromParcel(Parcel in) {
+      return new Landmark(in);
+    }
+
+    @Override
+    public Landmark[] newArray(int size) {
+      return new Landmark[size];
+    }
+  };
 }

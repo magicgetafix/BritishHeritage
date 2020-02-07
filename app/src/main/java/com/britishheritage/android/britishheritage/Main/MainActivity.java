@@ -6,11 +6,9 @@ import android.location.Location;
 import android.net.Uri;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AbsListView;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -18,9 +16,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
 
+import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
 import com.britishheritage.android.britishheritage.Home.HomeFragment;
+import com.britishheritage.android.britishheritage.LandmarkDetails.LandmarkActivity;
 import com.britishheritage.android.britishheritage.Main.Dialogs.BottomDialogFragment;
 import com.britishheritage.android.britishheritage.Maps.ArchMapFragment;
 import com.britishheritage.android.britishheritage.Maps.ListedBuildingMapFragment;
@@ -49,7 +49,7 @@ import io.realm.RealmObject;
 import io.realm.RealmResults;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements BottomDialogFragment.ItemClickListener {
+public class MainActivity extends BaseActivity implements BottomDialogFragment.ItemClickListener {
 
     private FrameLayout frameLayout;
     private BottomNavigationView navigationView;
@@ -240,6 +240,10 @@ public class MainActivity extends AppCompatActivity implements BottomDialogFragm
 
     @Override
     public void onViewDetailsClick() {
+
+        if (lastClickedLandmark!=null){
+            navigateWithLandmark(LandmarkActivity.class, lastClickedLandmark);
+        }
 
     }
 
