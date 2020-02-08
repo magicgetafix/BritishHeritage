@@ -2,9 +2,19 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@drawable/avebury"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".LandmarkDetails.LandmarkActivity">
+
+    <View
+        android:background="@color/trans_white"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <ScrollView
         android:id="@+id/scrollView2"
@@ -44,6 +54,7 @@
                 app:srcCompat="@color/colorAccent" />
 
             <TextView
+                android:textSize="18sp"
                 android:text="@string/press_the_button_to_check_in"
                 android:id="@+id/landmark_check_in_button_text"
                 android:layout_width="match_parent"
@@ -57,6 +68,7 @@
                 />
 
             <TextView
+                android:background="@color/trans_white"
                 android:id="@+id/landmark_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -67,6 +79,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/landmark_check_in_button_text" />
 
             <TextView
+                android:textSize="18sp"
                 android:text="@string/point_of_interest"
                 android:id="@+id/landmark_point_of_interest"
                 android:layout_width="match_parent"
@@ -88,6 +101,7 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
+                android:textSize="18sp"
                 android:text="@string/landmark_user_description"
                 android:id="@+id/landmark_suggestions"
                 android:layout_width="match_parent"

@@ -2,6 +2,7 @@ package com.britishheritage.android.britishheritage.LandmarkDetails;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.R;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class LandmarkActivity extends AppCompatActivity {
@@ -24,6 +26,7 @@ public class LandmarkActivity extends AppCompatActivity {
     private RecyclerView geoNamesRecyclerView;
     private TextView userSuggestionsTitleTV;
     private RecyclerView userDescriptionsRecyclerView;
+    private LandmarkViewModel landmarkViewModel;
 
 
     @Override
@@ -44,6 +47,15 @@ public class LandmarkActivity extends AppCompatActivity {
         geoNamesRecyclerView = findViewById(R.id.landmark_geonames_recylerview);
         userSuggestionsTitleTV = findViewById(R.id.landmark_suggestions);
         userDescriptionsRecyclerView = findViewById(R.id.landmark_user_descriptions_recylerview);
+
+        String name = mainLandmark.getName();
+        if (name!=null) {
+            landmarkTitleTV.setText(name);
+        }
+
+        landmarkViewModel = ViewModelProviders.of(this).get(LandmarkViewModel.class);
+        LatLng latLng = new LatLng(mainLandmark.latitude, mainLandmark.longitude);
+        landmarkViewModel.getWikiGeocodeData(latLng);
     }
 
 

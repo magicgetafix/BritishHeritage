@@ -49,6 +49,7 @@ dependencies {
     //core RxJava dependecies
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     //Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
     //location manager
@@ -58,6 +59,11 @@ dependencies {
     //Room
     def room_version = "2.2.0-alpha02"
     annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    //Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.6.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
 
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version"

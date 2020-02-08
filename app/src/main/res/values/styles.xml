@@ -21,6 +21,7 @@
     </style>
 
     <style name="MainTextStyle">
+        <item name="android:textSize">16sp</item>
         <item name="android:paddingStart">40dp</item>
         <item name="android:paddingEnd">20dp</item>
         <item name="android:paddingTop">16dp</item>

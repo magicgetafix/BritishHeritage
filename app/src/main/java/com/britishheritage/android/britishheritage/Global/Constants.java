@@ -13,4 +13,9 @@ public class Constants {
     public final static String GEO_FIRE_DATABASE_REF = "geo_location";
     public final static String LANDMARK_REF = "landmarks";
     public final static String DATABASE_NAME = "landmarks";
+
+    //for geocode api
+    public final static String GEOCODE_USERNAME = "britishheritage";
+    public final static String GEOCODE_STYLE = "full";
+
 }
