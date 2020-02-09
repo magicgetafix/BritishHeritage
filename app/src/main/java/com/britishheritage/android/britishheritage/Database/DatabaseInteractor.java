@@ -5,18 +5,21 @@ import android.os.AsyncTask;
 
 import com.britishheritage.android.britishheritage.Daos.LandmarkDao;
 import com.britishheritage.android.britishheritage.Global.Constants;
-import com.britishheritage.android.britishheritage.Model.FavouriteLandmarkRealmObj;
+import com.britishheritage.android.britishheritage.Model.Realm.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
-import com.britishheritage.android.britishheritage.Model.WikiLandmarkRealmObj;
+import com.britishheritage.android.britishheritage.Model.Realm.WikiLandmarkRealmObj;
+import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.Response.Geoname;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Room;
-import io.reactivex.Flowable;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
@@ -38,7 +41,17 @@ public class DatabaseInteractor {
         this.context = context;
         db = Room.databaseBuilder(context, LandmarkDatabase.class, Constants.DATABASE_NAME).build();
         Realm.init(context);
-        realm = Realm.getDefaultInstance();
+        try{
+            realm = Realm.getDefaultInstance();
+
+        }catch (Exception e){
+
+            // Get a Realm instance for this thread
+            RealmConfiguration config = new RealmConfiguration.Builder()
+                    .deleteRealmIfMigrationNeeded()
+                    .build();
+            realm = Realm.getInstance(config);
+        }
     }
 
     public void addAllLandmarks(List<Landmark> landmarks){
@@ -94,11 +107,26 @@ public class DatabaseInteractor {
                 .findAllAsync();
     }
 
-    public void addWikiLandmark(Geoname geoname){
+    public void addWikiLandmarks(List<Geoname> geonameList){
 
-        WikiLandmarkRealmObj wikiLandmark = new WikiLandmarkRealmObj(geoname);
         realm.beginTransaction();
-        realm.copyToRealmOrUpdate(wikiLandmark);
+        for (Geoname geoname: geonameList){
+            WikiLandmarkRealmObj wikiLandmark = new WikiLandmarkRealmObj(geoname);
+            realm.copyToRealmOrUpdate(wikiLandmark);
+        }
         realm.commitTransaction();
+    }
+
+    public RealmResults<WikiLandmarkRealmObj> getNearbyWikiLandmarks(LatLng latLng){
+
+        BigDecimal bigDecimalLat = new BigDecimal(latLng.latitude).setScale(1, RoundingMode.HALF_DOWN);
+        BigDecimal bigDecimalLng = new BigDecimal(latLng.longitude).setScale(1, RoundingMode.HALF_DOWN);
+
+        return realm.where(WikiLandmarkRealmObj.class)
+                .equalTo("lat", bigDecimalLat.doubleValue())
+                .equalTo("lng", bigDecimalLng.doubleValue())
+                .sort("title", Sort.ASCENDING)
+                .findAll();
+
     }
 }

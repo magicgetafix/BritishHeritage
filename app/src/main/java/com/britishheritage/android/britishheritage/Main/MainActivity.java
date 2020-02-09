@@ -24,8 +24,6 @@ import com.britishheritage.android.britishheritage.LandmarkDetails.LandmarkActiv
 import com.britishheritage.android.britishheritage.Main.Dialogs.BottomDialogFragment;
 import com.britishheritage.android.britishheritage.Maps.ArchMapFragment;
 import com.britishheritage.android.britishheritage.Maps.ListedBuildingMapFragment;
-import com.britishheritage.android.britishheritage.Maps.MapViewModel;
-import com.britishheritage.android.britishheritage.Model.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.LandmarkList;
 import com.britishheritage.android.britishheritage.R;
@@ -35,18 +33,11 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Locale;
 
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import io.realm.RealmChangeListener;
-import io.realm.RealmObject;
-import io.realm.RealmResults;
 import timber.log.Timber;
 
 public class MainActivity extends BaseActivity implements BottomDialogFragment.ItemClickListener {
@@ -137,7 +128,6 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
         frameLayout = findViewById(R.id.main_frame_layout);
         navigationView = findViewById(R.id.main_navigation);
         progressBar = findViewById(R.id.main_progress_bar);
-
 
         Location location = MyLocationProvider.getLastLocation(this);
         databaseInteractor = DatabaseInteractor.getInstance(getApplicationContext());

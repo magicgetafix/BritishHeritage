@@ -3,22 +3,14 @@ package com.britishheritage.android.britishheritage.Maps;
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import io.reactivex.FlowableSubscriber;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import timber.log.Timber;
 
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
-import com.britishheritage.android.britishheritage.Model.FavouriteLandmarkRealmObj;
-import com.britishheritage.android.britishheritage.Model.GeoMarker;
+import com.britishheritage.android.britishheritage.Model.Realm.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.google.android.gms.maps.model.LatLng;
 
-
-import org.reactivestreams.Subscription;
 
 import java.util.*;
 

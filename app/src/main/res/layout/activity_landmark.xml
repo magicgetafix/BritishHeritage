@@ -68,7 +68,8 @@
                 />
 
             <TextView
-                android:background="@color/trans_white"
+                android:background="@color/white"
+                android:textColor="@color/black"
                 android:id="@+id/landmark_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -93,6 +94,8 @@
                 />
 
             <androidx.recyclerview.widget.RecyclerView
+                android:paddingStart="30dp"
+                android:clipToPadding="false"
                 android:id="@+id/landmark_geonames_recylerview"
                 app:layout_constraintTop_toBottomOf="@id/landmark_point_of_interest"
                 app:layout_constraintStart_toStartOf="parent"
@@ -101,18 +104,18 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
-                android:textSize="18sp"
-                android:text="@string/landmark_user_description"
                 android:id="@+id/landmark_suggestions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/landmark_geonames_recylerview"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/color_accent_gradient"
                 android:padding="10dp"
-                android:paddingEnd="100dp"
                 android:paddingStart="40dp"
-                />
+                android:paddingEnd="100dp"
+                android:text="@string/landmark_user_description"
+                android:textSize="18sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/landmark_geonames_recylerview" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/landmark_user_descriptions_recylerview"

@@ -2,6 +2,7 @@
 <resources>
     <color name="colorPrimary">#04c4ce</color>
     <color name="colorPrimaryDark">#027e84</color>
+    <color name="colorPrimaryTrans">#8004C4CE</color>
     <color name="colorAccent">#D81B60</color>
     <color name="transColorAccent">#80D81B60</color>
     <color name="trans_overlay">#4DD81B60</color>

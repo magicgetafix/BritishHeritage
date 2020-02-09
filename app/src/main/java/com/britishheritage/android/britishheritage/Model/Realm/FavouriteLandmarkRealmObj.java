@@ -1,4 +1,6 @@
-package com.britishheritage.android.britishheritage.Model;
+package com.britishheritage.android.britishheritage.Model.Realm;
+
+import com.britishheritage.android.britishheritage.Model.Landmark;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

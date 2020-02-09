@@ -3,7 +3,7 @@ package com.britishheritage.android.britishheritage.Main;
 import android.app.Application;
 
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
-import com.britishheritage.android.britishheritage.Model.FavouriteLandmarkRealmObj;
+import com.britishheritage.android.britishheritage.Model.Realm.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 
 import java.util.ArrayList;
@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 

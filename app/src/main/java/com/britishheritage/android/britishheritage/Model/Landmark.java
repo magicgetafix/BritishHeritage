@@ -3,6 +3,8 @@ package com.britishheritage.android.britishheritage.Model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.britishheritage.android.britishheritage.Model.Realm.FavouriteLandmarkRealmObj;
+
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;

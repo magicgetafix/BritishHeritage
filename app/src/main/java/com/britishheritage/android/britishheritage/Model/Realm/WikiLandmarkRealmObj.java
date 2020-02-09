@@ -1,4 +1,4 @@
-package com.britishheritage.android.britishheritage.Model;
+package com.britishheritage.android.britishheritage.Model.Realm;
 
 import android.text.Html;
 
@@ -29,12 +29,13 @@ public class WikiLandmarkRealmObj extends RealmObject {
 
         this.url = geoname.getWikipediaUrl();
         String summary = geoname.getSummary();
-        summary = Html.escapeHtml(summary);
+        summary = Html.fromHtml(summary).toString();
         //removing any weblinks
         summary = summary.replaceAll(Constants.URL_REGEX, "");
         String dots = "(...)";
         if (summary.contains(dots)){
             summary = summary.substring(0, summary.length()-dots.length());
+            summary = summary.trim();
             String finalCharacter = String.valueOf(summary.charAt(summary.length()-1));
             if (!finalCharacter.equalsIgnoreCase(".")){
                 summary = summary+"...";
@@ -44,9 +45,9 @@ public class WikiLandmarkRealmObj extends RealmObject {
         this.title = geoname.getTitle();
         //latitude and longitude of two decimal places are accurate to a km- this will allow us to index by more results
         //from around the area
-        BigDecimal bigDecimalLat = new BigDecimal(geoname.getLat()).setScale(2, RoundingMode.DOWN);
+        BigDecimal bigDecimalLat = new BigDecimal(geoname.getLat()).setScale(1, RoundingMode.HALF_DOWN);
         this.lat = bigDecimalLat.doubleValue();
-        BigDecimal bigDecimalLng = new BigDecimal(geoname.getLng()).setScale(2, RoundingMode.DOWN);
+        BigDecimal bigDecimalLng = new BigDecimal(geoname.getLng()).setScale(1, RoundingMode.HALF_DOWN);
         this.lng = bigDecimalLng.doubleValue();
     }
 
