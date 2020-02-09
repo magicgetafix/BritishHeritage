@@ -10,16 +10,16 @@ public class Geoname {
     private String summary;
     @SerializedName("elevation")
     @Expose
-    private Integer elevation;
+    private Number elevation;
     @SerializedName("lng")
     @Expose
-    private Double lng;
+    private Number lng;
     @SerializedName("distance")
     @Expose
     private String distance;
     @SerializedName("rank")
     @Expose
-    private Integer rank;
+    private Number rank;
     @SerializedName("lang")
     @Expose
     private String lang;
@@ -28,7 +28,7 @@ public class Geoname {
     private String title;
     @SerializedName("lat")
     @Expose
-    private Double lat;
+    private Number lat;
     @SerializedName("wikipediaUrl")
     @Expose
     private String wikipediaUrl;
@@ -47,19 +47,19 @@ public class Geoname {
         this.summary = summary;
     }
 
-    public Integer getElevation() {
-        return elevation;
+    public int getElevation() {
+        return elevation.intValue();
     }
 
-    public void setElevation(Integer elevation) {
+    public void setElevation(Number elevation) {
         this.elevation = elevation;
     }
 
-    public Double getLng() {
-        return lng;
+    public double getLng() {
+        return lng.doubleValue();
     }
 
-    public void setLng(Double lng) {
+    public void setLng(Number lng) {
         this.lng = lng;
     }
 
@@ -71,11 +71,11 @@ public class Geoname {
         this.distance = distance;
     }
 
-    public Integer getRank() {
-        return rank;
+    public int getRank() {
+        return rank.intValue();
     }
 
-    public void setRank(Integer rank) {
+    public void setRank(Number rank) {
         this.rank = rank;
     }
 
@@ -95,11 +95,11 @@ public class Geoname {
         this.title = title;
     }
 
-    public Double getLat() {
-        return lat;
+    public double getLat() {
+        return lat.doubleValue();
     }
 
-    public void setLat(Double lat) {
+    public void setLat(Number lat) {
         this.lat = lat;
     }
 

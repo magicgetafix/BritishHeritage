@@ -7,6 +7,8 @@ import com.britishheritage.android.britishheritage.Daos.LandmarkDao;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Model.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
+import com.britishheritage.android.britishheritage.Model.WikiLandmarkRealmObj;
+import com.britishheritage.android.britishheritage.Response.Geoname;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
@@ -90,5 +92,13 @@ public class DatabaseInteractor {
         return realm.where(FavouriteLandmarkRealmObj.class)
                 .sort("latitude", Sort.DESCENDING)
                 .findAllAsync();
+    }
+
+    public void addWikiLandmark(Geoname geoname){
+
+        WikiLandmarkRealmObj wikiLandmark = new WikiLandmarkRealmObj(geoname);
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(wikiLandmark);
+        realm.commitTransaction();
     }
 }

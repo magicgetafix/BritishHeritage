@@ -17,5 +17,5 @@ public class Constants {
     //for geocode api
     public final static String GEOCODE_USERNAME = "britishheritage";
     public final static String GEOCODE_STYLE = "full";
-
+    public final static String URL_REGEX = "(?:www|https?)[^\\s]+";
 }
