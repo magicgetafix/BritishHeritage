@@ -67,7 +67,7 @@ public class WikiLandmarkAdapter extends RecyclerView.Adapter<WikiLandmarkAdapte
                 titleTextView.setText(wikilandmark.getTitle());
                 summaryTextView.setText(wikilandmark.getSummary());
             }
-            itemView.setOnClickListener(new View.OnClickListener() {
+            this.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (wikiLandmarkClickListener!=null){

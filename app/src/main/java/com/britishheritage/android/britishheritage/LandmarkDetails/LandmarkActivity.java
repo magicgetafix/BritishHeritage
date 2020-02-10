@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -15,6 +16,7 @@ import com.britishheritage.android.britishheritage.Main.FavouritesAdapter;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.R;
+import com.britishheritage.android.britishheritage.WebActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -32,6 +34,7 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
     private RecyclerView userDescriptionsRecyclerView;
     private LandmarkViewModel landmarkViewModel;
     private RecyclerView.LayoutManager layoutManager;
+    public static final String WIKI_URL_KEY = "british_heritage_wiki_url";
 
 
     @Override
@@ -60,7 +63,6 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
             if (getSupportActionBar()!=null) {
                 getSupportActionBar().setTitle(name);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                getSupportActionBar().setHomeButtonEnabled(true);
             }
         }
 
@@ -86,5 +88,17 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
     @Override
     public void onItemClick(String url) {
         //todo set up on click
+        Intent wikiWebViewIntent = new Intent(this, WebActivity.class);
+        wikiWebViewIntent.putExtra(WIKI_URL_KEY, url);
+        startActivity(wikiWebViewIntent);
     }
+
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+
 }

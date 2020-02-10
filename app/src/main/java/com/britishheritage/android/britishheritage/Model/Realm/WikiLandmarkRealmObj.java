@@ -27,7 +27,14 @@ public class WikiLandmarkRealmObj extends RealmObject {
 
     public WikiLandmarkRealmObj(Geoname geoname){
 
-        this.url = geoname.getWikipediaUrl();
+        String webUrl = geoname.getWikipediaUrl();
+        if (webUrl.length()>5) {
+            String startOfUrl = webUrl.substring(0, 5);
+            if (!startOfUrl.contains("http") && !startOfUrl.contains("HTTP")){
+                webUrl = "https://"+webUrl;
+            }
+        }
+        this.url = webUrl;
         String summary = geoname.getSummary();
         summary = Html.fromHtml(summary).toString();
         //removing any weblinks
