@@ -34,23 +34,22 @@
                 android:id="@+id/landmark_map"
                 class="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="360dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/landmark_check_in_button"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:layout_marginTop="220dp"
-                android:layout_marginEnd="24dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="-10dp"
                 android:clickable="true"
-                android:focusable="true"
                 android:elevation="20dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                android:focusable="true"
                 app:layout_constraintBottom_toBottomOf="@id/landmark_check_in_button_text"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:srcCompat="@color/colorAccent" />
 
             <TextView

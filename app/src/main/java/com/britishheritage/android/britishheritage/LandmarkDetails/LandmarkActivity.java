@@ -17,15 +17,22 @@ import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.R;
 import com.britishheritage.android.britishheritage.WebActivity;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkAdapter.OnWikiLandmarkClickListener {
+public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkAdapter.OnWikiLandmarkClickListener, OnMapReadyCallback {
 
     private Landmark mainLandmark;
-    private Fragment landmarkMapFragment;
+    private SupportMapFragment landmarkMapFragment;
     private FloatingActionButton checkInButton;
     private TextView checkInTV;
     private TextView landmarkTitleTV;
@@ -35,6 +42,8 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
     private LandmarkViewModel landmarkViewModel;
     private RecyclerView.LayoutManager layoutManager;
     public static final String WIKI_URL_KEY = "british_heritage_wiki_url";
+
+    private GoogleMap gMap;
 
 
     @Override
@@ -66,12 +75,14 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
             }
         }
 
-
-
         landmarkViewModel = ViewModelProviders.of(this).get(LandmarkViewModel.class);
         LatLng latLng = new LatLng(mainLandmark.latitude, mainLandmark.longitude);
         landmarkViewModel.getWikiGeocodeData(latLng);
         landmarkViewModel.getWikiLandmarkLiveData().observe(this, this::processWikiLandmarkLiveData);
+
+        landmarkMapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.landmark_map);
+        landmarkMapFragment.getMapAsync(this);
     }
 
 
@@ -101,4 +112,31 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
     }
 
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        LatLng locationLatLng = new LatLng(mainLandmark.getLatitude(), mainLandmark.getLongitude());
+        gMap = googleMap;
+        gMap.setMinZoomPreference(13);
+        gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationLatLng, 17));
+        gMap.getUiSettings().setMapToolbarEnabled(false);
+        gMap.getUiSettings().setZoomControlsEnabled(true);
+        gMap.getUiSettings().setAllGesturesEnabled(false);
+        gMap.setPadding(10, 10, 14 ,30);
+        gMap.addMarker(new MarkerOptions().position(locationLatLng).alpha(new Float(0.5)));
+
+    }
+
+    @Override
+    public void onUserInteraction() {
+        super.onUserInteraction();
+        float zoomLevel = gMap.getCameraPosition().zoom;
+        if (zoomLevel <= 14.0){
+            gMap.getUiSettings().setZoomControlsEnabled(false);
+        }
+        else{
+            gMap.getUiSettings().setZoomControlsEnabled(true);
+        }
+    }
 }
