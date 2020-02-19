@@ -1,10 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
+        android:background="@drawable/avebury"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".SplashActivity">
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/trans_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:background="@drawable/white_circle_coloraccent_outline"
+        android:id="@+id/splash_username"
+        style="@style/SearchBar"
+        android:hint="@string/choose_your_username"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:inputType="text"
+        android:maxLines="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
+
+    <EditText
+        android:background="@drawable/white_circle_coloraccent_outline"
+        android:id="@+id/splash_email"
+        style="@style/SearchBar"
+        android:hint="@string/enter_your_email"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="64dp"
+        android:inputType="text"
+        android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/splash_username"
+        />
+
+    <EditText
+        android:background="@drawable/white_circle_coloraccent_outline"
+        android:id="@+id/splash_password"
+        style="@style/SearchBar"
+        android:hint="@string/choose_a_password"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:inputType="text"
+        android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/splash_email"
+        />
+
+
+
+
+
+
+    <Button
+        android:id="@+id/splash_sign_in_button"
+        app:layout_constraintTop_toBottomOf="@id/splash_password"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/sign_in_with_google"
+        android:background="@drawable/common_google_signin_btn_text_light_normal"
+        android:foreground="@drawable/transparent_circle_coloraccent_outline"
+        android:layout_marginTop="64dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="@id/splash_sign_in_button"
+        app:layout_constraintEnd_toEndOf="@id/splash_sign_in_button"
+        app:layout_constraintTop_toTopOf="@id/splash_sign_in_button"
+        app:layout_constraintBottom_toBottomOf="@id/splash_sign_in_button"
+        android:background="@drawable/white_circle_coloraccent_outline"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/or"
+        android:textSize="22sp"
+        app:layout_constraintBottom_toTopOf="@+id/splash_sign_in_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/splash_password" />
+
+    <Button
+        android:shadowColor="@color/trans_white"
+        android:id="@+id/login_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:drawablePadding="32dp"
+        android:drawableEnd="@drawable/enter_icon_bluish"
+        android:background="@drawable/white_circle_coloraccent_outline"
+        android:padding="12dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/splash_sign_in_button" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

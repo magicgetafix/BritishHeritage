@@ -32,20 +32,20 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.0-alpha1'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.2'
 
-    def lifecycle_version = "2.0.0"
+    def lifecycle_version = "2.2.0"
 
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     //google maps
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     //authentification
-    implementation 'com.google.firebase:firebase-auth:19.0.0'
+    implementation 'com.google.firebase:firebase-auth:19.2.0'
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
     //database
-    implementation 'com.google.firebase:firebase-database:19.1.0'
+    implementation 'com.google.firebase:firebase-database:19.2.1'
     implementation 'com.firebase:geofire-java:3.0.0'
     //firebase
-    implementation 'com.google.firebase:firebase-core:17.2.0'
+    implementation 'com.google.firebase:firebase-core:17.2.2'
     //core RxJava dependecies
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
@@ -57,7 +57,7 @@ dependencies {
     //Gson
     implementation 'com.google.code.gson:gson:2.8.5'
     //Room
-    def room_version = "2.2.0-alpha02"
+    def room_version = "2.2.3"
     annotationProcessor "androidx.room:room-compiler:$room_version"
 
     //Retrofit

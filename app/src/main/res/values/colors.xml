@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#04c4ce</color>
+    <color name="colorPrimaryBlur">#0459D8</color>
+    <color name="colorPrimaryDarkBlue">#032F70</color>
+    <color name="colorPrimaryTransBlue">#800459D8</color>
+    <color name="colorPrimary">#049CD8</color>
     <color name="colorPrimaryDark">#027e84</color>
-    <color name="colorPrimaryTrans">#8004C4CE</color>
+    <color name="colorPrimaryTrans">#80049CD8</color>
     <color name="colorAccent">#D81B60</color>
     <color name="transColorAccent">#80D81B60</color>
     <color name="trans_overlay">#4DD81B60</color>

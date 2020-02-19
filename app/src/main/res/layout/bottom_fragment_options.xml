@@ -9,7 +9,7 @@
 
     <TextView
         android:textColor="@color/black"
-        android:textSize="16sp"
+        android:textSize="24sp"
         android:id="@+id/direction_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -30,10 +30,11 @@
         app:layout_constraintBottom_toBottomOf="@+id/direction_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/direction_text"
+        android:tint="@color/colorPrimary"
         app:srcCompat="@drawable/get_directions" />
 
     <View
-        android:background="@color/grey"
+        android:background="@color/colorPrimary"
         android:id="@+id/divider1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/direction_text"
@@ -44,7 +45,7 @@
 
     <TextView
         android:textColor="@color/black"
-        android:textSize="16sp"
+        android:textSize="24sp"
         android:id="@+id/favourite_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -57,6 +58,7 @@
         app:layout_constraintTop_toBottomOf="@id/divider1" />
 
     <ImageView
+        android:tint="@color/colorAccent"
         android:id="@+id/favourite_image"
         android:layout_width="25dp"
         android:layout_height="25dp"
@@ -68,7 +70,7 @@
         app:srcCompat="@drawable/favourite_icon" />
 
     <View
-        android:background="@color/grey"
+        android:background="@color/colorPrimary"
         android:id="@+id/divider2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/favourite_text"
@@ -79,7 +81,7 @@
 
     <TextView
         android:textColor="@color/black"
-        android:textSize="16sp"
+        android:textSize="24sp"
         android:id="@+id/view_detail_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -92,6 +94,7 @@
         app:layout_constraintTop_toBottomOf="@id/divider2" />
 
     <ImageView
+        android:tint="@color/colorPrimary"
         android:id="@+id/view_detail_image"
         android:layout_width="25dp"
         android:layout_height="25dp"
@@ -103,7 +106,7 @@
         app:srcCompat="@drawable/view_details" />
 
     <View
-        android:background="@color/grey"
+        android:background="@color/colorPrimary"
         android:id="@+id/divider3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/view_detail_text"

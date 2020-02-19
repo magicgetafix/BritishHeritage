@@ -55,12 +55,16 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
     private LiveData<Integer> databaseSizeLiveData;
     //private FirebaseDatabase database;
     public static Landmark lastClickedLandmark = null;
+    private int currentMenuId = -999999999;
 
     //To set up BottomNavigationView on select behaviour
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
+            if (menuItem.getItemId() == currentMenuId){
+                return false;
+            }
             switch (menuItem.getItemId()){
 
                 case (R.id.arch_map): selectedFragment = getArchMapFragment();
@@ -91,6 +95,7 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
                 previousFragment = selectedFragment;
                 fragmentTransaction.commit();
             }
+            currentMenuId = menuItem.getItemId();
             return true;
         }
     };
