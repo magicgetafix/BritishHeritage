@@ -20,5 +20,8 @@
     <string name="choose_a_password">Choose a password...</string>
     <string name="sign_in_with_google">Sign in with Google</string>
     <string name="or">or</string>
+    <string name="please_enter_a_username">Please enter a username of 8 characters or more</string>
+    <string name="please_enter_an_email_address">Please enter an email address</string>
+    <string name="please_enter_a_password_of_eight_chars">Please enter a password of 8 characters or more</string>
 
 </resources>

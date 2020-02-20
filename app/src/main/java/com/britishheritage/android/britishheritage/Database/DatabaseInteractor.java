@@ -44,7 +44,7 @@ public class DatabaseInteractor {
         try{
             realm = Realm.getDefaultInstance();
 
-        }catch (Exception e){
+        } catch (Exception e){
 
             // Get a Realm instance for this thread
             RealmConfiguration config = new RealmConfiguration.Builder()

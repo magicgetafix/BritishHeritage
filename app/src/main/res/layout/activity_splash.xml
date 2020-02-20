@@ -35,6 +35,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.3" />
 
+    <TextView
+        tools:visibility="visible"
+        android:visibility="invisible"
+        android:id="@+id/splash_username_error"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="4dp"
+        app:layout_constraintStart_toStartOf="@id/splash_username"
+        app:layout_constraintTop_toBottomOf="@id/splash_username"
+        android:textSize="14sp"
+        android:textColor="@color/red"
+        android:text="@string/please_enter_a_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 
     <EditText
         android:background="@drawable/white_circle_coloraccent_outline"
@@ -52,6 +66,20 @@
         app:layout_constraintTop_toBottomOf="@id/splash_username"
         />
 
+    <TextView
+        tools:visibility="visible"
+        android:visibility="invisible"
+        android:id="@+id/splash_email_error"
+        android:layout_marginTop="0dp"
+        android:layout_marginStart="4dp"
+        app:layout_constraintStart_toStartOf="@id/splash_email"
+        app:layout_constraintTop_toBottomOf="@id/splash_email"
+        android:textSize="14sp"
+        android:textColor="@color/red"
+        android:text="@string/please_enter_an_email_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <EditText
         android:background="@drawable/white_circle_coloraccent_outline"
         android:id="@+id/splash_password"
@@ -67,9 +95,19 @@
         app:layout_constraintTop_toBottomOf="@id/splash_email"
         />
 
-
-
-
+    <TextView
+        tools:visibility="visible"
+        android:visibility="invisible"
+        android:id="@+id/splash_password_error"
+        android:layout_marginTop="0dp"
+        android:layout_marginStart="4dp"
+        app:layout_constraintStart_toStartOf="@id/splash_password"
+        app:layout_constraintTop_toBottomOf="@id/splash_password"
+        android:textSize="14sp"
+        android:textColor="@color/red"
+        android:text="@string/please_enter_a_password_of_eight_chars"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 
     <Button

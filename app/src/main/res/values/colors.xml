@@ -15,4 +15,5 @@
     <color name="grey">#7A7A7A</color>
     <color name="trans_white">#B3FFFFFF</color>
     <color name="white">#FFFFFF</color>
+    <color name="red">#F44336</color>
 </resources>
