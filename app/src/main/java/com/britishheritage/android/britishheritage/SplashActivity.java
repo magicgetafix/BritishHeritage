@@ -1,5 +1,6 @@
 package com.britishheritage.android.britishheritage;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import io.reactivex.Observable;
@@ -9,15 +10,23 @@ import timber.log.Timber;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.Model.LandmarkList;
 import com.britishheritage.android.britishheritage.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -25,8 +34,10 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends BaseActivity {
 
   private DatabaseInteractor databaseInteractor;
   private LiveData<Integer> databaseSizeLiveData;
@@ -39,8 +50,47 @@ public class SplashActivity extends AppCompatActivity {
   private TextView usernameErrorTV;
   private TextView emailErrorTV;
   private TextView passwordErrorTV;
+  private ProgressBar progressBar;
+
+  private TextWatcher textWatcher = new TextWatcher() {
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+      checkValidity(false);
+    }
+  };
+
+  private TextWatcher userNameTextWatcher = new TextWatcher() {
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+      checkUsernameValidity();
+    }
+  };
 
   private FirebaseAuth firebaseAuth;
+
+  private String username = "";
+  private String password = "";
+  private String emailAddress = "";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +105,7 @@ public class SplashActivity extends AppCompatActivity {
     usernameErrorTV = findViewById(R.id.splash_username_error);
     emailErrorTV = findViewById(R.id.splash_email_error);
     passwordErrorTV = findViewById(R.id.splash_password_error);
+    progressBar = findViewById(R.id.splash_progressbar);
 
     firebaseAuth = FirebaseAuth.getInstance();
     FirebaseUser currentUser = firebaseAuth.getCurrentUser();
@@ -66,6 +117,119 @@ public class SplashActivity extends AppCompatActivity {
     databaseInteractor = DatabaseInteractor.getInstance(getApplicationContext());
     databaseSizeLiveData = databaseInteractor.getDatabaseSize();
     databaseSizeLiveData.observe(this, this::populateDatabase);
+    setUpButtons();
+
+  }
+
+  public void setUpButtons(){
+
+    loginButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        signUp();
+        passwordTV.addTextChangedListener(textWatcher);
+        emailTV.addTextChangedListener(textWatcher);
+      }
+    });
+
+    usernameTV.addTextChangedListener(userNameTextWatcher);
+  }
+
+  private void signUp(){
+    progressBar.setVisibility(View.VISIBLE);
+
+    if (checkValidity(true)){
+      firebaseAuth.createUserWithEmailAndPassword(emailAddress, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        @Override
+        public void onComplete(@NonNull Task<AuthResult> task) {
+          if (task.isSuccessful()){
+            FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+            UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(username).build();
+            currentUser.updateProfile(profileChangeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
+              @Override
+              public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()){
+                  Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
+                  startActivity(mainIntent);
+                  progressBar.setVisibility(View.INVISIBLE);
+                }
+                else{
+                  showSnackbar(getString(R.string.login_failure));
+                  progressBar.setVisibility(View.INVISIBLE);
+                }
+
+              }
+            });
+          }
+          else{
+            showSnackbar(getString(R.string.login_failure));
+            progressBar.setVisibility(View.INVISIBLE);
+          }
+        }
+      });
+    }
+
+    progressBar.setVisibility(View.INVISIBLE);
+
+  }
+
+  private boolean checkUsernameValidity(){
+
+    boolean validUsername = username.length() >= 8;
+
+    if (!validUsername){
+      usernameErrorTV.setVisibility(View.VISIBLE);
+      return false;
+    }
+    else return true;
+  }
+
+  private boolean checkValidity(boolean checkAll){
+
+    username = usernameTV.getText().toString().trim();
+    password = passwordTV.getText().toString().trim();
+    emailAddress = emailTV.getText().toString().trim();
+
+    String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+    Pattern pattern = Pattern.compile(regex);
+    Matcher matcher = pattern.matcher(emailAddress);
+
+    boolean validEmail = matcher.matches();
+    if (!validEmail){
+        emailErrorTV.setVisibility(View.VISIBLE);
+        if (!checkAll){
+          return false;
+        }
+    }
+    else{
+        emailErrorTV.setVisibility(View.INVISIBLE);
+    }
+
+    boolean validUsername = username.length() >= 8;
+
+    if (!validUsername){
+      usernameErrorTV.setVisibility(View.VISIBLE);
+      if (!checkAll){
+        return false;
+      }
+    }
+    else{
+      usernameErrorTV.setVisibility(View.INVISIBLE);
+    }
+
+    boolean validPassword = password.length() >= 8;
+
+    if (!validPassword) {
+      passwordErrorTV.setVisibility(View.VISIBLE);
+      if (!checkAll){
+        return false;
+      }
+    }
+    else{
+      passwordErrorTV.setVisibility(View.INVISIBLE);
+    }
+
+    return validEmail && validPassword && validUsername;
 
   }
 

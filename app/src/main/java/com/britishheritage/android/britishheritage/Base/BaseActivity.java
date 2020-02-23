@@ -3,6 +3,7 @@ package com.britishheritage.android.britishheritage.Base;
 import android.content.Intent;
 
 import com.britishheritage.android.britishheritage.Model.Landmark;
+import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,5 +19,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         startActivity(intent);
 
     }
+
+    public void showSnackbar(String message){
+        Snackbar snackbar = Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
+
 
 }
