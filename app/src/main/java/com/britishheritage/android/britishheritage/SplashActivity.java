@@ -21,14 +21,24 @@ import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
+import com.britishheritage.android.britishheritage.Global.Constants;
+import com.britishheritage.android.britishheritage.Keys.GooglePlayKeys;
 import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.Model.LandmarkList;
 import com.britishheritage.android.britishheritage.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.gson.Gson;
 
@@ -51,6 +61,9 @@ public class SplashActivity extends BaseActivity {
   private TextView emailErrorTV;
   private TextView passwordErrorTV;
   private ProgressBar progressBar;
+
+  private GoogleSignInClient googleSignInClient;
+  private static final int SIGN_IN_CODE = 583;
 
   private TextWatcher textWatcher = new TextWatcher() {
     @Override
@@ -107,6 +120,8 @@ public class SplashActivity extends BaseActivity {
     passwordErrorTV = findViewById(R.id.splash_password_error);
     progressBar = findViewById(R.id.splash_progressbar);
 
+    FirebaseApp.initializeApp(getApplicationContext());
+
     firebaseAuth = FirebaseAuth.getInstance();
     FirebaseUser currentUser = firebaseAuth.getCurrentUser();
 
@@ -117,8 +132,13 @@ public class SplashActivity extends BaseActivity {
     databaseInteractor = DatabaseInteractor.getInstance(getApplicationContext());
     databaseSizeLiveData = databaseInteractor.getDatabaseSize();
     databaseSizeLiveData.observe(this, this::populateDatabase);
-    setUpButtons();
 
+    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(GooglePlayKeys.CLIENT_ID)
+            .requestEmail()
+            .build();
+    googleSignInClient = GoogleSignIn.getClient(this, gso);
+    setUpButtons();
   }
 
   public void setUpButtons(){
@@ -129,6 +149,15 @@ public class SplashActivity extends BaseActivity {
         signUp();
         passwordTV.addTextChangedListener(textWatcher);
         emailTV.addTextChangedListener(textWatcher);
+      }
+    });
+
+    googleSignInBtn.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if (checkUsernameValidity()){
+          googleSignIn();
+        }
       }
     });
 
@@ -144,22 +173,10 @@ public class SplashActivity extends BaseActivity {
         public void onComplete(@NonNull Task<AuthResult> task) {
           if (task.isSuccessful()){
             FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-            UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(username).build();
-            currentUser.updateProfile(profileChangeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
-              @Override
-              public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()){
-                  Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
-                  startActivity(mainIntent);
-                  progressBar.setVisibility(View.INVISIBLE);
-                }
-                else{
-                  showSnackbar(getString(R.string.login_failure));
-                  progressBar.setVisibility(View.INVISIBLE);
-                }
+            if (currentUser!=null) {
+              saveUsername(currentUser);
+            }
 
-              }
-            });
           }
           else{
             showSnackbar(getString(R.string.login_failure));
@@ -173,15 +190,80 @@ public class SplashActivity extends BaseActivity {
 
   }
 
+  private void saveUsername(FirebaseUser currentUser){
+    UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(username).build();
+    currentUser.updateProfile(profileChangeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
+      @Override
+      public void onComplete(@NonNull Task<Void> task) {
+        if (task.isSuccessful()){
+          Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
+          startActivity(mainIntent);
+          progressBar.setVisibility(View.INVISIBLE);
+        }
+        else{
+          showSnackbar(getString(R.string.login_failure));
+          progressBar.setVisibility(View.INVISIBLE);
+        }
+
+      }
+    });
+  }
+
+  private void googleSignIn(){
+    Intent signInIntent = googleSignInClient.getSignInIntent();
+    startActivityForResult(signInIntent, SIGN_IN_CODE);
+  }
+
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+
+    // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+    if (requestCode == SIGN_IN_CODE) {
+      Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+      try {
+        // Google Sign In was successful, authenticate with Firebase
+        GoogleSignInAccount account = task.getResult(ApiException.class);
+        firebaseAuthWithGoogle(account);
+      } catch (ApiException e) {
+        Timber.e(e);
+      }
+    }
+  }
+
+  private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+
+  AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+  firebaseAuth.signInWithCredential(credential)
+          .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+              if (task.isSuccessful()) {
+                // Sign in success, update UI with the signed-in user's information
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                saveUsername(user);
+              } else {
+                showSnackbar(getString(R.string.login_failure));
+                progressBar.setVisibility(View.INVISIBLE);
+              }
+            }
+          });
+  }
+
+
   private boolean checkUsernameValidity(){
 
+    username = usernameTV.getText().toString().trim();
     boolean validUsername = username.length() >= 8;
 
     if (!validUsername){
       usernameErrorTV.setVisibility(View.VISIBLE);
       return false;
     }
-    else return true;
+    else {
+      usernameErrorTV.setVisibility(View.INVISIBLE);
+      return true;
+    }
   }
 
   private boolean checkValidity(boolean checkAll){
