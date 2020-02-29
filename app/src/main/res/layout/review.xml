@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.card.MaterialCardView
+        android:clipChildren="true"
+        app:cardCornerRadius="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content">
+
+
+            <ImageView
+                android:id="@+id/review_user_photo"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="centerInside"
+                android:tint="@color/colorPrimary"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/user_icon" />
+
+            <TextView
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:id="@+id/review_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                tools:text="@string/username"
+                app:layout_constraintStart_toEndOf="@+id/review_user_photo"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                />
+
+            <TextView
+                android:id="@+id/review_points"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                tools:text="@string/points"
+                app:layout_constraintStart_toEndOf="@+id/review_user_photo"
+                app:layout_constraintTop_toBottomOf="@id/review_username"
+                android:layout_marginTop="0dp"
+                />
+
+            <TextView
+                android:background="@drawable/white_rounded"
+                android:id="@+id/review_text"
+                android:layout_width="0dp"
+                android:layout_height="250dp"
+                android:layout_marginTop="12dp"
+                tools:text="350 char limit"
+                android:padding="4dp"
+                app:layout_constraintEnd_toEndOf="@+id/review_username"
+                app:layout_constraintStart_toStartOf="@+id/review_user_photo"
+                app:layout_constraintTop_toBottomOf="@+id/review_user_photo" />
+
+            <ImageButton
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/write_review_icon"
+                android:backgroundTint="@color/colorPrimary"
+                android:tint="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@id/review_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/review_text"
+                app:layout_constraintVertical_bias="0.42000002" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

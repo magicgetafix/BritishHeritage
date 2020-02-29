@@ -108,8 +108,17 @@ public class SplashActivity extends BaseActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_splash);
+    FirebaseApp.initializeApp(getApplicationContext());
 
+    firebaseAuth = FirebaseAuth.getInstance();
+    FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+
+    if (currentUser != null){
+      Intent mainIntent = new Intent(this, MainActivity.class);
+      startActivity(mainIntent);
+    }
+
+    setContentView(R.layout.activity_splash);
     usernameTV = findViewById(R.id.splash_username);
     emailTV = findViewById(R.id.splash_email);
     passwordTV = findViewById(R.id.splash_password);
@@ -120,15 +129,7 @@ public class SplashActivity extends BaseActivity {
     passwordErrorTV = findViewById(R.id.splash_password_error);
     progressBar = findViewById(R.id.splash_progressbar);
 
-    FirebaseApp.initializeApp(getApplicationContext());
 
-    firebaseAuth = FirebaseAuth.getInstance();
-    FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-
-    if (currentUser != null){
-      Intent mainIntent = new Intent(this, MainActivity.class);
-      startActivity(mainIntent);
-    }
     databaseInteractor = DatabaseInteractor.getInstance(getApplicationContext());
     databaseSizeLiveData = databaseInteractor.getDatabaseSize();
     databaseSizeLiveData.observe(this, this::populateDatabase);

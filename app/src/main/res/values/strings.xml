@@ -25,5 +25,7 @@
     <string name="please_enter_a_password_of_eight_chars">Please enter a password of 8 characters or more</string>
     <string name="login_failure">Login failed. Please try again!</string>
     <string name="sign_in">Sign up</string>
+    <string name="points">Points: %d</string>
+    <string name="username">UsernameUsernameUser1</string>
 
 </resources>
