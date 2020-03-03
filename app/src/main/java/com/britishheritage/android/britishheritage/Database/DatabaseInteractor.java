@@ -1,6 +1,7 @@
 package com.britishheritage.android.britishheritage.Database;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
 import com.britishheritage.android.britishheritage.Daos.LandmarkDao;
@@ -29,6 +30,7 @@ public class DatabaseInteractor {
     private Context context;
     private LandmarkDatabase db;
     private Realm realm;
+    private SharedPreferences sharedPrefs;
 
     public static DatabaseInteractor getInstance(Context context){
         if (instance == null){
@@ -52,6 +54,7 @@ public class DatabaseInteractor {
                     .build();
             realm = Realm.getInstance(config);
         }
+        sharedPrefs = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
     }
 
     public void addAllLandmarks(List<Landmark> landmarks){
@@ -128,5 +131,23 @@ public class DatabaseInteractor {
                 .sort("title", Sort.ASCENDING)
                 .findAll();
 
+    }
+
+    public void recordReviewUpvote(String reviewId){
+        sharedPrefs.edit().putBoolean(reviewId+"_up", true).apply();
+        sharedPrefs.edit().putBoolean(reviewId+"_down", false).apply();
+    }
+
+    public boolean hasReviewBeenUpvoted(String reviewId){
+        return sharedPrefs.getBoolean(reviewId+"_up", false);
+    }
+
+    public void recordReviewDownvote(String reviewId){
+        sharedPrefs.edit().putBoolean(reviewId+"_dwn", true).apply();
+        sharedPrefs.edit().putBoolean(reviewId+"_up", false).apply();
+    }
+
+    public boolean hasReviewBeenDownvoted(String reviewId){
+        return sharedPrefs.getBoolean(reviewId+"_dwn", false);
     }
 }

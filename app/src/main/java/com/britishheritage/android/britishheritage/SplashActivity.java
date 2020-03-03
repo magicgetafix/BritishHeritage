@@ -255,7 +255,7 @@ public class SplashActivity extends BaseActivity {
   private boolean checkUsernameValidity(){
 
     username = usernameTV.getText().toString().trim();
-    boolean validUsername = username.length() >= 8;
+    boolean validUsername = username.length() >= 8 && username.length() <= 25;
 
     if (!validUsername){
       usernameErrorTV.setVisibility(View.VISIBLE);
@@ -288,7 +288,7 @@ public class SplashActivity extends BaseActivity {
         emailErrorTV.setVisibility(View.INVISIBLE);
     }
 
-    boolean validUsername = username.length() >= 8;
+    boolean validUsername = username.length() >= 8 && username.length() <= 25;
 
     if (!validUsername){
       usernameErrorTV.setVisibility(View.VISIBLE);

@@ -1,4 +1,4 @@
-package com.britishheritage.android.britishheritage.LandmarkDetails;
+package com.britishheritage.android.britishheritage.LandmarkDetails.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

@@ -1,7 +1,6 @@
 package com.britishheritage.android.britishheritage.LandmarkDetails;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,7 +11,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
-import com.britishheritage.android.britishheritage.Main.FavouritesAdapter;
+import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.WikiLandmarkAdapter;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.R;
@@ -21,9 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
