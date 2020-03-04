@@ -1,18 +1,18 @@
 package com.britishheritage.android.britishheritage.Model;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-
+import com.google.firebase.database.Exclude;
 import java.util.Date;
 
 public class Review {
 
     private String txt;
     private String uN;
-    private int pnts;
+    private int pts;
     private long tS;
     private String uId;
     private String rId;
+    @Exclude
     private boolean pH;
 
 
@@ -29,7 +29,7 @@ public class Review {
         this.tS = new Date().getTime();
         this.txt = txt;
         this.uN = currentUser.getDisplayName();
-        this.pnts = 1;
+        this.pts = 1;
         this.uId = currentUser.getUid();
         this.rId = landmark.getId() + this.uId;
     }
@@ -51,15 +51,15 @@ public class Review {
     }
 
     public int getUpvotes() {
-        return pnts;
+        return pts;
     }
 
     public void addUpvote() {
-        this.pnts = pnts + 1;
+        this.pts = pts + 1;
     }
 
     public void downVote(){
-        this.pnts = pnts - 1;
+        this.pts = pts - 1;
     }
 
     public long getTimeStamp() {
@@ -86,10 +86,12 @@ public class Review {
         this.rId = reviewId;
     }
 
+    @Exclude
     public boolean isPlaceholder(){
         return pH;
     }
 
+    @Exclude
     public void setAsPlaceholder(boolean isPlaceholder){
         this.pH = isPlaceholder;
     }

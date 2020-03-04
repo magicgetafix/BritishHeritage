@@ -18,4 +18,13 @@ public class Constants {
     public final static String GEOCODE_USERNAME = "britishheritage";
     public final static String GEOCODE_STYLE = "full";
     public final static String URL_REGEX = "(?:www|https?)[^\\s]+";
+
+    //review database keys
+    public final static String REVIEW_TEXT_KEY = "txt";
+    public final static String REVIEW_USERNAME_KEY = "uN";
+    public final static String REVIEW_SCORE_KEY = "pts";
+    public final static String REVIEW_TIME_STAMP_KEY =  "tS";
+    public final static String REVIEW_USER_ID_KEY = "uId";
+    public final static String REVIEW_ID = "rId";
+    private boolean pH;
 }

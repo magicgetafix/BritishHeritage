@@ -1,7 +1,9 @@
 package com.britishheritage.android.britishheritage.LandmarkDetails.adapters;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,12 +14,41 @@ import com.britishheritage.android.britishheritage.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class LandmarkReviewAdapter {
+public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAdapter.ReviewViewHolder> {
 
+    private List<Review> reviewList = new ArrayList<>();
+    private Context context;
+    private ReviewViewHolder.OnClickListener listener;
 
+    public LandmarkReviewAdapter(List<Review> reviewList, Context context, ReviewViewHolder.OnClickListener listener){
+       this.reviewList = reviewList;
+       this.context = context;
+       this.listener = listener;
+    }
+
+    @NonNull
+    @Override
+    public ReviewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.wiki_landmark_view, parent, false);
+        return new ReviewViewHolder(view, this.context, this.listener);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
+        Review review = this.reviewList.get(position);
+        holder.setContent(review);
+    }
+
+    @Override
+    public int getItemCount() {
+        return reviewList.size();
+    }
 
     public static class ReviewViewHolder extends RecyclerView.ViewHolder{
 
@@ -71,12 +102,18 @@ public class LandmarkReviewAdapter {
                 }
                 upvoteReviewButton.setOnClickListener(v->{
                     if (listener!=null){
-                        listener.upvoted();
+                        listener.upvoted(review);
+                        databaseInteractor.upvoteReview(review.getReviewId());
+                        reviewDownvotedIV.setVisibility(View.INVISIBLE);
+                        reviewUpvotedIV.setVisibility(View.VISIBLE);
                     }
                 });
                 downvoteReviewButton.setOnClickListener(v->{
                     if (listener!=null){
-                        listener.downvoted();
+                        listener.downvoted(review);
+                        databaseInteractor.downvoteReview(review.getReviewId());
+                        reviewDownvotedIV.setVisibility(View.VISIBLE);
+                        reviewUpvotedIV.setVisibility(View.INVISIBLE);
                     }
                 });
             }
@@ -95,13 +132,12 @@ public class LandmarkReviewAdapter {
                     }
                 });
             }
-
         }
 
         public interface OnClickListener {
             void addReview();
-            void upvoted();
-            void downvoted();
+            void upvoted(Review review);
+            void downvoted(Review review);
         }
     }
 }

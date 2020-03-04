@@ -9,9 +9,12 @@ import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Model.Realm.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.Realm.WikiLandmarkRealmObj;
+import com.britishheritage.android.britishheritage.Model.Review;
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.Response.Geoname;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -31,6 +34,8 @@ public class DatabaseInteractor {
     private LandmarkDatabase db;
     private Realm realm;
     private SharedPreferences sharedPrefs;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference reviewReference;
 
     public static DatabaseInteractor getInstance(Context context){
         if (instance == null){
@@ -55,6 +60,10 @@ public class DatabaseInteractor {
             realm = Realm.getInstance(config);
         }
         sharedPrefs = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        firebaseDatabase.setPersistenceEnabled(true);
+        reviewReference = firebaseDatabase.getReference().child("reviews");
+
     }
 
     public void addAllLandmarks(List<Landmark> landmarks){
@@ -133,18 +142,27 @@ public class DatabaseInteractor {
 
     }
 
-    public void recordReviewUpvote(String reviewId){
+    public void upvoteReview(String reviewId, Review review, Landmark landmark){
         sharedPrefs.edit().putBoolean(reviewId+"_up", true).apply();
         sharedPrefs.edit().putBoolean(reviewId+"_down", false).apply();
+        reviewReference.child(landmark.getId())
+                       .child(review.getUserId())
+                       .child(Constants.REVIEW_SCORE_KEY)
+                       .setValue(review.getUpvotes()+1);
+
     }
 
     public boolean hasReviewBeenUpvoted(String reviewId){
         return sharedPrefs.getBoolean(reviewId+"_up", false);
     }
 
-    public void recordReviewDownvote(String reviewId){
+    public void downvoteReview(String reviewId, Review review, Landmark landmark){
         sharedPrefs.edit().putBoolean(reviewId+"_dwn", true).apply();
         sharedPrefs.edit().putBoolean(reviewId+"_up", false).apply();
+        reviewReference.child(landmark.getId())
+                .child(review.getUserId())
+                .child(Constants.REVIEW_SCORE_KEY)
+                .setValue(review.getUpvotes()-1);
     }
 
     public boolean hasReviewBeenDownvoted(String reviewId){
