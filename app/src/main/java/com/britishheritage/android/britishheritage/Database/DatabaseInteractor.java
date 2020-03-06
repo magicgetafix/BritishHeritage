@@ -13,19 +13,29 @@ import com.britishheritage.android.britishheritage.Model.Review;
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.Response.Geoname;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.room.Room;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import timber.log.Timber;
 
 public class DatabaseInteractor {
 
@@ -167,5 +177,44 @@ public class DatabaseInteractor {
 
     public boolean hasReviewBeenDownvoted(String reviewId){
         return sharedPrefs.getBoolean(reviewId+"_dwn", false);
+    }
+
+    public void addReviewToLandmark(String landmarkId, Review review){
+        reviewReference.child(landmarkId).child(review.getUserId()).setValue(review);
+    }
+
+    public LiveData<List<Review>> getReviews(String landmarkId){
+
+        MutableLiveData<List<Review>> reviewLiveData = new MutableLiveData<>();
+        List<Review> reviews = new ArrayList<>();
+        Review firstReview = new Review();
+        firstReview.setAsPlaceholder(true);
+
+        reviews.add(firstReview);
+
+        reviewReference.child(landmarkId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
+                while (snapshotIterator.hasNext()){
+                    DataSnapshot snapshot = snapshotIterator.next();
+                    Timber.d(snapshot.toString());
+                    Review review = snapshot.getValue(Review.class);
+                    if (review!=null){
+                        reviews.add(review);
+                    }
+                }
+                Timber.d("Number of reviews: "+reviews.size());
+                reviewLiveData.setValue(reviews);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                reviews.clear();
+                Timber.e(databaseError.getMessage());
+            }
+        });
+
+        return reviewLiveData;
     }
 }

@@ -103,7 +103,6 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                 upvoteReviewButton.setOnClickListener(v->{
                     if (listener!=null){
                         listener.upvoted(review);
-                        databaseInteractor.upvoteReview(review.getReviewId());
                         reviewDownvotedIV.setVisibility(View.INVISIBLE);
                         reviewUpvotedIV.setVisibility(View.VISIBLE);
                     }
@@ -111,7 +110,6 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                 downvoteReviewButton.setOnClickListener(v->{
                     if (listener!=null){
                         listener.downvoted(review);
-                        databaseInteractor.downvoteReview(review.getReviewId());
                         reviewDownvotedIV.setVisibility(View.VISIBLE);
                         reviewUpvotedIV.setVisibility(View.INVISIBLE);
                     }

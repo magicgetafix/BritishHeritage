@@ -8,11 +8,14 @@ import timber.log.Timber;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
+import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.LandmarkReviewAdapter;
 import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.WikiLandmarkAdapter;
 import com.britishheritage.android.britishheritage.Model.Landmark;
+import com.britishheritage.android.britishheritage.Model.Review;
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.R;
 import com.britishheritage.android.britishheritage.WebActivity;
@@ -26,7 +29,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkAdapter.OnWikiLandmarkClickListener, OnMapReadyCallback {
+public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkAdapter.OnWikiLandmarkClickListener, LandmarkReviewAdapter.ReviewViewHolder.OnClickListener, OnMapReadyCallback {
 
     private Landmark mainLandmark;
     private SupportMapFragment landmarkMapFragment;
@@ -34,8 +37,8 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
     private TextView checkInTV;
     private TextView landmarkTitleTV;
     private RecyclerView geoNamesRecyclerView;
-    private TextView userSuggestionsTitleTV;
-    private RecyclerView userDescriptionsRecyclerView;
+    private TextView userReviewsTitleTV;
+    private RecyclerView userReviewsRecyclerView;
     private LandmarkViewModel landmarkViewModel;
     private RecyclerView.LayoutManager layoutManager;
     public static final String WIKI_URL_KEY = "british_heritage_wiki_url";
@@ -59,8 +62,8 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
         checkInTV = findViewById(R.id.landmark_check_in_button_text);
         landmarkTitleTV = findViewById(R.id.landmark_title);
         geoNamesRecyclerView = findViewById(R.id.landmark_geonames_recylerview);
-        userSuggestionsTitleTV = findViewById(R.id.landmark_suggestions);
-        userDescriptionsRecyclerView = findViewById(R.id.landmark_user_descriptions_recylerview);
+        userReviewsTitleTV = findViewById(R.id.landmark_suggestions);
+        userReviewsRecyclerView = findViewById(R.id.landmark_user_descriptions_recylerview);
         layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
 
         String name = mainLandmark.getName();
@@ -76,6 +79,7 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
         LatLng latLng = new LatLng(mainLandmark.latitude, mainLandmark.longitude);
         landmarkViewModel.getWikiGeocodeData(latLng);
         landmarkViewModel.getWikiLandmarkLiveData().observe(this, this::processWikiLandmarkLiveData);
+        landmarkViewModel.getReviewsLiveData().observe(this, this::processReviewLiveData);
 
         landmarkMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.landmark_map);
@@ -83,6 +87,14 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
     }
 
 
+    private void processReviewLiveData(List<Review> reviewList){
+
+        userReviewsTitleTV.setVisibility(View.VISIBLE);
+        userReviewsRecyclerView.setLayoutManager(layoutManager);
+        layoutManager.offsetChildrenHorizontal(40);
+        LandmarkReviewAdapter reviewAdapter = new LandmarkReviewAdapter(reviewList, this, this);
+        userReviewsRecyclerView.setAdapter(reviewAdapter);
+    }
 
     private void processWikiLandmarkLiveData(List<WikiLandmark> wikiLandmarkList){
 
@@ -135,5 +147,20 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
         else{
             gMap.getUiSettings().setZoomControlsEnabled(true);
         }
+    }
+
+    @Override
+    public void addReview() {
+        //todo
+    }
+
+    @Override
+    public void upvoted(Review review) {
+        landmarkViewModel.upvoteReview(review, mainLandmark);
+    }
+
+    @Override
+    public void downvoted(Review review) {
+        landmarkViewModel.downvoteReview(review, mainLandmark);
     }
 }

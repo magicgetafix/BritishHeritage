@@ -5,7 +5,9 @@ import android.app.Application;
 import com.britishheritage.android.britishheritage.Api.FindNearbyWikipediaApi;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.Constants;
+import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.Realm.WikiLandmarkRealmObj;
+import com.britishheritage.android.britishheritage.Model.Review;
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.Response.Geoname;
 import com.britishheritage.android.britishheritage.Response.NearbyWikipediaResponse;
@@ -36,6 +38,7 @@ public class LandmarkViewModel extends AndroidViewModel {
 
     private DatabaseInteractor databaseInteractor;
     private MutableLiveData<List<WikiLandmark>> wikiLandmarkLiveData = new MutableLiveData<>();
+    private LiveData<List<Review>> reviewsLiveData = new MutableLiveData<>();
     private List<WikiLandmark> wikiLandmarkList = new ArrayList<>();
     private RealmResults<WikiLandmarkRealmObj> wikiLandmarkRealmResults;
 
@@ -106,6 +109,10 @@ public class LandmarkViewModel extends AndroidViewModel {
         wikiLandmarkRealmResults.addChangeListener(wikiLandmarkChangeListener);
     }
 
+    public void getReviews(Landmark landmark){
+        reviewsLiveData = databaseInteractor.getReviews(landmark.getId());
+    }
+
     public Retrofit getRetrofit(){
 
         return new Retrofit.Builder()
@@ -120,5 +127,15 @@ public class LandmarkViewModel extends AndroidViewModel {
 
     public LiveData<List<WikiLandmark>> getWikiLandmarkLiveData(){
         return wikiLandmarkLiveData;
+    }
+
+    public LiveData<List<Review>> getReviewsLiveData(){ return reviewsLiveData;}
+
+    public void upvoteReview(Review review, Landmark landmark){
+        databaseInteractor.upvoteReview(review.getReviewId(), review, landmark);
+    }
+
+    public void downvoteReview(Review review, Landmark landmark){
+        databaseInteractor.downvoteReview(review.getReviewId(), review, landmark);
     }
 }
