@@ -93,7 +93,7 @@
                 app:boxCornerRadiusTopEnd="4dp"
                 app:boxCornerRadiusTopStart="4dp"
                 app:counterEnabled="true"
-                app:counterMaxLength="350"
+                app:counterMaxLength="400"
                 app:counterOverflowTextAppearance="@color/colorAccent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

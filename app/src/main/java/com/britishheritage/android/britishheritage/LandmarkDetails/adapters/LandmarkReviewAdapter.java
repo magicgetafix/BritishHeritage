@@ -99,8 +99,7 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                 usernameTextView.setText(review.getUsername());
                 reviewTitle.setText(review.getReviewTitle());
                 reviewTextView.setText(review.getText());
-                String score = context.getString(R.string.points, review.getUpvotes());
-                reviewScoreTextView.setText(score);
+                setScore(review, context, reviewScoreTextView);
                 downvoteReviewIcon.setVisibility(View.VISIBLE);
                 upvoteReviewIcon.setVisibility(View.VISIBLE);
                 if (databaseInteractor.hasReviewBeenUpvoted(review.getReviewId())) {
@@ -119,7 +118,8 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                                 listener.upvoted(review);
                                 reviewDownvotedIV.setVisibility(View.INVISIBLE);
                                 reviewUpvotedIV.setVisibility(View.VISIBLE);
-                                review.getUpvotes();
+                                review.addUpvote();
+                                setScore(review, context, reviewScoreTextView);
                             }
                         }
                     }
@@ -132,6 +132,8 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                                 listener.downvoted(review);
                                 reviewDownvotedIV.setVisibility(View.VISIBLE);
                                 reviewUpvotedIV.setVisibility(View.INVISIBLE);
+                                review.downVote();
+                                setScore(review, context, reviewScoreTextView);
                             }
                         }
                     }
@@ -156,6 +158,11 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                 });
                 reviewTitle.setText(context.getString(R.string.write_review));
             }
+        }
+
+        private void setScore(Review review, Context context, TextView reviewScoreTextView) {
+            String score = context.getString(R.string.points, review.getUpvotes());
+            reviewScoreTextView.setText(score);
         }
 
         public interface OnClickListener {

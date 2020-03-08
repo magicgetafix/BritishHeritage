@@ -6,8 +6,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
 
@@ -29,9 +31,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapter.OnWikiLandmarkClickListener, LandmarkReviewAdapter.ReviewViewHolder.OnClickListener, OnMapReadyCallback {
+public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapter.OnWikiLandmarkClickListener, LandmarkReviewAdapter.ReviewViewHolder.OnClickListener, OnMapReadyCallback, AddReviewDialogFragment.DialogListener {
 
     private FirebaseUser user;
     private Landmark mainLandmark;
@@ -46,6 +49,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     private RecyclerView.LayoutManager wikiLayoutManager;
     private RecyclerView.LayoutManager reviewLayoutManager;
     public static final String WIKI_URL_KEY = "british_heritage_wiki_url";
+    private List<Review> reviewList = new ArrayList<>();
 
     private GoogleMap gMap;
 
@@ -95,10 +99,11 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
     private void processReviewLiveData(List<Review> reviewList){
 
+        this.reviewList = reviewList;
         userReviewsTitleTV.setVisibility(View.VISIBLE);
         reviewLayoutManager.offsetChildrenHorizontal(40);
         userReviewsRecyclerView.setLayoutManager(reviewLayoutManager);
-        LandmarkReviewAdapter reviewAdapter = new LandmarkReviewAdapter(reviewList, this, this);
+        LandmarkReviewAdapter reviewAdapter = new LandmarkReviewAdapter(this.reviewList, this, this);
         userReviewsRecyclerView.setAdapter(reviewAdapter);
     }
 
@@ -160,6 +165,8 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             AddReviewDialogFragment reviewDialogFragment = AddReviewDialogFragment.newInstance(mainLandmark.getName(), mainLandmark, user.getUid(), user.getDisplayName());
             FragmentManager fragmentManager = getSupportFragmentManager();
             reviewDialogFragment.show(fragmentManager, "add_review_dialog");
+            reviewDialogFragment.setListener(this);
+
         }
     }
 
@@ -171,5 +178,28 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     @Override
     public void downvoted(Review review) {
         landmarkViewModel.downvoteReview(review, mainLandmark);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mainLandmark!=null){
+            landmarkViewModel.getReviews(mainLandmark);
+        }
+    }
+
+    @Override
+    public void onDismiss(Review review) {
+        for (int i = 0; i < this.reviewList.size(); i++){
+            Review newReview = this.reviewList.get(i);
+            if (newReview.isPlaceholder()){
+                reviewList.remove(i);
+                reviewList.add(i, review);
+            }
+        }
+        if (userReviewsRecyclerView.getAdapter() != null) {
+            userReviewsRecyclerView.getAdapter().notifyDataSetChanged();
+        }
+
     }
 }

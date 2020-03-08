@@ -37,6 +37,7 @@ public class AddReviewDialogFragment extends DialogFragment {
     private Landmark mainLandmark;
     private String userId;
     private String username;
+    private DialogListener listener;
 
     public static String ARG_REVIEW_LANDMARK = "british_heritage_review_landmark_id";
     public static String ARG_REVIEW_USERNAME = "british_heritage_review_username";
@@ -53,6 +54,10 @@ public class AddReviewDialogFragment extends DialogFragment {
         AddReviewDialogFragment fragment = new AddReviewDialogFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public void setListener(DialogListener listener){
+        this.listener = listener;
     }
 
     @Nullable
@@ -120,7 +125,7 @@ public class AddReviewDialogFragment extends DialogFragment {
 
                 if (userId!=null && !userId.isEmpty() && username!=null && !username.isEmpty() && mainLandmark!=null){
 
-                    Review review = new Review(text, title, username, userId, mainLandmark);
+                    final Review review = new Review(text, title, username, userId, mainLandmark);
                     progressBar.setVisibility(View.VISIBLE);
                     databaseInteractor.addReviewToLandmark(landmark.getId(), review, new OnCompleteListener<Void>() {
                         @Override
@@ -128,6 +133,10 @@ public class AddReviewDialogFragment extends DialogFragment {
                             if (task.isSuccessful()){
                                 progressBar.setVisibility(View.INVISIBLE);
                                 dismiss();
+                                if (listener!=null){
+                                    listener.onDismiss(review);
+                                }
+
                             }
                             else{
                                 FragmentActivity activity = getActivity();
@@ -162,6 +171,11 @@ public class AddReviewDialogFragment extends DialogFragment {
         params.width = ViewGroup.LayoutParams.MATCH_PARENT;
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         getDialog().getWindow().setAttributes((android.view.WindowManager.LayoutParams) params);
+    }
+
+    public interface DialogListener{
+
+        void onDismiss(Review review);
     }
 
 }
