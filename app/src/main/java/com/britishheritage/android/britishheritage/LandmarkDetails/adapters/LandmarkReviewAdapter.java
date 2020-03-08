@@ -35,7 +35,7 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
     @NonNull
     @Override
     public ReviewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.wiki_landmark_view, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.review, parent, false);
         return new ReviewViewHolder(view, this.context, this.listener);
     }
 
@@ -57,14 +57,17 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
         private OnClickListener listener;
         View itemView;
         TextView usernameTextView;
+        TextView reviewTitle;
         TextView reviewScoreTextView;
         ImageView userProfilePhoto;
         ImageButton addReviewButton;
         TextView reviewTextView;
-        ImageView upvoteReviewButton;
-        ImageView downvoteReviewButton;
+        ImageView upvoteReviewIcon;
+        ImageView downvoteReviewIcon;
         ImageView reviewDownvotedIV;
         ImageView reviewUpvotedIV;
+        ImageButton upvoteButton;
+        ImageButton downvoteButton;
 
 
         public ReviewViewHolder(@NonNull View itemView, Context context, OnClickListener listener ) {
@@ -74,14 +77,17 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
             this.listener = listener;
             databaseInteractor = DatabaseInteractor.getInstance(context);
             this.usernameTextView = itemView.findViewById(R.id.review_username);
+            this.reviewTitle = itemView.findViewById(R.id.review_title);
             this.reviewScoreTextView = itemView.findViewById(R.id.review_points);
             this.userProfilePhoto = itemView.findViewById(R.id.review_user_photo);
             this.addReviewButton = itemView.findViewById(R.id.review_add_new_review);
             this.reviewTextView = itemView.findViewById(R.id.review_text);
-            this.upvoteReviewButton = itemView.findViewById(R.id.review_upvote);
+            this.upvoteReviewIcon = itemView.findViewById(R.id.review_upvote);
             this.reviewUpvotedIV = itemView.findViewById(R.id.review_upvoted);
-            this.downvoteReviewButton = itemView.findViewById(R.id.review_downvote);
+            this.downvoteReviewIcon = itemView.findViewById(R.id.review_downvote);
             this.reviewDownvotedIV = itemView.findViewById(R.id.review_downvoted);
+            this.upvoteButton = itemView.findViewById(R.id.upvote__big_button);
+            this.downvoteButton = itemView.findViewById(R.id.downvote__big_button);
 
 
         }
@@ -90,9 +96,13 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
 
             if (!review.isPlaceholder()) {
                 addReviewButton.setVisibility(View.INVISIBLE);
-                usernameTextView.setText(review.getText());
+                usernameTextView.setText(review.getUsername());
+                reviewTitle.setText(review.getReviewTitle());
+                reviewTextView.setText(review.getText());
                 String score = context.getString(R.string.points, review.getUpvotes());
                 reviewScoreTextView.setText(score);
+                downvoteReviewIcon.setVisibility(View.VISIBLE);
+                upvoteReviewIcon.setVisibility(View.VISIBLE);
                 if (databaseInteractor.hasReviewBeenUpvoted(review.getReviewId())) {
                     reviewUpvotedIV.setVisibility(View.VISIBLE);
                     reviewDownvotedIV.setVisibility(View.INVISIBLE);
@@ -100,20 +110,33 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                     reviewDownvotedIV.setVisibility(View.VISIBLE);
                     reviewUpvotedIV.setVisibility(View.INVISIBLE);
                 }
-                upvoteReviewButton.setOnClickListener(v->{
-                    if (listener!=null){
-                        listener.upvoted(review);
-                        reviewDownvotedIV.setVisibility(View.INVISIBLE);
-                        reviewUpvotedIV.setVisibility(View.VISIBLE);
+
+                upvoteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (!databaseInteractor.hasReviewBeenUpvoted(review.getReviewId())){
+                            if (listener!=null){
+                                listener.upvoted(review);
+                                reviewDownvotedIV.setVisibility(View.INVISIBLE);
+                                reviewUpvotedIV.setVisibility(View.VISIBLE);
+                                review.getUpvotes();
+                            }
+                        }
                     }
                 });
-                downvoteReviewButton.setOnClickListener(v->{
-                    if (listener!=null){
-                        listener.downvoted(review);
-                        reviewDownvotedIV.setVisibility(View.VISIBLE);
-                        reviewUpvotedIV.setVisibility(View.INVISIBLE);
+                downvoteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (!databaseInteractor.hasReviewBeenDownvoted(review.getReviewId())){
+                            if (listener!=null){
+                                listener.downvoted(review);
+                                reviewDownvotedIV.setVisibility(View.VISIBLE);
+                                reviewUpvotedIV.setVisibility(View.INVISIBLE);
+                            }
+                        }
                     }
                 });
+
             }
             else{
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -123,12 +146,15 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                 reviewScoreTextView.setText("");
                 reviewDownvotedIV.setVisibility(View.INVISIBLE);
                 reviewUpvotedIV.setVisibility(View.INVISIBLE);
+                upvoteReviewIcon.setVisibility(View.VISIBLE);
+                downvoteReviewIcon.setVisibility(View.VISIBLE);
                 addReviewButton.setVisibility(View.VISIBLE);
                 addReviewButton.setOnClickListener(v->{
                     if (listener!=null){
                         listener.addReview();
                     }
                 });
+                reviewTitle.setText(context.getString(R.string.write_review));
             }
         }
 

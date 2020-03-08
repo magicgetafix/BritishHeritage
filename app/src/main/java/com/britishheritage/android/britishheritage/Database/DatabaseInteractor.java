@@ -13,6 +13,9 @@ import com.britishheritage.android.britishheritage.Model.Review;
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.Response.Geoname;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,6 +49,7 @@ public class DatabaseInteractor {
     private SharedPreferences sharedPrefs;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference reviewReference;
+    private FirebaseUser currentUser;
 
     public static DatabaseInteractor getInstance(Context context){
         if (instance == null){
@@ -167,7 +171,7 @@ public class DatabaseInteractor {
     }
 
     public void downvoteReview(String reviewId, Review review, Landmark landmark){
-        sharedPrefs.edit().putBoolean(reviewId+"_dwn", true).apply();
+        sharedPrefs.edit().putBoolean(reviewId+"_down", true).apply();
         sharedPrefs.edit().putBoolean(reviewId+"_up", false).apply();
         reviewReference.child(landmark.getId())
                 .child(review.getUserId())
@@ -176,20 +180,23 @@ public class DatabaseInteractor {
     }
 
     public boolean hasReviewBeenDownvoted(String reviewId){
-        return sharedPrefs.getBoolean(reviewId+"_dwn", false);
+        return sharedPrefs.getBoolean(reviewId+"_down", false);
     }
 
-    public void addReviewToLandmark(String landmarkId, Review review){
-        reviewReference.child(landmarkId).child(review.getUserId()).setValue(review);
+    public void addReviewToLandmark(String landmarkId, Review review, OnCompleteListener<Void> listener){
+        reviewReference.child(landmarkId).child(review.getUserId()).setValue(review).addOnCompleteListener(listener);
     }
 
     public LiveData<List<Review>> getReviews(String landmarkId){
+
+        if (currentUser == null){
+            currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        }
 
         MutableLiveData<List<Review>> reviewLiveData = new MutableLiveData<>();
         List<Review> reviews = new ArrayList<>();
         Review firstReview = new Review();
         firstReview.setAsPlaceholder(true);
-
         reviews.add(firstReview);
 
         reviewReference.child(landmarkId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -202,6 +209,11 @@ public class DatabaseInteractor {
                     Review review = snapshot.getValue(Review.class);
                     if (review!=null){
                         reviews.add(review);
+                    }
+                    if (currentUser!=null) {
+                        if (review.getUserId().equals(currentUser.getUid())){
+                            reviews.remove(firstReview);
+                        }
                     }
                 }
                 Timber.d("Number of reviews: "+reviews.size());

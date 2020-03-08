@@ -109,8 +109,8 @@ public class LandmarkViewModel extends AndroidViewModel {
         wikiLandmarkRealmResults.addChangeListener(wikiLandmarkChangeListener);
     }
 
-    public void getReviews(Landmark landmark){
-        reviewsLiveData = databaseInteractor.getReviews(landmark.getId());
+    public LiveData<List<Review>> getReviews(Landmark landmark){
+        return databaseInteractor.getReviews(landmark.getId());
     }
 
     public Retrofit getRetrofit(){
@@ -129,7 +129,9 @@ public class LandmarkViewModel extends AndroidViewModel {
         return wikiLandmarkLiveData;
     }
 
-    public LiveData<List<Review>> getReviewsLiveData(){ return reviewsLiveData;}
+    public LiveData<List<Review>> getReviewsLiveData(Landmark landmark){
+        return getReviews(landmark);
+    }
 
     public void upvoteReview(Review review, Landmark landmark){
         databaseInteractor.upvoteReview(review.getReviewId(), review, landmark);

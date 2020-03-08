@@ -117,6 +117,8 @@
                 app:layout_constraintTop_toBottomOf="@id/landmark_geonames_recylerview" />
 
             <androidx.recyclerview.widget.RecyclerView
+                android:paddingStart="30dp"
+                android:clipToPadding="false"
                 android:id="@+id/landmark_user_descriptions_recylerview"
                 app:layout_constraintTop_toBottomOf="@id/landmark_suggestions"
                 app:layout_constraintStart_toStartOf="parent"

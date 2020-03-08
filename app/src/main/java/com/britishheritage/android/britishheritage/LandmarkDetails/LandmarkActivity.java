@@ -1,6 +1,6 @@
 package com.britishheritage.android.britishheritage.LandmarkDetails;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,11 +26,14 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
 
-public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkAdapter.OnWikiLandmarkClickListener, LandmarkReviewAdapter.ReviewViewHolder.OnClickListener, OnMapReadyCallback {
+public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapter.OnWikiLandmarkClickListener, LandmarkReviewAdapter.ReviewViewHolder.OnClickListener, OnMapReadyCallback {
 
+    private FirebaseUser user;
     private Landmark mainLandmark;
     private SupportMapFragment landmarkMapFragment;
     private FloatingActionButton checkInButton;
@@ -40,7 +43,8 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
     private TextView userReviewsTitleTV;
     private RecyclerView userReviewsRecyclerView;
     private LandmarkViewModel landmarkViewModel;
-    private RecyclerView.LayoutManager layoutManager;
+    private RecyclerView.LayoutManager wikiLayoutManager;
+    private RecyclerView.LayoutManager reviewLayoutManager;
     public static final String WIKI_URL_KEY = "british_heritage_wiki_url";
 
     private GoogleMap gMap;
@@ -58,13 +62,15 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
             Timber.d("Landmark failed to be unwrapped");
             onDestroy();
         }
+        user = FirebaseAuth.getInstance().getCurrentUser();
         checkInButton = findViewById(R.id.landmark_check_in_button);
         checkInTV = findViewById(R.id.landmark_check_in_button_text);
         landmarkTitleTV = findViewById(R.id.landmark_title);
         geoNamesRecyclerView = findViewById(R.id.landmark_geonames_recylerview);
         userReviewsTitleTV = findViewById(R.id.landmark_suggestions);
         userReviewsRecyclerView = findViewById(R.id.landmark_user_descriptions_recylerview);
-        layoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
+        wikiLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
+        reviewLayoutManager  = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
 
         String name = mainLandmark.getName();
         if (name!=null) {
@@ -79,7 +85,7 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
         LatLng latLng = new LatLng(mainLandmark.latitude, mainLandmark.longitude);
         landmarkViewModel.getWikiGeocodeData(latLng);
         landmarkViewModel.getWikiLandmarkLiveData().observe(this, this::processWikiLandmarkLiveData);
-        landmarkViewModel.getReviewsLiveData().observe(this, this::processReviewLiveData);
+        landmarkViewModel.getReviewsLiveData(mainLandmark).observe(this, this::processReviewLiveData);
 
         landmarkMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.landmark_map);
@@ -90,8 +96,8 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
     private void processReviewLiveData(List<Review> reviewList){
 
         userReviewsTitleTV.setVisibility(View.VISIBLE);
-        userReviewsRecyclerView.setLayoutManager(layoutManager);
-        layoutManager.offsetChildrenHorizontal(40);
+        reviewLayoutManager.offsetChildrenHorizontal(40);
+        userReviewsRecyclerView.setLayoutManager(reviewLayoutManager);
         LandmarkReviewAdapter reviewAdapter = new LandmarkReviewAdapter(reviewList, this, this);
         userReviewsRecyclerView.setAdapter(reviewAdapter);
     }
@@ -99,15 +105,14 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
     private void processWikiLandmarkLiveData(List<WikiLandmark> wikiLandmarkList){
 
         WikiLandmarkAdapter wikiLandmarkAdapter = new WikiLandmarkAdapter(wikiLandmarkList, this, this);
-        geoNamesRecyclerView.setLayoutManager(layoutManager);
-        layoutManager.offsetChildrenHorizontal(40);
+        geoNamesRecyclerView.setLayoutManager(wikiLayoutManager);
+        wikiLayoutManager.offsetChildrenHorizontal(40);
         geoNamesRecyclerView.setAdapter(wikiLandmarkAdapter);
     }
 
 
     @Override
     public void onItemClick(String url) {
-        //todo set up on click
         Intent wikiWebViewIntent = new Intent(this, WebActivity.class);
         wikiWebViewIntent.putExtra(WIKI_URL_KEY, url);
         startActivity(wikiWebViewIntent);
@@ -151,7 +156,11 @@ public class LandmarkActivity extends AppCompatActivity implements WikiLandmarkA
 
     @Override
     public void addReview() {
-        //todo
+        if (mainLandmark!=null && user!=null){
+            AddReviewDialogFragment reviewDialogFragment = AddReviewDialogFragment.newInstance(mainLandmark.getName(), mainLandmark, user.getUid(), user.getDisplayName());
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            reviewDialogFragment.show(fragmentManager, "add_review_dialog");
+        }
     }
 
     @Override
