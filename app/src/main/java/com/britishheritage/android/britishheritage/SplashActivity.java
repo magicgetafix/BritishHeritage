@@ -2,6 +2,7 @@ package com.britishheritage.android.britishheritage;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LiveData;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -10,6 +11,8 @@ import timber.log.Timber;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -22,6 +25,7 @@ import android.widget.TextView;
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.Constants;
+import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.Keys.GooglePlayKeys;
 import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.Model.LandmarkList;
@@ -44,6 +48,7 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,6 +61,7 @@ public class SplashActivity extends BaseActivity {
   private EditText passwordTV;
   private Button googleSignInBtn;
   private Button loginButton;
+  private ConstraintLayout splashViewGroup;
 
   private TextView usernameErrorTV;
   private TextView emailErrorTV;
@@ -104,6 +110,7 @@ public class SplashActivity extends BaseActivity {
   private String username = "";
   private String password = "";
   private String emailAddress = "";
+  private List<View> taggedViews;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -112,11 +119,6 @@ public class SplashActivity extends BaseActivity {
 
     firebaseAuth = FirebaseAuth.getInstance();
     FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-
-    if (currentUser != null){
-      Intent mainIntent = new Intent(this, MainActivity.class);
-      startActivity(mainIntent);
-    }
 
     setContentView(R.layout.activity_splash);
     usernameTV = findViewById(R.id.splash_username);
@@ -128,7 +130,32 @@ public class SplashActivity extends BaseActivity {
     emailErrorTV = findViewById(R.id.splash_email_error);
     passwordErrorTV = findViewById(R.id.splash_password_error);
     progressBar = findViewById(R.id.splash_progressbar);
+    splashViewGroup = findViewById(R.id.splash_viewgroup);
 
+    taggedViews = Tools.getViewsByTag(splashViewGroup, "splash_component");
+    for (View view: taggedViews){
+      Tools.animateToOpaqueAlpha(view, 1000);
+    }
+
+    if (currentUser != null){
+
+      for (View view: taggedViews){
+        if (view.getId() != R.id.splash_transparency) {
+          //set all views to invisible except transparency view which
+          //will fade in over splash
+          view.setVisibility(View.INVISIBLE);
+        }
+      }
+      //start main activity after a delay
+      new Handler().postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          Intent mainIntent = new Intent(SplashActivity.this, MainActivity.class);
+          startActivity(mainIntent);
+        }
+      }, 1000);
+
+    }
 
     databaseInteractor = DatabaseInteractor.getInstance(getApplicationContext());
     databaseSizeLiveData = databaseInteractor.getDatabaseSize();

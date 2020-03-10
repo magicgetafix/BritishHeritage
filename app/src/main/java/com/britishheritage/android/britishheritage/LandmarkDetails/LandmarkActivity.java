@@ -42,6 +42,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     private FloatingActionButton checkInButton;
     private TextView checkInTV;
     private TextView landmarkTitleTV;
+    private TextView pointOfInterestTitleTV;
     private RecyclerView geoNamesRecyclerView;
     private TextView userReviewsTitleTV;
     private RecyclerView userReviewsRecyclerView;
@@ -70,6 +71,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         checkInButton = findViewById(R.id.landmark_check_in_button);
         checkInTV = findViewById(R.id.landmark_check_in_button_text);
         landmarkTitleTV = findViewById(R.id.landmark_title);
+        pointOfInterestTitleTV = findViewById(R.id.landmark_point_of_interest);
         geoNamesRecyclerView = findViewById(R.id.landmark_geonames_recylerview);
         userReviewsTitleTV = findViewById(R.id.landmark_suggestions);
         userReviewsRecyclerView = findViewById(R.id.landmark_user_descriptions_recylerview);
@@ -99,6 +101,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
     private void processReviewLiveData(List<Review> reviewList){
 
+        userReviewsTitleTV.setVisibility(View.VISIBLE);
         this.reviewList = reviewList;
         userReviewsTitleTV.setVisibility(View.VISIBLE);
         reviewLayoutManager.offsetChildrenHorizontal(40);
@@ -109,6 +112,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
     private void processWikiLandmarkLiveData(List<WikiLandmark> wikiLandmarkList){
 
+        pointOfInterestTitleTV.setVisibility(View.VISIBLE);
         WikiLandmarkAdapter wikiLandmarkAdapter = new WikiLandmarkAdapter(wikiLandmarkList, this, this);
         geoNamesRecyclerView.setLayoutManager(wikiLayoutManager);
         wikiLayoutManager.offsetChildrenHorizontal(40);

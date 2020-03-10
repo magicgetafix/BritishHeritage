@@ -13,7 +13,7 @@
     <string name="home">Home</string>
     <string name="added_to_favourites">Added to favourites</string>
     <string name="press_the_button_to_check_in">Press the button to check in</string>
-    <string name="point_of_interest">Point of interest:</string>
+    <string name="point_of_interest">Points of interest:</string>
     <string name="landmark_user_description">What can you see here?</string>
     <string name="choose_your_username">Choose your username</string>
     <string name="enter_your_email">Email address...</string>
@@ -34,5 +34,7 @@
     <string name="review_error">Your review must be less than 350 characters long</string>
     <string name="failed_to_add_review">Failed to save review</string>
     <string name="write_review">Write review...</string>
+    <string name="failed_to_upload_photo">Failed to upload photo</string>
+    <string name="uploaded_photo">Successfully uploaded photo</string>
 
 </resources>

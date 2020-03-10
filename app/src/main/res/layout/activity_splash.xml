@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/splash_viewgroup"
         android:background="@drawable/avebury"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
@@ -9,7 +10,9 @@
         tools:context=".SplashActivity">
 
     <View
-        android:id="@+id/view"
+        android:alpha="0"
+        android:tag="splash_component"
+        android:id="@+id/splash_transparency"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/trans_white"
@@ -19,6 +22,8 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
+        android:alpha="0"
+        android:tag="splash_component"
         android:background="@drawable/white_circle_coloraccent_outline"
         android:id="@+id/splash_username"
         style="@style/SearchBar"
@@ -36,6 +41,8 @@
         app:layout_constraintVertical_bias="0.3" />
 
     <TextView
+        android:alpha="0"
+        android:tag="splash_component"
         tools:visibility="visible"
         android:visibility="invisible"
         android:id="@+id/splash_username_error"
@@ -51,6 +58,8 @@
 
 
     <EditText
+        android:alpha="0"
+        android:tag="splash_component"
         android:background="@drawable/white_circle_coloraccent_outline"
         android:id="@+id/splash_email"
         style="@style/SearchBar"
@@ -67,6 +76,8 @@
         />
 
     <TextView
+        android:alpha="0"
+        android:tag="splash_component"
         tools:visibility="visible"
         android:visibility="invisible"
         android:id="@+id/splash_email_error"
@@ -81,6 +92,8 @@
         android:layout_height="wrap_content"/>
 
     <EditText
+        android:alpha="0"
+        android:tag="splash_component"
         android:background="@drawable/white_circle_coloraccent_outline"
         android:id="@+id/splash_password"
         style="@style/SearchBar"
@@ -96,6 +109,8 @@
         />
 
     <TextView
+        android:alpha="0"
+        android:tag="splash_component"
         tools:visibility="visible"
         android:visibility="invisible"
         android:id="@+id/splash_password_error"
@@ -111,6 +126,8 @@
 
 
     <Button
+        android:tag="splash_component"
+        android:alpha="0"
         android:elevation="20dp"
         android:id="@+id/splash_sign_in_button"
         app:layout_constraintTop_toBottomOf="@id/login_button"
@@ -126,6 +143,8 @@
         android:layout_height="wrap_content"/>
 
     <View
+        android:alpha="0"
+        android:tag="splash_component"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@drawable/white_circle_coloraccent_outline"
@@ -137,6 +156,8 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <TextView
+        android:alpha="0"
+        android:tag="splash_component"
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -148,6 +169,8 @@
         app:layout_constraintTop_toBottomOf="@+id/login_button" />
 
     <Button
+        android:alpha="0"
+        android:tag="splash_component"
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -164,6 +187,8 @@
         app:layout_constraintTop_toBottomOf="@+id/splash_password" />
 
     <ProgressBar
+        android:alpha="0"
+        android:tag="splash_component"
         android:visibility="invisible"
         android:elevation="20dp"
         android:id="@+id/splash_progressbar"

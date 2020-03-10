@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
@@ -30,6 +31,7 @@ import com.britishheritage.android.britishheritage.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -246,4 +248,8 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
         Snackbar.make(findViewById(R.id.main_frame_layout), message, Snackbar.LENGTH_SHORT).show();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }

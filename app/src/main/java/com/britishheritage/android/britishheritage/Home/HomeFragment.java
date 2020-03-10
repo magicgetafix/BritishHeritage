@@ -1,6 +1,7 @@
 package com.britishheritage.android.britishheritage.Home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -11,16 +12,32 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Main.FavouritesAdapter;
+import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.Main.MainViewModel;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.R;
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.IOException;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
 
 
 public class HomeFragment extends Fragment {
@@ -30,6 +47,8 @@ public class HomeFragment extends Fragment {
   private RecyclerView favouriteRecyclerView;
   private FavouritesAdapter favouritesAdapter;
   private LinearLayoutManager layoutManager;
+  private ImageView userPhotoIV;
+  private FirebaseUser currentUser;
 
   public HomeFragment() {
     // Required empty public constructor
@@ -53,9 +72,15 @@ public class HomeFragment extends Fragment {
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     favouriteRecyclerView = view.findViewById(R.id.favourites_recycler_view);
+    userPhotoIV = view.findViewById(R.id.home_fragment_photo);
+    currentUser = FirebaseAuth.getInstance().getCurrentUser();
     mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel .class);
-    mainViewModel.getFavouriteListLiveData().observe(this, this::onFavouritesUpdated);
+    mainViewModel.getFavouriteListLiveData().observe(getViewLifecycleOwner(), this::onFavouritesUpdated);
     layoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false);
+
+    userPhotoIV.setOnClickListener(v->{
+      onChooseImageClick();
+    });
   }
 
   private void onFavouritesUpdated(List<Landmark> landmarks) {
@@ -64,6 +89,64 @@ public class HomeFragment extends Fragment {
     favouriteRecyclerView.setLayoutManager(layoutManager);
     favouriteRecyclerView.setAdapter(favouritesAdapter);
 
+  }
+
+  public void onChooseImageClick() {
+
+    CropImage.activity()
+            .setGuidelines(CropImageView.Guidelines.ON)
+            .setActivityTitle("Choose an image for your profile")
+            .setCropMenuCropButtonTitle("Done")
+            .setRequestedSize(userPhotoIV.getWidth(), userPhotoIV.getHeight())
+            .setAspectRatio(1, 1)
+            .setCropShape(CropImageView.CropShape.OVAL)
+            .start(getContext(), this);
+
+  }
+
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    // handle result of CropImageActivity
+    if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+      CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+      if (resultCode == RESULT_OK) {
+
+        Uri imageUri = result.getUri();
+        Glide.with(this)
+                .load(imageUri)
+                .centerCrop()
+                .into(userPhotoIV);
+
+        savePhotoToFirebase(imageUri);
+
+      }
+
+      else  {
+
+        ((BaseActivity)getActivity()).showSnackbar(getString(R.string.failed_to_upload_photo));
+
+      }
+    }
+  }
+
+  private void savePhotoToFirebase(Uri uri){
+    UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setPhotoUri(uri).build();
+
+    currentUser.updateProfile(profileChangeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
+      @Override
+      public void onComplete(@NonNull Task<Void> task) {
+        if (task.isSuccessful()){
+          ((BaseActivity)getActivity()).showSnackbar(getString(R.string.uploaded_photo));
+        }
+        else{
+          ((BaseActivity)getActivity()).showSnackbar(getString(R.string.failed_to_upload_photo));
+
+        }
+
+      }
+    });
   }
 
 

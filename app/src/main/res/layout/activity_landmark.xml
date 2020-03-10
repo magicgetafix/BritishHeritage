@@ -53,6 +53,8 @@
                 app:srcCompat="@color/colorAccent" />
 
             <TextView
+                tools:visibility="visible"
+                android:visibility="visible"
                 android:textSize="18sp"
                 android:text="@string/press_the_button_to_check_in"
                 android:id="@+id/landmark_check_in_button_text"
@@ -67,18 +69,20 @@
                 />
 
             <TextView
-                android:background="@color/white"
-                android:textColor="@color/black"
                 android:id="@+id/landmark_title"
+                style="@style/MainTextStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                style="@style/MainTextStyle"
-                tools:text="Church Cross; in Churchyard; 10 Metres South of Church of St Andrew"
-                app:layout_constraintStart_toStartOf="parent"
+                android:background="@color/white"
+                android:textColor="@color/black"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/landmark_check_in_button_text" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/landmark_check_in_button_text"
+                tools:text="Church Cross; in Churchyard; 10 Metres South of Church of St Andrew" />
 
             <TextView
+                tools:visibility="visible"
+                android:visibility="gone"
                 android:textSize="18sp"
                 android:text="@string/point_of_interest"
                 android:id="@+id/landmark_point_of_interest"
