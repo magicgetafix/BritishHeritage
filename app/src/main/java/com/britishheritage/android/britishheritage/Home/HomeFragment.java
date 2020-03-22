@@ -2,6 +2,8 @@ package com.britishheritage.android.britishheritage.Home;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -11,7 +13,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import timber.log.Timber;
 
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +40,10 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -109,6 +117,8 @@ public class HomeFragment extends Fragment {
             .setRequestedSize(userPhotoIV.getWidth(), userPhotoIV.getHeight())
             .setAspectRatio(1, 1)
             .setCropShape(CropImageView.CropShape.OVAL)
+            .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
+            .setOutputCompressQuality(30)
             .start(getContext(), this);
 
   }
@@ -153,18 +163,39 @@ public class HomeFragment extends Fragment {
 
   private void savePhotoToStorage(Uri uri, String userId){
 
-    databaseInteractor.saveProfilePhotoToStorage(uri, userId, task -> {
-      if (task.isSuccessful()){
-        ((BaseActivity)getActivity()).showSnackbar(getString(R.string.uploaded_photo));
-      }
-      else{
-        ((BaseActivity)getActivity()).showSnackbar(getString(R.string.failed_to_upload_photo));
+    Bitmap bitmap = BitmapFactory.decodeFile(uri.getPath());
+    Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth()/6, bitmap.getHeight()/6, false);
+    try {
+      Uri condensedUri = convertBitmapToCondensedUri(scaledBitmap);
+      databaseInteractor.saveProfilePhotoToStorage(condensedUri, userId, task -> {
+        if (task.isSuccessful()) {
+          ((BaseActivity) getActivity()).showSnackbar(getString(R.string.uploaded_photo));
+        } else {
+          ((BaseActivity) getActivity()).showSnackbar(getString(R.string.failed_to_upload_photo));
 
-      }
-    });
-
+        }
+      });
+    }
+    catch (IOException exception){
+      Timber.e(exception);
+    }
   }
 
+  private Uri convertBitmapToCondensedUri(Bitmap bitmap) throws IOException{
+    File tempDir= getActivity().getApplication().getCacheDir();
+    tempDir = new File(tempDir.getAbsolutePath()+"/british_heritage_temp/");
+    tempDir.mkdir();
+    File tempFile = File.createTempFile("image", ".jpg", tempDir);
+    ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+    byte[] bitmapData = bytes.toByteArray();
+
+    FileOutputStream fos = new FileOutputStream(tempFile);
+    fos.write(bitmapData);
+    fos.flush();
+    fos.close();
+    return Uri.fromFile(tempFile);
+  }
 
 
 }
