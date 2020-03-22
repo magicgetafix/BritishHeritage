@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
+import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Main.FavouritesAdapter;
 import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.Main.MainViewModel;
@@ -31,6 +32,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -49,6 +51,7 @@ public class HomeFragment extends Fragment {
   private LinearLayoutManager layoutManager;
   private ImageView userPhotoIV;
   private FirebaseUser currentUser;
+  private DatabaseInteractor databaseInteractor;
 
   public HomeFragment() {
     // Required empty public constructor
@@ -58,6 +61,7 @@ public class HomeFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    databaseInteractor = new DatabaseInteractor(getContext());
 
   }
 
@@ -71,16 +75,21 @@ public class HomeFragment extends Fragment {
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+    currentUser = FirebaseAuth.getInstance().getCurrentUser();
     favouriteRecyclerView = view.findViewById(R.id.favourites_recycler_view);
     userPhotoIV = view.findViewById(R.id.home_fragment_photo);
-    currentUser = FirebaseAuth.getInstance().getCurrentUser();
     mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel .class);
     mainViewModel.getFavouriteListLiveData().observe(getViewLifecycleOwner(), this::onFavouritesUpdated);
     layoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false);
-
     userPhotoIV.setOnClickListener(v->{
       onChooseImageClick();
     });
+
+    if (currentUser.getPhotoUrl() != null){
+      Glide.with(this)
+              .load(currentUser.getPhotoUrl())
+              .into(userPhotoIV);
+    }
   }
 
   private void onFavouritesUpdated(List<Landmark> landmarks) {
@@ -120,13 +129,10 @@ public class HomeFragment extends Fragment {
                 .into(userPhotoIV);
 
         savePhotoToFirebase(imageUri);
-
       }
 
       else  {
-
         ((BaseActivity)getActivity()).showSnackbar(getString(R.string.failed_to_upload_photo));
-
       }
     }
   }
@@ -134,19 +140,29 @@ public class HomeFragment extends Fragment {
   private void savePhotoToFirebase(Uri uri){
     UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setPhotoUri(uri).build();
 
-    currentUser.updateProfile(profileChangeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
-      @Override
-      public void onComplete(@NonNull Task<Void> task) {
-        if (task.isSuccessful()){
-          ((BaseActivity)getActivity()).showSnackbar(getString(R.string.uploaded_photo));
-        }
-        else{
-          ((BaseActivity)getActivity()).showSnackbar(getString(R.string.failed_to_upload_photo));
-
-        }
+    currentUser.updateProfile(profileChangeRequest).addOnCompleteListener(task -> {
+      if (task.isSuccessful()){
+        savePhotoToStorage(uri, currentUser.getUid());
+      }
+      else{
+        ((BaseActivity)getActivity()).showSnackbar(getString(R.string.failed_to_upload_photo));
 
       }
     });
+  }
+
+  private void savePhotoToStorage(Uri uri, String userId){
+
+    databaseInteractor.saveProfilePhotoToStorage(uri, userId, task -> {
+      if (task.isSuccessful()){
+        ((BaseActivity)getActivity()).showSnackbar(getString(R.string.uploaded_photo));
+      }
+      else{
+        ((BaseActivity)getActivity()).showSnackbar(getString(R.string.failed_to_upload_photo));
+
+      }
+    });
+
   }
 
 

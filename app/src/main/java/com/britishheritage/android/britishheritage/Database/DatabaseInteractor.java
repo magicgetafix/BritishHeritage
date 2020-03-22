@@ -2,6 +2,7 @@ package com.britishheritage.android.britishheritage.Database;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.britishheritage.android.britishheritage.Daos.LandmarkDao;
@@ -10,19 +11,25 @@ import com.britishheritage.android.britishheritage.Model.Realm.FavouriteLandmark
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.Realm.WikiLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Review;
-import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.Response.Geoname;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -30,7 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Room;
@@ -50,6 +56,7 @@ public class DatabaseInteractor {
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference reviewReference;
     private FirebaseUser currentUser;
+    private StorageReference profileImageGalleryRef;
 
     public static DatabaseInteractor getInstance(Context context){
         if (instance == null){
@@ -75,8 +82,8 @@ public class DatabaseInteractor {
         }
         sharedPrefs = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
         firebaseDatabase = FirebaseDatabase.getInstance();
-        firebaseDatabase.setPersistenceEnabled(true);
         reviewReference = firebaseDatabase.getReference().child("reviews");
+        profileImageGalleryRef = FirebaseStorage.getInstance().getReference().child("images").child("profile");
 
     }
 
@@ -228,5 +235,26 @@ public class DatabaseInteractor {
         });
 
         return reviewLiveData;
+    }
+
+    public void saveProfilePhotoToStorage(Uri uri, String userId, OnCompleteListener<UploadTask.TaskSnapshot> onCompleteListener){
+
+        profileImageGalleryRef.child(userId).putFile(uri).addOnCompleteListener(onCompleteListener);
+    }
+
+    public LiveData<File> getProfilePhoto(String userId) throws IOException {
+
+        MutableLiveData<File> fileLiveData = new MutableLiveData<>();
+        int random = (int) Math.random() * 100;
+        File imageFile = File.createTempFile("image"+random, ".jpg");
+        profileImageGalleryRef.child(userId).getFile(imageFile).addOnCompleteListener(new OnCompleteListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<FileDownloadTask.TaskSnapshot> task) {
+                if (task.isSuccessful()){
+                    fileLiveData.setValue(imageFile);
+                }
+            }
+        });
+        return fileLiveData;
     }
 }

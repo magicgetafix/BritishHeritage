@@ -106,7 +106,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         userReviewsTitleTV.setVisibility(View.VISIBLE);
         reviewLayoutManager.offsetChildrenHorizontal(40);
         userReviewsRecyclerView.setLayoutManager(reviewLayoutManager);
-        LandmarkReviewAdapter reviewAdapter = new LandmarkReviewAdapter(this.reviewList, this, this);
+        LandmarkReviewAdapter reviewAdapter = new LandmarkReviewAdapter(this.reviewList, this, this, this);
         userReviewsRecyclerView.setAdapter(reviewAdapter);
     }
 

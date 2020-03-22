@@ -36,7 +36,6 @@
         app:layout_constraintDimensionRatio="1:1.1"
         android:src="@drawable/add_photo_white_icon"
         android:padding="16dp"
-        android:paddingStart="20dp"
         android:background="@drawable/transparent_circle_coloraccent_outline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

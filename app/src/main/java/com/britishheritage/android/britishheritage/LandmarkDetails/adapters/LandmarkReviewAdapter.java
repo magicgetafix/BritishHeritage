@@ -9,15 +9,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
+import com.britishheritage.android.britishheritage.LandmarkDetails.LandmarkActivity;
 import com.britishheritage.android.britishheritage.Model.Review;
 import com.britishheritage.android.britishheritage.R;
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAdapter.ReviewViewHolder> {
@@ -25,18 +31,20 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
     private List<Review> reviewList = new ArrayList<>();
     private Context context;
     private ReviewViewHolder.OnClickListener listener;
+    private LifecycleOwner lifecycleOwner;
 
-    public LandmarkReviewAdapter(List<Review> reviewList, Context context, ReviewViewHolder.OnClickListener listener){
+    public LandmarkReviewAdapter(List<Review> reviewList, Context context, ReviewViewHolder.OnClickListener listener, LifecycleOwner lifecycleOwner){
        this.reviewList = reviewList;
        this.context = context;
        this.listener = listener;
+       this.lifecycleOwner = lifecycleOwner;
     }
 
     @NonNull
     @Override
     public ReviewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.review, parent, false);
-        return new ReviewViewHolder(view, this.context, this.listener);
+        return new ReviewViewHolder(view, this.context, this.listener, this.lifecycleOwner);
     }
 
     @Override
@@ -55,6 +63,7 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
         private Context context;
         private DatabaseInteractor databaseInteractor;
         private OnClickListener listener;
+        private LifecycleOwner lifecycleOwner;
         View itemView;
         TextView usernameTextView;
         TextView reviewTitle;
@@ -70,11 +79,12 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
         ImageButton downvoteButton;
 
 
-        public ReviewViewHolder(@NonNull View itemView, Context context, OnClickListener listener ) {
+        public ReviewViewHolder(@NonNull View itemView, Context context, OnClickListener listener, LifecycleOwner lifecycleOwner) {
             super(itemView);
             this.itemView = itemView;
             this.context = context;
             this.listener = listener;
+            this.lifecycleOwner = lifecycleOwner;
             databaseInteractor = DatabaseInteractor.getInstance(context);
             this.usernameTextView = itemView.findViewById(R.id.review_username);
             this.reviewTitle = itemView.findViewById(R.id.review_title);
@@ -95,6 +105,14 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
         public void setContent(Review review){
 
             if (!review.isPlaceholder()) {
+                try {
+                    LiveData<File> fileLiveData = databaseInteractor.getProfilePhoto(review.getUserId());
+                    fileLiveData.observe(lifecycleOwner, file -> {
+                        Glide.with(context).load(file).circleCrop().into(userProfilePhoto);
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 addReviewButton.setVisibility(View.INVISIBLE);
                 usernameTextView.setText(review.getUsername());
                 reviewTitle.setText(review.getReviewTitle());
