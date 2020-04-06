@@ -10,6 +10,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.R;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -45,9 +47,11 @@ public class MyLocationProvider {
         }
 
         else{
+            MainActivity mainActivity = (MainActivity) myActivity;
             //Shows a message to ask the user to modify their location permissions
-            Toast.makeText(myActivity.getBaseContext(),
-                    appContext.getString(R.string.unable_to_find_location), Toast.LENGTH_LONG).show();
+            if (mainActivity!= null){
+                mainActivity.showSnackbar(appContext.getString(R.string.unable_to_find_location));
+            }
             return null;
         }
 
@@ -56,10 +60,13 @@ public class MyLocationProvider {
     public static LatLng getLastLocationLatLng(Activity activity){
 
         Location location = getLastLocation(activity);
-        Double latitude = location.getLatitude();
-        Double longitude = location.getLongitude();
-        LatLng latLng = new LatLng(latitude, longitude);
-        return latLng;
+        if (location!=null) {
+            Double latitude = location.getLatitude();
+            Double longitude = location.getLongitude();
+            LatLng latLng = new LatLng(latitude, longitude);
+            return latLng;
+        }
+        else return Constants.DEFAULT_LATLNG;
 
     }
 

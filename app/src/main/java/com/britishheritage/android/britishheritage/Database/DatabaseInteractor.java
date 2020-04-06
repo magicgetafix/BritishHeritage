@@ -1,9 +1,11 @@
 package com.britishheritage.android.britishheritage.Database;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 
 import com.britishheritage.android.britishheritage.Daos.LandmarkDao;
 import com.britishheritage.android.britishheritage.Global.Constants;
@@ -33,10 +35,12 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.room.Room;
@@ -224,6 +228,9 @@ public class DatabaseInteractor {
                     }
                 }
                 Timber.d("Number of reviews: "+reviews.size());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                   sortReviews(reviews);
+                }
                 reviewLiveData.setValue(reviews);
             }
 
@@ -235,6 +242,16 @@ public class DatabaseInteractor {
         });
 
         return reviewLiveData;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void sortReviews(List<Review> reviews){
+        reviews.sort(new Comparator<Review>() {
+            @Override
+            public int compare(Review o1, Review o2) {
+                return (int) (o2.getUpvotes() - o1.getUpvotes());
+            }
+        });
     }
 
     public void saveProfilePhotoToStorage(Uri uri, String userId, OnCompleteListener<UploadTask.TaskSnapshot> onCompleteListener){

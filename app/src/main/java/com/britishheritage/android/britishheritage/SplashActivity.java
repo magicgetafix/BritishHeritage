@@ -116,8 +116,6 @@ public class SplashActivity extends BaseActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    FirebaseApp.initializeApp(getApplicationContext());
-    FirebaseDatabase.getInstance().setPersistenceEnabled(true);
     firebaseAuth = FirebaseAuth.getInstance();
     FirebaseUser currentUser = firebaseAuth.getCurrentUser();
 

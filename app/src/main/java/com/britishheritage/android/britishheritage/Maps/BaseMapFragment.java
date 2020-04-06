@@ -28,6 +28,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 
+import java.util.concurrent.ConcurrentNavigableMap;
+
 import timber.log.Timber;
 
 public class BaseMapFragment extends Fragment implements OnMapReadyCallback, LatLngQuery.LatLngResultListener {
@@ -78,7 +80,12 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         supportMapFragment.getMapAsync(this);
         Location location = MyLocationProvider.getLastLocation(getActivity());
         if (newLatLng==null) {
-            currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+            if (location != null) {
+                currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+            }
+            else{
+                currentLatLng = Constants.DEFAULT_LATLNG;
+            }
         }
         else{
             currentLatLng = newLatLng;

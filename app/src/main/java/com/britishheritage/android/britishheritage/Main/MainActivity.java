@@ -140,6 +140,7 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
         databaseInteractor = DatabaseInteractor.getInstance(getApplicationContext());
         databaseSizeLiveData = databaseInteractor.getDatabaseSize();
         databaseSizeLiveData.observe(this, this::populateDatabase);
+        navigationView.setBackgroundColor(getResources().getColor(R.color.white));
 
     }
 
@@ -251,5 +252,18 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (navigationView!=null) {
+            if (navigationView.getSelectedItemId() != R.id.home) {
+                navigationView.setSelectedItemId(R.id.home);
+            }
+            else{
+                finishAffinity();
+            }
+        }
     }
 }

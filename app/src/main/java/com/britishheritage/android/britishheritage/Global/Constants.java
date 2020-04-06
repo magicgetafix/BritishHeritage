@@ -1,5 +1,7 @@
 package com.britishheritage.android.britishheritage.Global;
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class Constants {
 
     public static final String LISTED_BUILDINGS_ID = "LB";
@@ -13,6 +15,7 @@ public class Constants {
     public final static String GEO_FIRE_DATABASE_REF = "geo_location";
     public final static String LANDMARK_REF = "landmarks";
     public final static String DATABASE_NAME = "landmarks";
+    public final static LatLng DEFAULT_LATLNG = new LatLng(51.179, -1.828);
 
     //for geocode api
     public final static String GEOCODE_USERNAME = "britishheritage";
