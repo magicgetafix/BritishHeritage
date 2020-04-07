@@ -130,12 +130,27 @@ public class DatabaseInteractor {
     }
 
     public void addFavourite(Landmark landmark){
-
         FavouriteLandmarkRealmObj favourite = new FavouriteLandmarkRealmObj(landmark);
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(favourite);
         realm.commitTransaction();
+    }
 
+    public void removeFavourite(String landmarkId){
+        realm.beginTransaction();
+        FavouriteLandmarkRealmObj landmarkRealmObj = realm.where(FavouriteLandmarkRealmObj.class).equalTo("id", landmarkId).findFirst();
+        if (landmarkRealmObj!=null) {
+            landmarkRealmObj.deleteFromRealm();
+        }
+        realm.commitTransaction();
+    }
+
+    public boolean isFavourite(String landmarkId){
+        FavouriteLandmarkRealmObj favourite = realm.where(FavouriteLandmarkRealmObj.class).equalTo("id", landmarkId).findFirst();
+        if (favourite == null){
+            return false;
+        }
+        return true;
     }
 
     public RealmResults<FavouriteLandmarkRealmObj> getFavourites(){

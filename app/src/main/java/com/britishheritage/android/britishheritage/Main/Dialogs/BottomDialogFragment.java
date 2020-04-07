@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
+import com.britishheritage.android.britishheritage.Main.MainActivity;
+import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -27,6 +30,7 @@ public class BottomDialogFragment extends BottomSheetDialogFragment {
     private ImageView viewDetailsIV;
 
     private ItemClickListener clickListener;
+    private DatabaseInteractor databaseInteractor;
 
     public static BottomDialogFragment newInstance() {
         return new BottomDialogFragment();
@@ -41,12 +45,25 @@ public class BottomDialogFragment extends BottomSheetDialogFragment {
 
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        databaseInteractor = DatabaseInteractor.getInstance(view.getContext());
         directionsTV = view.findViewById(R.id.direction_text);
         directionsIV = view.findViewById(R.id.direction_image);
         favouritesTV = view.findViewById(R.id.favourite_text);
         favouritesIV = view.findViewById(R.id.favourite_image);
         viewDetailsTV = view.findViewById(R.id.view_detail_text);
         viewDetailsIV = view.findViewById(R.id.view_detail_image);
+        Landmark landmark = MainActivity.lastClickedLandmark;
+
+        if (landmark!=null && databaseInteractor.isFavourite(landmark.getId())){
+            String removeFromFavourites = getString(R.string.remove_from_favourites);
+            favouritesTV.setText(removeFromFavourites);
+            favouritesIV.setImageDrawable(getView().getResources().getDrawable(R.drawable.favourite_heart_empty));
+        }
+        else{
+            String addToFavourites = getString(R.string.add_to_favourites);
+            favouritesTV.setText(addToFavourites);
+            favouritesIV.setImageDrawable(getView().getResources().getDrawable(R.drawable.favourite_heart_full));
+        }
 
         directionsIV.setOnClickListener(new View.OnClickListener() {
             @Override

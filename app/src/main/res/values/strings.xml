@@ -11,6 +11,7 @@
     <string name="arch_map">Monuments</string>
     <string name="listed_building_string">Buildings</string>
     <string name="home">Home</string>
+    <string name="add_to_favourites">Add to favourites</string>
     <string name="added_to_favourites">Added to favourites</string>
     <string name="press_the_button_to_check_in">Press the button to check in</string>
     <string name="point_of_interest">Points of interest:</string>
@@ -36,5 +37,7 @@
     <string name="write_review">Write review...</string>
     <string name="failed_to_upload_photo">Failed to upload photo</string>
     <string name="uploaded_photo">Successfully uploaded photo</string>
+    <string name="remove_from_favourites">Remove from favourites</string>
+    <string name="removed_from_favourites">Removed from favourites</string>
 
 </resources>

@@ -1,19 +1,21 @@
 package com.britishheritage.android.britishheritage.LandmarkDetails;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
+import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.LandmarkReviewAdapter;
 import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.WikiLandmarkAdapter;
 import com.britishheritage.android.britishheritage.Model.Landmark;
@@ -41,6 +43,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     private SupportMapFragment landmarkMapFragment;
     private FloatingActionButton checkInButton;
     private TextView checkInTV;
+    private ImageView favouriteIcon;
     private TextView landmarkTitleTV;
     private TextView pointOfInterestTitleTV;
     private RecyclerView geoNamesRecyclerView;
@@ -51,8 +54,13 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     private RecyclerView.LayoutManager reviewLayoutManager;
     public static final String WIKI_URL_KEY = "british_heritage_wiki_url";
     private List<Review> reviewList = new ArrayList<>();
+    private Toolbar toolbar;
+    private DatabaseInteractor databaseInteractor;
+    private Drawable isFavouriteDrawable;
+    private Drawable notFavouriteDrawable;
 
     private GoogleMap gMap;
+    public static int LANDMARK_EXITED = 452;
 
 
     @Override
@@ -67,6 +75,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             Timber.d("Landmark failed to be unwrapped");
             onDestroy();
         }
+        databaseInteractor = DatabaseInteractor.getInstance(this);
         user = FirebaseAuth.getInstance().getCurrentUser();
         checkInButton = findViewById(R.id.landmark_check_in_button);
         checkInTV = findViewById(R.id.landmark_check_in_button_text);
@@ -74,18 +83,15 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         pointOfInterestTitleTV = findViewById(R.id.landmark_point_of_interest);
         geoNamesRecyclerView = findViewById(R.id.landmark_geonames_recylerview);
         userReviewsTitleTV = findViewById(R.id.landmark_suggestions);
+        toolbar = findViewById(R.id.landmark_activity_toolbar);
+        favouriteIcon = findViewById(R.id.favourite_icon);
         userReviewsRecyclerView = findViewById(R.id.landmark_user_descriptions_recylerview);
         wikiLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
         reviewLayoutManager  = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
+        isFavouriteDrawable = getDrawable(R.drawable.favourite_heart_full);
+        notFavouriteDrawable = getDrawable(R.drawable.favourite_heart_empty);
 
-        String name = mainLandmark.getName();
-        if (name!=null) {
-            landmarkTitleTV.setText(name);
-            if (getSupportActionBar()!=null) {
-                getSupportActionBar().setTitle(name);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            }
-        }
+        setUpToolbar();
 
         landmarkViewModel = ViewModelProviders.of(this).get(LandmarkViewModel.class);
         LatLng latLng = new LatLng(mainLandmark.latitude, mainLandmark.longitude);
@@ -96,6 +102,40 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         landmarkMapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.landmark_map);
         landmarkMapFragment.getMapAsync(this);
+
+        setUpFavouriteButton();
+    }
+
+    private void setUpFavouriteButton() {
+
+        favouriteIcon.setOnClickListener(v->{
+            if (databaseInteractor.isFavourite(mainLandmark.getId())){
+                databaseInteractor.removeFavourite(mainLandmark.getId());
+                favouriteIcon.setImageDrawable(notFavouriteDrawable);
+            }
+            else{
+                databaseInteractor.addFavourite(mainLandmark);
+                favouriteIcon.setImageDrawable(isFavouriteDrawable);
+            }
+        });
+    }
+
+    private void setUpToolbar(){
+        String name = mainLandmark.getName();
+        if (name!=null) {
+            landmarkTitleTV.setText(name);
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar()!=null) {
+                final Drawable upArrow = getResources().getDrawable(R.drawable.baseline_arrow_back_white_24);
+                getSupportActionBar().setHomeAsUpIndicator(upArrow);
+                getSupportActionBar().setTitle(name);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+        }
+        boolean isFavourite = databaseInteractor.isFavourite(mainLandmark.getId());
+        if (isFavourite){
+            favouriteIcon.setImageDrawable(isFavouriteDrawable);
+        }
     }
 
 
@@ -205,5 +245,11 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             userReviewsRecyclerView.getAdapter().notifyDataSetChanged();
         }
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(LANDMARK_EXITED);
+        super.onBackPressed();
     }
 }

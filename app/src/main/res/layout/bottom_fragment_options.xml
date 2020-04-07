@@ -67,7 +67,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/favourite_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/favourite_text"
-        app:srcCompat="@drawable/favourite_icon" />
+        app:srcCompat="@drawable/favourite_heart_full" />
 
     <View
         android:background="@color/colorPrimary"

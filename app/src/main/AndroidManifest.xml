@@ -25,7 +25,8 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".WebActivity"
             ></activity>
-        <activity android:name=".LandmarkDetails.LandmarkActivity" />
+        <activity android:name=".LandmarkDetails.LandmarkActivity"
+            android:theme="@style/AppThemeNoActionBar"/>
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/AppTheme" />

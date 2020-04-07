@@ -144,7 +144,6 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
 
     }
 
-
     private void populateDatabase(int databaseSize){
         Timber.d("Database size is: "+databaseSize);
         if (databaseSize == 0){
@@ -229,9 +228,16 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
     public void onAddToFavouritesClick() {
 
         if (lastClickedLandmark!=null) {
-            databaseInteractor.addFavourite(lastClickedLandmark);
-            bottomDialogFragment.dismiss();
-            showSnackbar(getString(R.string.added_to_favourites));
+            if (!databaseInteractor.isFavourite(lastClickedLandmark.getId())) {
+                databaseInteractor.addFavourite(lastClickedLandmark);
+                bottomDialogFragment.dismiss();
+                showSnackbar(getString(R.string.added_to_favourites));
+            }
+            else{
+                databaseInteractor.removeFavourite(lastClickedLandmark.getId());
+                bottomDialogFragment.dismiss();
+                showSnackbar(getString(R.string.removed_from_favourites));
+            }
         }
 
     }
@@ -240,7 +246,7 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
     public void onViewDetailsClick() {
 
         if (lastClickedLandmark!=null){
-            navigateWithLandmark(LandmarkActivity.class, lastClickedLandmark);
+            navigateWithLandmarkForResult(LandmarkActivity.class, lastClickedLandmark);
         }
 
     }
@@ -251,6 +257,12 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == LandmarkActivity.LANDMARK_EXITED){
+            if (bottomDialogFragment!=null && bottomDialogFragment.isVisible()){
+                bottomDialogFragment.dismissAllowingStateLoss();
+                return;
+            }
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
