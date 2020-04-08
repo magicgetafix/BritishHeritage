@@ -7,10 +7,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RotateDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -41,8 +51,9 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     private FirebaseUser user;
     private Landmark mainLandmark;
     private SupportMapFragment landmarkMapFragment;
-    private FloatingActionButton checkInButton;
+    private Button checkInButton;
     private TextView checkInTV;
+    private ImageView checkInStarIV;
     private ImageView favouriteIcon;
     private TextView landmarkTitleTV;
     private TextView pointOfInterestTitleTV;
@@ -58,6 +69,11 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     private DatabaseInteractor databaseInteractor;
     private Drawable isFavouriteDrawable;
     private Drawable notFavouriteDrawable;
+    private Drawable starDrawable;
+    //animated image views
+    private ImageView star1;
+    private ImageView star2;
+    private ImageView star3;
 
     private GoogleMap gMap;
     public static int LANDMARK_EXITED = 452;
@@ -79,6 +95,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         user = FirebaseAuth.getInstance().getCurrentUser();
         checkInButton = findViewById(R.id.landmark_check_in_button);
         checkInTV = findViewById(R.id.landmark_check_in_button_text);
+        checkInStarIV = findViewById(R.id.star_award_image_view);
         landmarkTitleTV = findViewById(R.id.landmark_title);
         pointOfInterestTitleTV = findViewById(R.id.landmark_point_of_interest);
         geoNamesRecyclerView = findViewById(R.id.landmark_geonames_recylerview);
@@ -90,6 +107,11 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         reviewLayoutManager  = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
         isFavouriteDrawable = getDrawable(R.drawable.favourite_heart_full);
         notFavouriteDrawable = getDrawable(R.drawable.favourite_heart_empty);
+        starDrawable = getDrawable(R.drawable.star_drawable);
+
+        star1 = findViewById(R.id.star_award_image_view1);
+        star2 = findViewById(R.id.star_award_image_view2);
+        star3 = findViewById(R.id.star_award_image_view3);
 
         setUpToolbar();
 
@@ -104,6 +126,55 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         landmarkMapFragment.getMapAsync(this);
 
         setUpFavouriteButton();
+        setUpCheckInButton();
+    }
+
+    private void setUpCheckInButton() {
+
+        checkInButton.setOnClickListener(v->{
+
+            RotateDrawable rotateDrawable = (RotateDrawable) checkInStarIV.getBackground();
+            ObjectAnimator anim = ObjectAnimator.ofInt(rotateDrawable, "level", 0, 10000);
+            anim.setDuration(1500);
+            anim.setRepeatCount(ValueAnimator.REVERSE);
+            anim.start();
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    anim.end();
+                    star1.setVisibility(View.VISIBLE);
+                    star1.setAlpha(1f);
+                    star1.animate().alpha(0).setDuration(750);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            star2.setVisibility(View.VISIBLE);
+                            star2.setAlpha(1f);
+                            star2.animate().alpha(0).setDuration(750);
+
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    star3.setVisibility(View.VISIBLE);
+                                    star3.setAlpha(1f);
+                                    star3.animate().alpha(0).setDuration(750);
+                                }
+                            }, 500);
+                        }
+                    }, 500);
+
+                }
+            }, 3000);
+
+
+
+
+
+
+
+        });
     }
 
     private void setUpFavouriteButton() {

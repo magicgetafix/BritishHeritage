@@ -72,18 +72,125 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/landmark_activity_toolbar" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
+            <Space
+                android:id="@+id/button_spacing_top2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/landmark_check_in_button_text"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"/>
+
+            <Space
+                android:id="@+id/button_spacing_top"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/landmark_check_in_button_text"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"/>
+
+            <Button
                 android:id="@+id/landmark_check_in_button"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="-10dp"
+                android:layout_marginTop="-10dp"
+                android:background="@drawable/round_button_ripple"
                 android:clickable="true"
-                android:elevation="20dp"
                 android:focusable="true"
-                app:layout_constraintBottom_toBottomOf="@id/landmark_check_in_button_text"
+                android:elevation="20dp"
+                android:shadowColor="@color/trans_white"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintBottom_toBottomOf="@id/button_spacing_bottom"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/button_spacing_top"
                 app:srcCompat="@color/colorAccent" />
+
+            <ImageView
+                android:id="@+id/star_award_image_view"
+                android:elevation="25dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="10dp"
+                android:visibility="visible"
+                android:background="@drawable/rotating_star"
+                app:layout_constraintBottom_toBottomOf="@id/landmark_check_in_button"
+                app:layout_constraintEnd_toEndOf="@id/landmark_check_in_button"
+                app:layout_constraintStart_toStartOf="@id/landmark_check_in_button"
+                app:layout_constraintTop_toTopOf="@id/landmark_check_in_button"
+                android:layout_width="0dp"
+                android:layout_height="0dp"/>
+
+            <ImageView
+                app:layout_constraintDimensionRatio="1:1"
+                android:id="@+id/star_award_image_view1"
+                android:elevation="26dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginBottom="0dp"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                android:background="@drawable/rotating_star"
+                app:layout_constraintBottom_toBottomOf="@id/landmark_check_in_button"
+                app:layout_constraintEnd_toEndOf="@id/landmark_check_in_button"
+                app:layout_constraintStart_toStartOf="@id/landmark_check_in_button"
+                app:layout_constraintTop_toTopOf="@id/landmark_check_in_button"
+                android:layout_width="0dp"
+                android:layout_height="60dp"/>
+
+            <ImageView
+                app:layout_constraintDimensionRatio="1:1"
+                android:id="@+id/star_award_image_view2"
+                android:elevation="27dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginBottom="0dp"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                android:background="@drawable/rotating_star"
+                app:layout_constraintStart_toStartOf="@id/landmark_check_in_button"
+                app:layout_constraintEnd_toEndOf="@id/landmark_check_in_button"
+                app:layout_constraintBottom_toBottomOf="@id/button_spacing_bottom2"
+                app:layout_constraintTop_toTopOf="@id/button_spacing_top2"
+                android:layout_width="0dp"
+                android:layout_height="100dp"/>
+
+            <ImageView
+                app:layout_constraintDimensionRatio="1:1"
+                android:id="@+id/star_award_image_view3"
+                android:elevation="27dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginBottom="0dp"
+                android:visibility="invisible"
+                tools:visibility="visible"
+                android:background="@drawable/rotating_star"
+                app:layout_constraintStart_toStartOf="@id/landmark_check_in_button"
+                app:layout_constraintEnd_toEndOf="@id/landmark_check_in_button"
+                app:layout_constraintBottom_toBottomOf="@id/button_spacing_bottom2"
+                app:layout_constraintTop_toTopOf="@id/button_spacing_top2"
+                android:layout_width="0dp"
+                android:layout_height="130dp"/>
+
+            <Space
+                android:id="@+id/button_spacing_bottom"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/landmark_check_in_button_text"
+                android:layout_width="match_parent"
+                android:layout_height="5dp"/>
+
+            <Space
+                android:id="@+id/button_spacing_bottom2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/landmark_check_in_button_text"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"/>
 
             <TextView
                 tools:visibility="visible"
