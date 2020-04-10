@@ -1,6 +1,5 @@
 package com.britishheritage.android.britishheritage.Database;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -19,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,7 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -40,9 +39,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.room.Room;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -57,10 +58,14 @@ public class DatabaseInteractor {
     private LandmarkDatabase db;
     private Realm realm;
     private SharedPreferences sharedPrefs;
+    private SharedPreferences checkedInLandmarksSharedPrefs;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference reviewReference;
     private FirebaseUser currentUser;
     private StorageReference profileImageGalleryRef;
+    private DatabaseReference checkedInReviewsRef;
+
+    public static final String CHECKED_IN_PREFS = "checked_in_prefs";
 
     public static DatabaseInteractor getInstance(Context context){
         if (instance == null){
@@ -85,8 +90,10 @@ public class DatabaseInteractor {
             realm = Realm.getInstance(config);
         }
         sharedPrefs = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
+        checkedInLandmarksSharedPrefs = context.getSharedPreferences(CHECKED_IN_PREFS, Context.MODE_PRIVATE);
         firebaseDatabase = FirebaseDatabase.getInstance();
-        reviewReference = firebaseDatabase.getReference().child("reviews");
+        reviewReference = firebaseDatabase.getReference().child(Constants.REVIEWS);
+        checkedInReviewsRef = firebaseDatabase.getReference().child(Constants.CHECKED_IN);
         profileImageGalleryRef = FirebaseStorage.getInstance().getReference().child("images").child("profile");
 
     }
@@ -127,6 +134,10 @@ public class DatabaseInteractor {
         double maxLong = topRightLatLng.longitude;
         double minLong = bottomLeftLatLng.longitude;
         return db.landmarkDao().getNearestLandmarks(maxLat, minLat, maxLong, minLong);
+    }
+
+    public LiveData<Landmark> getLandmark(String landmarkRef){
+        return db.landmarkDao().getLandmark(landmarkRef);
     }
 
     public void addFavourite(Landmark landmark){
@@ -213,12 +224,66 @@ public class DatabaseInteractor {
         reviewReference.child(landmarkId).child(review.getUserId()).setValue(review).addOnCompleteListener(listener);
     }
 
+    public void checkInToLandmark(Landmark landmark, OnCompleteListener listener){
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser!=null && listener!=null) {
+            checkedInReviewsRef.child(currentUser.getUid()).child(landmark.getId()).setValue(true).addOnCompleteListener(listener);
+        }
+    }
+
+    public boolean isCheckedInLandmark(String landmarkId){
+        return checkedInLandmarksSharedPrefs.getBoolean(landmarkId, false);
+    }
+
+    public LiveData<List<Landmark>> getCheckedInLandmarks(FirebaseUser currentUser){
+
+        MutableLiveData<List<Landmark>> checkedInLandmarks = new MutableLiveData<>();
+        if (currentUser!=null){
+            List<Landmark> landmarkList = new ArrayList<>();
+            checkedInReviewsRef.child(currentUser.getUid()).addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    String landmarkRef = dataSnapshot.getKey();
+                    LiveData<Landmark> landmarkLiveData = getLandmark(landmarkRef);
+                    landmarkLiveData.observeForever(new Observer<Landmark>() {
+                        @Override
+                        public void onChanged(Landmark landmark) {
+                            landmarkList.add(landmark);
+                            landmarkLiveData.removeObserver(this);
+                            checkedInLandmarks.setValue(landmarkList);
+                            checkedInLandmarksSharedPrefs.edit().putBoolean(landmarkRef, true).apply();
+                        }
+                    });
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+        }
+        return checkedInLandmarks;
+    }
+
     public LiveData<List<Review>> getReviews(String landmarkId){
 
-        if (currentUser == null){
-            currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        }
-
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
         MutableLiveData<List<Review>> reviewLiveData = new MutableLiveData<>();
         List<Review> reviews = new ArrayList<>();
         Review firstReview = new Review();

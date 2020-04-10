@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Global.Constants;
@@ -15,17 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
 
-public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesAdapter.FavouritesViewHolder> {
+public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.FavouritesViewHolder> {
 
     private List<Landmark> favouritesList = new ArrayList<>();
     private Context context;
 
-    public FavouritesAdapter(List<Landmark> favouritesList, Context context){
+    public LandmarksAdapter(List<Landmark> favouritesList, Context context){
         this.favouritesList = favouritesList;
         this.context = context;
     }
@@ -82,25 +80,24 @@ public class FavouritesAdapter extends RecyclerView.Adapter<FavouritesAdapter.Fa
             if (landmark.getType()!=null){
 
                 String type = landmark.getType();
-                if (type.equalsIgnoreCase("Buildings")){
+                if (type.equalsIgnoreCase("Buildings") || type.equals(Constants.LISTED_BUILDINGS_ID)){
                     type = "Listed Building";
-                }
-
-                Timber.d(landmark.getType());
-
-                if (landmark.getType().equalsIgnoreCase("Scheduled Monument")){
-                    scheduledMonumentBackground.setVisibility(View.VISIBLE);
-                }
-                else if (landmark.getType().equalsIgnoreCase("Listed Building")){
                     listedBuildingBackground.setVisibility(View.VISIBLE);
                 }
-                else if (landmark.getType().equalsIgnoreCase("Hillfort")){
+
+                if (landmark.getType().equalsIgnoreCase("Scheduled Monument") || type.equals(Constants.SCHEDULED_MONUMENTS_ID)){
+                    scheduledMonumentBackground.setVisibility(View.VISIBLE);
+                }
+                else if (landmark.getType().equalsIgnoreCase("Listed Building") || type.equals(Constants.LISTED_BUILDINGS_ID)){
+                    listedBuildingBackground.setVisibility(View.VISIBLE);
+                }
+                else if (landmark.getType().equalsIgnoreCase("Hillfort") || type.equals(Constants.HILLFORTS_ID)){
                     hillfortBackground.setVisibility(View.VISIBLE);
                 }
-                else if (landmark.getType().equalsIgnoreCase("Park or Garden")){
+                else if (landmark.getType().equalsIgnoreCase("Park or Garden") || type.equals(Constants.PARKS_AND_GARDENS_ID)){
                     parkAndGardenBackground.setVisibility(View.VISIBLE);
                 }
-                else if (landmark.getType().equalsIgnoreCase("Battlefield")){
+                else if (landmark.getType().equalsIgnoreCase("Battlefield") || type.equals(Constants.BATTLEFIELDS_ID)){
                     battlefieldBackground.setVisibility(View.VISIBLE);
                 }
             }

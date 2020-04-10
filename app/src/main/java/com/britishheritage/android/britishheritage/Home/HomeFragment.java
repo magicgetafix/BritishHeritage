@@ -1,6 +1,5 @@
 package com.britishheritage.android.britishheritage.Home;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,36 +14,30 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
-import com.britishheritage.android.britishheritage.Main.FavouritesAdapter;
-import com.britishheritage.android.britishheritage.Main.MainActivity;
+import com.britishheritage.android.britishheritage.Global.Constants;
+import com.britishheritage.android.britishheritage.Main.LandmarksAdapter;
 import com.britishheritage.android.britishheritage.Main.MainViewModel;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.R;
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
@@ -55,8 +48,11 @@ public class HomeFragment extends Fragment {
 
   private MainViewModel mainViewModel;
   private RecyclerView favouriteRecyclerView;
-  private FavouritesAdapter favouritesAdapter;
-  private LinearLayoutManager layoutManager;
+  private LandmarksAdapter favouritesAdapter;
+  private LinearLayoutManager favouritesLayoutManager;
+  private RecyclerView checkedInLandmarksRecyclerView;
+  private LandmarksAdapter checkedInLandmarksAdapter;
+  private LinearLayoutManager checkedInLandmarksManager;
   private ImageView userPhotoIV;
   private FirebaseUser currentUser;
   private DatabaseInteractor databaseInteractor;
@@ -85,10 +81,17 @@ public class HomeFragment extends Fragment {
     super.onViewCreated(view, savedInstanceState);
     currentUser = FirebaseAuth.getInstance().getCurrentUser();
     favouriteRecyclerView = view.findViewById(R.id.favourites_recycler_view);
+    checkedInLandmarksRecyclerView = view.findViewById(R.id.home_checked_in_landmarks_recycler_view);
     userPhotoIV = view.findViewById(R.id.home_fragment_photo);
     mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel .class);
+    favouritesLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false);
+    checkedInLandmarksManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+    //set up with default values
+    onCheckedInLandmarksUpdated(new ArrayList<Landmark>());
+    //set up with default values
+    onFavouritesUpdated(new ArrayList<Landmark>());
     mainViewModel.getFavouriteListLiveData().observe(getViewLifecycleOwner(), this::onFavouritesUpdated);
-    layoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false);
+    mainViewModel.getCheckedInLandmarkLiveData().observe(getViewLifecycleOwner(), this::onCheckedInLandmarksUpdated);
     userPhotoIV.setOnClickListener(v->{
       onChooseImageClick();
     });
@@ -102,9 +105,33 @@ public class HomeFragment extends Fragment {
 
   private void onFavouritesUpdated(List<Landmark> landmarks) {
 
-    favouritesAdapter = new FavouritesAdapter(landmarks, getContext());
-    favouriteRecyclerView.setLayoutManager(layoutManager);
+    if (landmarks.isEmpty()){
+      Landmark tempLandmark = new Landmark();
+      String tempFavText = getString(R.string.temp_favourite_text);
+      tempLandmark.setName(tempFavText);
+      tempLandmark.setId("0");
+      tempLandmark.setType(Constants.LISTED_BUILDINGS_ID);
+      landmarks.add(tempLandmark);
+    }
+    favouritesAdapter = new LandmarksAdapter(landmarks, getContext());
+    favouriteRecyclerView.setLayoutManager(favouritesLayoutManager);
     favouriteRecyclerView.setAdapter(favouritesAdapter);
+
+  }
+
+  private void onCheckedInLandmarksUpdated(List<Landmark> landmarks){
+
+    if (landmarks.isEmpty()){
+      Landmark tempLandmark = new Landmark();
+      String tempFavText = getString(R.string.temp_checked_in_landmarks);
+      tempLandmark.setName(tempFavText);
+      tempLandmark.setId("0");
+      tempLandmark.setType(Constants.SCHEDULED_MONUMENTS_ID);
+      landmarks.add(tempLandmark);
+    }
+    checkedInLandmarksAdapter = new LandmarksAdapter(landmarks, getContext());
+    checkedInLandmarksRecyclerView.setLayoutManager(checkedInLandmarksManager);
+    checkedInLandmarksRecyclerView.setAdapter(checkedInLandmarksAdapter);
 
   }
 

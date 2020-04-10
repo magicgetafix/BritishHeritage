@@ -5,6 +5,8 @@ import android.app.Application;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Model.Realm.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -24,12 +26,37 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
     private DatabaseInteractor databaseInteractor;
     private MutableLiveData<List<Landmark>> favouriteListLiveData = new MutableLiveData<>();
     private RealmResults<FavouriteLandmarkRealmObj> realmResults;
+    private MutableLiveData<List<Landmark>> checkedInLandmarksLiveData = new MutableLiveData<>();
 
     public MainViewModel(@NonNull Application application) {
         super(application);
         databaseInteractor = DatabaseInteractor.getInstance(getApplication());
-        realmResults = databaseInteractor.getFavourites();
-        realmResults.addChangeListener(this);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        getUserData(user);
+
+        FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+                if (currentUser == null){
+                    favouriteListLiveData.setValue(new ArrayList<Landmark>());
+                    checkedInLandmarksLiveData.setValue(new ArrayList<Landmark>());
+                }
+                else{
+                    getUserData(currentUser);
+                }
+            }
+        });
+    }
+
+    private void getUserData(FirebaseUser user){
+        if (user!=null) {
+            realmResults = databaseInteractor.getFavourites();
+            realmResults.addChangeListener(this);
+            databaseInteractor.getCheckedInLandmarks(user).observeForever(landmarks -> {
+                checkedInLandmarksLiveData.setValue(landmarks);
+            });
+        }
     }
 
 
@@ -44,6 +71,9 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
             favouriteListLiveData.setValue(favouriteLandmarkList);
         }
 
+    }
+    public LiveData<List<Landmark>> getCheckedInLandmarkLiveData(){
+        return checkedInLandmarksLiveData;
     }
 
     public LiveData<List<Landmark>> getFavouriteListLiveData() {

@@ -7,10 +7,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.R;
 import com.google.android.gms.maps.model.LatLng;
@@ -47,14 +49,45 @@ public class MyLocationProvider {
         }
 
         else{
-            MainActivity mainActivity = (MainActivity) myActivity;
+            BaseActivity baseActivity = (BaseActivity) myActivity;
             //Shows a message to ask the user to modify their location permissions
-            if (mainActivity!= null){
-                mainActivity.showSnackbar(appContext.getString(R.string.unable_to_find_location));
+            if (baseActivity!= null){
+                baseActivity.showSnackbar(appContext.getString(R.string.unable_to_find_location));
             }
             return null;
         }
 
+    }
+
+    public static void addLocationListener(LocationListener listener, Activity activity) throws SecurityException {
+
+        if (locationManager == null) {
+            locationManager = (LocationManager) appContext.getSystemService(Context.LOCATION_SERVICE);
+        }
+        boolean havePermissions = checkPermissions();
+        if (havePermissions){
+            boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if (gpsEnabled) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 50, listener);
+            }
+            else{
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 50, listener);
+            }
+        }
+        else{
+            BaseActivity baseActivity = (BaseActivity) activity;
+            //Shows a message to ask the user to modify their location permissions
+            if (baseActivity!= null){
+                baseActivity.showSnackbar(appContext.getString(R.string.unable_to_find_location));
+            }
+            return;
+        }
+    }
+
+    public static void removeLocationListeners(LocationListener listener){
+        if (locationManager != null){
+            locationManager.removeUpdates(listener);
+        }
     }
 
     public static LatLng getLastLocationLatLng(Activity activity){

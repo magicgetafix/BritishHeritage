@@ -20,6 +20,9 @@ public interface LandmarkDao {
     @Query("SELECT COUNT(*) FROM LANDMARK_TABLE")
     LiveData<Integer> getNumberOfEntries();
 
+    @Query("SELECT * FROM LANDMARK_TABLE WHERE id LIKE :landmarkId")
+    LiveData<Landmark> getLandmark(String landmarkId);
+
     @Query("SELECT * FROM LANDMARK_TABLE WHERE latitude < :maxLat AND latitude > :minLat AND longitude < :maxLong AND longitude > :minLong")
     LiveData<List<Landmark>> getNearestLandmarks(double maxLat, double minLat, double maxLong, double minLong);
 

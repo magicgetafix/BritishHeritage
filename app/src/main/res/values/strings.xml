@@ -39,5 +39,13 @@
     <string name="uploaded_photo">Successfully uploaded photo</string>
     <string name="remove_from_favourites">Remove from favourites</string>
     <string name="removed_from_favourites">Removed from favourites</string>
+    <string name="check_in_message">You have explored this site!</string>
+    <string name="not_within_area">You need to be within the area to check in successfully</string>
+    <string name="something_went_wrong">Sorry, something went wrong</string>
+    <string name="places_you_have_visited">Places you have visited:</string>
+    <string name="places_you_have_explored">Places you have explored:</string>
+    <string name="your_favourite_places">Your favourite places:</string>
+    <string name="temp_favourite_text">This is where your favourite places will be shown</string>
+    <string name="temp_checked_in_landmarks">This is where any sites you have visited will be shown</string>
 
 </resources>

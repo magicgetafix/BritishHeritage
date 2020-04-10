@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
@@ -25,7 +27,9 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
       String[] dataCSV = marker.getSnippet().split("//");
       String locationName = "";
       String typeOfLocation = "";
+      String id = "";
       if (dataCSV.length == 5){
+        id = dataCSV[0];
         locationName = dataCSV[1];
         typeOfLocation = dataCSV[4];
       }
@@ -56,13 +60,22 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
 
       locationName = locationName.replace(";", ",");
 
+      DatabaseInteractor databaseInteractor = DatabaseInteractor.getInstance(context);
+
       LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
       View v = inflater.inflate(R.layout.map_info_window, null);
       TextView title = v.findViewById(R.id.map_entity_title);
       TextView type = v.findViewById(R.id.type_of_marker);
       ImageView image = v.findViewById(R.id.map_info_window_image);
+      ImageView star = v.findViewById(R.id.map_checked_in_star);
       title.setText(locationName);
       type.setText(typeOfLocation);
+      if (databaseInteractor.isCheckedInLandmark(id)){
+        star.setVisibility(View.VISIBLE);
+      }
+      else{
+        star.setVisibility(View.INVISIBLE);
+      }
       return v;
 
     }

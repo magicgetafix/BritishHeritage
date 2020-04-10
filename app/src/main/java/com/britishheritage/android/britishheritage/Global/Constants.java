@@ -30,4 +30,8 @@ public class Constants {
     public final static String REVIEW_USER_ID_KEY = "uId";
     public final static String REVIEW_ID = "rId";
     public final static String REVIEW_TITLE = "rT";
+
+    //checked in landmark keys
+    public final static String CHECKED_IN = "visits";
+    public static final String REVIEWS = "reviews";
 }
