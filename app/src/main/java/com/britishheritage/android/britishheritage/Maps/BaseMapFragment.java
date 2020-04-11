@@ -4,6 +4,7 @@ package com.britishheritage.android.britishheritage.Maps;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.location.LocationListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -32,7 +33,7 @@ import java.util.concurrent.ConcurrentNavigableMap;
 
 import timber.log.Timber;
 
-public class BaseMapFragment extends Fragment implements OnMapReadyCallback, LatLngQuery.LatLngResultListener {
+public class BaseMapFragment extends Fragment implements OnMapReadyCallback, LatLngQuery.LatLngResultListener, LocationListener {
 
     private MapViewModel mViewModel;
     private SupportMapFragment supportMapFragment;
@@ -51,6 +52,9 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     private LatLngQuery latLngQuery;
     private float pixelDensityScale = 1.0f;
     private int iconBmapWidthHeight = 20;
+    private Marker currentLocationMarker;
+    private BitmapDescriptor locationBitmapDescriptor;
+    private boolean updatedLocationHasBeenSet = false;
 
 
     public static BaseMapFragment newInstance(LatLng targetLatLng) {
@@ -103,7 +107,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         buildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
         bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_park);
         parkIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
-
+        locationBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.baseline_my_location_black_36);
 
         searchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,13 +149,24 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
+
         gMap = googleMap;
         gMap.setMinZoomPreference(11);
         gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         gMap.moveCamera(CameraUpdateFactory.zoomTo(14));
         //moves map camera to current location
         gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+        //adds marker
+        if (currentLocationMarker == null){
+            currentLocationMarker = gMap.addMarker(new MarkerOptions().position(currentLatLng).icon(locationBitmapDescriptor));
+        }
+        else{
+            currentLocationMarker.setPosition(currentLatLng);
+        }
         gMap.setInfoWindowAdapter(new MapInfoWindow(getContext()));
+
+        MyLocationProvider.removeLocationListeners(this);
+        MyLocationProvider.addLocationListener(this, getActivity());
 
         for (Landmark landmark: mViewModel.getBattleFieldSet()){
             setUpMarker(landmark);
@@ -322,5 +337,40 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         if (mainActivity!=null) {
             mainActivity.showBottomSheet();
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+        if (location!=null && gMap != null) {
+            LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+            if (currentLocationMarker == null){
+                currentLocationMarker = gMap.addMarker(new MarkerOptions().position(latLng).icon(locationBitmapDescriptor));
+            }
+            else{
+                currentLocationMarker.setPosition(latLng);
+            }
+
+            if (!updatedLocationHasBeenSet && gMap!=null){
+                currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+                updatedLocationHasBeenSet = true;
+            }
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }

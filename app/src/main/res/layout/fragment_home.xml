@@ -36,7 +36,7 @@
         >
 
         <TextView
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             tools:visibility="visible"
             android:visibility="visible"
             android:textSize="18sp"
@@ -54,7 +54,7 @@
             />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:paddingStart="30dp"
+            android:paddingStart="20dp"
             android:clipToPadding="false"
             android:id="@+id/home_checked_in_landmarks_recycler_view"
             android:layout_width="0dp"
@@ -64,7 +64,7 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="10dp"
             tools:visibility="visible"
             android:visibility="visible"
             android:textSize="18sp"
@@ -82,7 +82,7 @@
             />
 
     <androidx.recyclerview.widget.RecyclerView
-            android:paddingStart="30dp"
+            android:paddingStart="20dp"
             android:clipToPadding="false"
             android:id="@+id/favourites_recycler_view"
             android:layout_width="0dp"

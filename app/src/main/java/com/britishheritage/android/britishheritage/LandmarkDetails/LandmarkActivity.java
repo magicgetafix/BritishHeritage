@@ -133,7 +133,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         isFavouriteDrawable = getDrawable(R.drawable.favourite_heart_full);
         notFavouriteDrawable = getDrawable(R.drawable.favourite_heart_empty);
         starDrawable = getDrawable(R.drawable.star_drawable);
-        BitmapDrawable locationDrawable = (BitmapDrawable) getDrawable(R.drawable.baseline_my_location_black_36);
+        BitmapDrawable locationDrawable = (BitmapDrawable) getDrawable(R.drawable.baseline_my_location_white_36);
         if (locationDrawable != null){
             locationDrawable.setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.CLEAR);
             Bitmap drawableBitmap = locationDrawable.getBitmap();
@@ -142,7 +142,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             }
         }
         else{
-            locationBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.baseline_my_location_black_36);
+            locationBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.baseline_my_location_white_36);
         }
 
         star1 = findViewById(R.id.star_award_image_view1);
