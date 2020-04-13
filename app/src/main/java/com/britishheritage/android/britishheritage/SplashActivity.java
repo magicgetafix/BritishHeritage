@@ -1,7 +1,6 @@
 package com.britishheritage.android.britishheritage;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LiveData;
 import io.reactivex.Observable;
@@ -12,24 +11,20 @@ import timber.log.Timber;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
-import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.Keys.GooglePlayKeys;
 import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.Model.LandmarkList;
-import com.britishheritage.android.britishheritage.R;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -37,14 +32,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -201,7 +194,7 @@ public class SplashActivity extends BaseActivity {
           if (task.isSuccessful()){
             FirebaseUser currentUser = firebaseAuth.getCurrentUser();
             if (currentUser!=null) {
-              saveUsername(currentUser);
+              saveUserName(currentUser);
             }
 
           }
@@ -217,11 +210,29 @@ public class SplashActivity extends BaseActivity {
 
   }
 
-  private void saveUsername(FirebaseUser currentUser){
+  private void saveUserName(FirebaseUser currentUser){
+
     UserProfileChangeRequest profileChangeRequest = new UserProfileChangeRequest.Builder().setDisplayName(username).build();
     currentUser.updateProfile(profileChangeRequest).addOnCompleteListener(new OnCompleteListener<Void>() {
       @Override
       public void onComplete(@NonNull Task<Void> task) {
+        if (task.isSuccessful()){
+          addNewUser(currentUser);
+        }
+        else{
+          showSnackbar(getString(R.string.login_failure));
+          progressBar.setVisibility(View.INVISIBLE);
+        }
+
+      }
+    });
+  }
+
+  private void addNewUser(FirebaseUser currentUser){
+
+    databaseInteractor.addNewUser(currentUser, 0, new OnCompleteListener() {
+      @Override
+      public void onComplete(@NonNull Task task) {
         if (task.isSuccessful()){
           Intent mainIntent = new Intent(getBaseContext(), MainActivity.class);
           startActivity(mainIntent);
@@ -231,9 +242,9 @@ public class SplashActivity extends BaseActivity {
           showSnackbar(getString(R.string.login_failure));
           progressBar.setVisibility(View.INVISIBLE);
         }
-
       }
     });
+
   }
 
   private void googleSignIn(){
@@ -268,7 +279,7 @@ public class SplashActivity extends BaseActivity {
               if (task.isSuccessful()) {
                 // Sign in success, update UI with the signed-in user's information
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                saveUsername(user);
+                saveUserName(user);
               } else {
                 showSnackbar(getString(R.string.login_failure));
                 progressBar.setVisibility(View.INVISIBLE);

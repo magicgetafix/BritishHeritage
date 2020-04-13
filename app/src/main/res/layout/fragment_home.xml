@@ -8,12 +8,24 @@
     tools:context=".Home.HomeFragment"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+
     <View
         android:background="@color/trans_white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <View
+        android:background="@color/trans_white"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />
@@ -44,7 +56,7 @@
             android:id="@+id/home_places_you_have_visited_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintTop_toBottomOf="@id/home_fragment_photo"
             app:layout_constraintStart_toStartOf="parent"
             android:background="@drawable/color_accent_gradient_with_rounded_start"
@@ -91,19 +103,49 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <TextView
+            android:layout_marginStart="10dp"
+            tools:visibility="visible"
+            android:visibility="gone"
+            android:textSize="18sp"
+            android:text="@string/top_users"
+            android:id="@+id/home_top_scores_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            app:layout_constraintTop_toBottomOf="@id/favourites_recycler_view"
+            app:layout_constraintStart_toStartOf="parent"
+            android:background="@drawable/color_accent_gradient_with_rounded_start"
+            android:padding="10dp"
+            android:paddingEnd="100dp"
+            android:paddingStart="40dp"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:paddingStart="20dp"
+            android:clipToPadding="false"
+            android:id="@+id/top_names_recycler_view"
+            android:nestedScrollingEnabled="false"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/home_top_scores_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
 
 
     <ImageView
         android:id="@+id/home_fragment_photo"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:maxHeight="260dp"
+        android:maxHeight="280dp"
+        android:maxWidth="300dp"
         android:layout_marginEnd="200dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="20dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="12dp"
         app:layout_constraintDimensionRatio="1:1.1"
         android:src="@drawable/add_photo_white_icon"
-        android:padding="16dp"
+        android:padding="8dp"
         android:background="@drawable/transparent_circle_coloraccent_outline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

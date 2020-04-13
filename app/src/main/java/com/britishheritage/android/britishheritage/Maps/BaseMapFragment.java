@@ -124,6 +124,12 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        updatedLocationHasBeenSet = false;
+    }
+
     public void searchForLatLng(String cityQuery){
         if (latLngQuery == null){
             latLngQuery = LatLngQuery.getInstance();

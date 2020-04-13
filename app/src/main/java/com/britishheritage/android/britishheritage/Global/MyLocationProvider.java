@@ -68,10 +68,10 @@ public class MyLocationProvider {
         if (havePermissions){
             boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             if (gpsEnabled) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 50, listener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 10, listener);
             }
             else{
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 50, listener);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 10, listener);
             }
         }
         else{

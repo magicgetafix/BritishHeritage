@@ -5,6 +5,7 @@ import android.app.Application;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Model.Realm.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
+import com.britishheritage.android.britishheritage.Model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -27,12 +28,14 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
     private MutableLiveData<List<Landmark>> favouriteListLiveData = new MutableLiveData<>();
     private RealmResults<FavouriteLandmarkRealmObj> realmResults;
     private MutableLiveData<List<Landmark>> checkedInLandmarksLiveData = new MutableLiveData<>();
+    private MutableLiveData<List<User>> topScoringUserLiveData = new MutableLiveData<>();
 
     public MainViewModel(@NonNull Application application) {
         super(application);
         databaseInteractor = DatabaseInteractor.getInstance(getApplication());
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         getUserData(user);
+        databaseInteractor.syncDatabase(user);
 
         FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
@@ -78,5 +81,12 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
 
     public LiveData<List<Landmark>> getFavouriteListLiveData() {
         return favouriteListLiveData;
+    }
+
+    public LiveData<List<User>> getTopScoringUserLiveData(){
+        databaseInteractor.getTopScoringUsers(30).observeForever(list->{
+            topScoringUserLiveData.setValue(list);
+        });
+        return topScoringUserLiveData;
     }
 }

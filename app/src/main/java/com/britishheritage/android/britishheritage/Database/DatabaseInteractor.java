@@ -10,11 +10,15 @@ import com.britishheritage.android.britishheritage.Daos.LandmarkDao;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Model.Realm.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
+import com.britishheritage.android.britishheritage.Model.Realm.UserRealmObj;
 import com.britishheritage.android.britishheritage.Model.Realm.WikiLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Review;
+import com.britishheritage.android.britishheritage.Model.User;
 import com.britishheritage.android.britishheritage.Response.Geoname;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -64,8 +68,11 @@ public class DatabaseInteractor {
     private FirebaseUser currentUser;
     private StorageReference profileImageGalleryRef;
     private DatabaseReference checkedInReviewsRef;
+    private DatabaseReference userRef;
 
-    public static final String CHECKED_IN_PREFS = "checked_in_prefs";
+    private static final String CHECKED_IN_PREFS = "checked_in_prefs";
+    private static final String POINTS_SHARED_PREFS = "points";
+
 
     public static DatabaseInteractor getInstance(Context context){
         if (instance == null){
@@ -91,10 +98,13 @@ public class DatabaseInteractor {
         }
         sharedPrefs = context.getSharedPreferences(context.getPackageName(), Context.MODE_PRIVATE);
         checkedInLandmarksSharedPrefs = context.getSharedPreferences(CHECKED_IN_PREFS, Context.MODE_PRIVATE);
+        checkedInLandmarksSharedPrefs.edit().clear().apply();
         firebaseDatabase = FirebaseDatabase.getInstance();
         reviewReference = firebaseDatabase.getReference().child(Constants.REVIEWS);
         checkedInReviewsRef = firebaseDatabase.getReference().child(Constants.CHECKED_IN);
+        userRef = firebaseDatabase.getReference().child(Constants.USERS);
         profileImageGalleryRef = FirebaseStorage.getInstance().getReference().child("images").child("profile");
+
 
     }
 
@@ -281,6 +291,150 @@ public class DatabaseInteractor {
         return checkedInLandmarks;
     }
 
+    public void addNewUser(FirebaseUser user, int points, OnCompleteListener listener){
+
+        if (user!=null && listener!= null) {
+            String userId = user.getUid();
+            String username = user.getDisplayName();
+            User newUser = new User(userId, username, points, 0, 0);
+            userRef.child(userId).setValue(newUser).addOnCompleteListener(listener);
+            realm.beginTransaction();
+            UserRealmObj realmUserObj = new UserRealmObj(newUser);
+            realm.copyToRealmOrUpdate(realmUserObj);
+            realm.commitTransaction();
+        }
+    }
+
+    public LiveData<List<User>> getTopScoringUsers(int limit){
+
+        MutableLiveData<List<User>> liveData = new MutableLiveData<>();
+        List<User> topScorersList = new ArrayList<>();
+        userRef.orderByChild("pts").limitToFirst(limit).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                User user = dataSnapshot.getValue(User.class);
+                if (user!=null){
+                    topScorersList.add(user);
+                    liveData.setValue(topScorersList);
+                }
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if (user!=null){
+                    topScorersList.remove(user);
+                    liveData.setValue(topScorersList);
+                }
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        return liveData;
+    }
+
+    /**This method synchronises the local database with the remote FirebaseRealtimeDatabase
+     *
+     * @param user
+     */
+    public void syncDatabase(FirebaseUser user){
+
+        if (user!=null) {
+
+            userRef.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User userFromDatabase = dataSnapshot.getValue(User.class);
+                    if (userFromDatabase != null) {
+                        realm.beginTransaction();
+                        UserRealmObj userRealmObj = new UserRealmObj(userFromDatabase);
+                        realm.copyToRealmOrUpdate(userRealmObj);
+                        realm.commitTransaction();
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    public LiveData<Status> addPoints(FirebaseUser user, int points, int additionalReviews, int additionalCheckIns){
+        MutableLiveData<Status> confirmationLiveData = new MutableLiveData<>();
+        confirmationLiveData.setValue(Status.PENDING);
+        final UserRealmObj userRealmObj = realm.where(UserRealmObj.class).equalTo("id", user.getUid()).findFirst();
+        if (userRealmObj == null){
+            User newUser = new User(user.getUid(), user.getDisplayName(), points, additionalReviews, additionalCheckIns);
+            final UserRealmObj newUserRealmObj = new UserRealmObj(newUser);
+            userRef.child(user.getUid()).setValue(newUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    realm.beginTransaction();
+                    realm.copyToRealmOrUpdate(newUserRealmObj);
+                    realm.commitTransaction();
+                    confirmationLiveData.setValue(Status.SUCCESS);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    confirmationLiveData.setValue(Status.FAILURE);
+                }
+            });
+        }
+        else{
+            int totalPoints = userRealmObj.getPoints() + points;
+            int reviews = userRealmObj.getNumOfReviews() + additionalReviews;
+            int checkIns = userRealmObj.getNumOfCheckIns() + additionalCheckIns;
+            User storedUser = new User(user.getUid(), user.getDisplayName(), totalPoints, reviews, checkIns);
+            userRef.child(user.getUid()).setValue(storedUser).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    realm.beginTransaction();
+                    userRealmObj.setPoints(totalPoints);
+                    realm.copyToRealmOrUpdate(userRealmObj);
+                    realm.commitTransaction();
+                    confirmationLiveData.setValue(Status.SUCCESS);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    confirmationLiveData.setValue(Status.FAILURE);
+                }
+            });
+        }
+
+        return confirmationLiveData;
+    }
+
+    public int getCurrentPointsTotal(FirebaseUser user){
+
+        UserRealmObj userRealmObj = realm.where(UserRealmObj.class)
+                .equalTo("id", user.getUid()).findFirst();
+
+        if (userRealmObj != null){
+            return userRealmObj.getPoints();
+        }
+        return 0;
+    }
+
+
     public LiveData<List<Review>> getReviews(String landmarkId){
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -354,4 +508,9 @@ public class DatabaseInteractor {
         });
         return fileLiveData;
     }
+
+    public enum Status {
+        SUCCESS, FAILURE, PENDING
+    }
+
 }

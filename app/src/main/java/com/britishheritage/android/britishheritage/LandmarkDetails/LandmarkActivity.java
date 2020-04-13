@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import timber.log.Timber;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
@@ -102,6 +103,9 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
     private GoogleMap gMap;
     public static int LANDMARK_EXITED = 452;
+
+    public static int CHECK_IN_BONUS = 10;
+    public static int WRITE_REVIEW_BONUS = 5;
 
 
     @Override
@@ -259,7 +263,27 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
                                     public void run() {
                                         star4.setVisibility(View.VISIBLE);
                                         star4.setAlpha(1f);
-                                        star4.animate().scaleX(100f).scaleY(100f).setDuration(1000);
+                                        star4.animate().scaleX(100f).scaleY(100f).setDuration(1000).setListener(new Animator.AnimatorListener() {
+                                            @Override
+                                            public void onAnimationStart(Animator animation) {
+
+                                            }
+
+                                            @Override
+                                            public void onAnimationEnd(Animator animation) {
+                                                addPoints(CHECK_IN_BONUS);
+                                            }
+
+                                            @Override
+                                            public void onAnimationCancel(Animator animation) {
+
+                                            }
+
+                                            @Override
+                                            public void onAnimationRepeat(Animator animation) {
+
+                                            }
+                                        });
                                         checkInTV.setText(R.string.check_in_message);
                                         checkInTV.setTextColor(getResources().getColor(R.color.gold));
                                         checkInTV.setBackgroundColor(getResources().getColor(R.color.colorAccent));
@@ -283,6 +307,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
                     if (task.isSuccessful()){
                         animateSuccessfulCheckIn(anim);
                         checkInButton.setOnClickListener(null);
+
                     }
                     else {
                         checkInStarIV.setVisibility(View.INVISIBLE);
@@ -292,6 +317,29 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             };
             databaseInteractor.checkInToLandmark(mainLandmark, listener);
         }
+    }
+
+    private void addPoints(int points){
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                int checkIn = 0;
+                int review = 0;
+                if (points == CHECK_IN_BONUS){
+                    checkIn = 1;
+                }
+                else if (points == WRITE_REVIEW_BONUS){
+                    review = 1;
+                }
+                databaseInteractor.addPoints(user, points, review, checkIn).observe(LandmarkActivity.this, status->{
+                    if (status == DatabaseInteractor.Status.SUCCESS){
+                        showSnackbar(getString(R.string.points_added, points));
+                    }
+                });
+            }
+        }, 100);
+
     }
 
     private void setUpFavouriteButton() {
@@ -404,7 +452,6 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             FragmentManager fragmentManager = getSupportFragmentManager();
             reviewDialogFragment.show(fragmentManager, "add_review_dialog");
             reviewDialogFragment.setListener(this);
-
         }
     }
 
@@ -438,6 +485,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         if (userReviewsRecyclerView.getAdapter() != null) {
             userReviewsRecyclerView.getAdapter().notifyDataSetChanged();
         }
+        addPoints(WRITE_REVIEW_BONUS);
 
     }
 

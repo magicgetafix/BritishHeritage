@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
@@ -141,6 +142,8 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
         databaseSizeLiveData = databaseInteractor.getDatabaseSize();
         databaseSizeLiveData.observe(this, this::populateDatabase);
         navigationView.setBackgroundColor(getResources().getColor(R.color.white));
+
+
 
     }
 

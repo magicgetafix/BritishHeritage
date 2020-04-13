@@ -3,6 +3,7 @@ package com.britishheritage.android.britishheritage.Home;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -18,13 +19,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.Constants;
+import com.britishheritage.android.britishheritage.Main.Dialogs.UsersAdapter;
 import com.britishheritage.android.britishheritage.Main.LandmarksAdapter;
 import com.britishheritage.android.britishheritage.Main.MainViewModel;
 import com.britishheritage.android.britishheritage.Model.Landmark;
+import com.britishheritage.android.britishheritage.Model.User;
 import com.britishheritage.android.britishheritage.R;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,6 +42,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
@@ -53,9 +58,13 @@ public class HomeFragment extends Fragment {
   private RecyclerView checkedInLandmarksRecyclerView;
   private LandmarksAdapter checkedInLandmarksAdapter;
   private LinearLayoutManager checkedInLandmarksManager;
+  private LinearLayoutManager topScoresLayoutManager;
+  private UsersAdapter topScoresAdapter;
   private ImageView userPhotoIV;
   private FirebaseUser currentUser;
   private DatabaseInteractor databaseInteractor;
+  private TextView highestScorersTitleTv;
+  private RecyclerView highestScorersRecyclerView;
 
   public HomeFragment() {
     // Required empty public constructor
@@ -83,15 +92,19 @@ public class HomeFragment extends Fragment {
     favouriteRecyclerView = view.findViewById(R.id.favourites_recycler_view);
     checkedInLandmarksRecyclerView = view.findViewById(R.id.home_checked_in_landmarks_recycler_view);
     userPhotoIV = view.findViewById(R.id.home_fragment_photo);
+    highestScorersTitleTv = view.findViewById(R.id.home_top_scores_text);
+    highestScorersRecyclerView = view.findViewById(R.id.top_names_recycler_view);
     mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel .class);
     favouritesLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false);
     checkedInLandmarksManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+    topScoresLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
     //set up with default values
     onCheckedInLandmarksUpdated(new ArrayList<Landmark>());
     //set up with default values
     onFavouritesUpdated(new ArrayList<Landmark>());
     mainViewModel.getFavouriteListLiveData().observe(getViewLifecycleOwner(), this::onFavouritesUpdated);
     mainViewModel.getCheckedInLandmarkLiveData().observe(getViewLifecycleOwner(), this::onCheckedInLandmarksUpdated);
+    mainViewModel.getTopScoringUserLiveData().observe(getViewLifecycleOwner(), this::onTopScoringUsersUpdated);
     userPhotoIV.setOnClickListener(v->{
       onChooseImageClick();
     });
@@ -100,6 +113,10 @@ public class HomeFragment extends Fragment {
       Glide.with(this)
               .load(currentUser.getPhotoUrl())
               .into(userPhotoIV);
+    }
+    else{
+      Drawable addPhotoDrawable = getResources().getDrawable(R.drawable.add_photo_white_icon);
+      userPhotoIV.setImageDrawable(addPhotoDrawable);
     }
   }
 
@@ -133,6 +150,20 @@ public class HomeFragment extends Fragment {
     checkedInLandmarksRecyclerView.setLayoutManager(checkedInLandmarksManager);
     checkedInLandmarksRecyclerView.setAdapter(checkedInLandmarksAdapter);
 
+  }
+
+  private void onTopScoringUsersUpdated(List<User> userList){
+
+    if (userList!=null && !userList.isEmpty()){
+      highestScorersTitleTv.setVisibility(View.VISIBLE);
+      topScoresAdapter = new UsersAdapter(getContext(), userList, getViewLifecycleOwner());
+      topScoresLayoutManager.setStackFromEnd(true);
+      highestScorersRecyclerView.setLayoutManager(topScoresLayoutManager);
+      highestScorersRecyclerView.setAdapter(topScoresAdapter);
+    }
+    else{
+      highestScorersTitleTv.setVisibility(View.GONE);
+    }
   }
 
   public void onChooseImageClick() {
