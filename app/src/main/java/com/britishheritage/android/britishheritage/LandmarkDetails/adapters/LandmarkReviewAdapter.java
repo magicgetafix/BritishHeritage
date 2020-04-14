@@ -150,7 +150,7 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                         if (dataSnapshot!=null) {
                                             int value = dataSnapshot.getValue(Integer.class);
-                                            ref.setValue(value+1);
+                                            ref.setValue(value-1);
                                         }
                                     }
 

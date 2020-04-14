@@ -150,6 +150,7 @@ public class HomeFragment extends Fragment {
     checkedInLandmarksRecyclerView.setLayoutManager(checkedInLandmarksManager);
     checkedInLandmarksRecyclerView.setAdapter(checkedInLandmarksAdapter);
 
+
   }
 
   private void onTopScoringUsersUpdated(List<User> userList){

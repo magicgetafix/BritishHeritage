@@ -34,6 +34,10 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         this.lifecycleOwner = lifecycleOwner;
     }
 
+    public void clear(){
+        userList.clear();
+    }
+
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -74,10 +78,13 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         public void setContent(User user){
             if (user!=null) {
                 usernameTv.setText(user.getUsername());
-                String scoreStr = Integer.toString(user.getTotalPoints());
+                //have to use absolute value because Firebase database is only
+                //able to order integers in descending order
+                int points = Math.abs(user.getTotalPoints());
+                String scoreStr = Integer.toString(points);
                 scoreTv.setText(scoreStr);
-                String reviews = context.getString(R.string.number_of_reviews, user.getNumOfReviews());
-                String checkIns = context.getString(R.string.number_of_check_ins, user.getNumOfCheckIns());
+                String reviews = context.getString(R.string.number_of_reviews, Math.abs(user.getNumOfReviews()));
+                String checkIns = context.getString(R.string.number_of_check_ins, Math.abs(user.getNumOfCheckIns()));
                 numReviews.setText(reviews);
                 numOfCheckIns.setText(checkIns);
                 try {

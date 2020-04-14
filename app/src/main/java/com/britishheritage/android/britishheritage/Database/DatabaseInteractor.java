@@ -69,6 +69,8 @@ public class DatabaseInteractor {
     private StorageReference profileImageGalleryRef;
     private DatabaseReference checkedInReviewsRef;
     private DatabaseReference userRef;
+    private List<User> topScorersList;
+    private ChildEventListener scoreChildEventListener;
 
     private static final String CHECKED_IN_PREFS = "checked_in_prefs";
     private static final String POINTS_SHARED_PREFS = "points";
@@ -249,6 +251,7 @@ public class DatabaseInteractor {
 
         MutableLiveData<List<Landmark>> checkedInLandmarks = new MutableLiveData<>();
         if (currentUser!=null){
+
             List<Landmark> landmarkList = new ArrayList<>();
             checkedInReviewsRef.child(currentUser.getUid()).addChildEventListener(new ChildEventListener() {
                 @Override
@@ -308,8 +311,8 @@ public class DatabaseInteractor {
     public LiveData<List<User>> getTopScoringUsers(int limit){
 
         MutableLiveData<List<User>> liveData = new MutableLiveData<>();
-        List<User> topScorersList = new ArrayList<>();
-        userRef.orderByChild("pts").limitToFirst(limit).addChildEventListener(new ChildEventListener() {
+        topScorersList = new ArrayList<>();
+        scoreChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 User user = dataSnapshot.getValue(User.class);
@@ -342,7 +345,8 @@ public class DatabaseInteractor {
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });
+        };
+        userRef.orderByChild("pts").limitToFirst(limit).addChildEventListener(scoreChildEventListener);
         return liveData;
     }
 
@@ -399,15 +403,19 @@ public class DatabaseInteractor {
             });
         }
         else{
-            int totalPoints = userRealmObj.getPoints() + points;
-            int reviews = userRealmObj.getNumOfReviews() + additionalReviews;
-            int checkIns = userRealmObj.getNumOfCheckIns() + additionalCheckIns;
+            //numbers all have to be negative because Firebase RealTime Database
+            //can only order integers in descending order
+            int totalPoints = userRealmObj.getPoints() - points;
+            int reviews = userRealmObj.getNumOfReviews() - additionalReviews;
+            int checkIns = userRealmObj.getNumOfCheckIns() - additionalCheckIns;
             User storedUser = new User(user.getUid(), user.getDisplayName(), totalPoints, reviews, checkIns);
             userRef.child(user.getUid()).setValue(storedUser).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
                     realm.beginTransaction();
                     userRealmObj.setPoints(totalPoints);
+                    userRealmObj.setNumOfReviews(reviews);
+                    userRealmObj.setNumOfCheckIns(checkIns);
                     realm.copyToRealmOrUpdate(userRealmObj);
                     realm.commitTransaction();
                     confirmationLiveData.setValue(Status.SUCCESS);

@@ -84,7 +84,7 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
     }
 
     public LiveData<List<User>> getTopScoringUserLiveData(){
-        databaseInteractor.getTopScoringUsers(30).observeForever(list->{
+        databaseInteractor.getTopScoringUsers(20).observeForever(list->{
             topScoringUserLiveData.setValue(list);
         });
         return topScoringUserLiveData;
