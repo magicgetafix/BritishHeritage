@@ -32,7 +32,7 @@
     <string name="review_title">Give your review a descriptive title</string>
     <string name="save_review">Add Review</string>
     <string name="title_error">Your title must be between 5 and 40 characters</string>
-    <string name="review_error">Your review must be less than 350 characters long</string>
+    <string name="review_error">Your review must be less than 400 characters long</string>
     <string name="failed_to_add_review">Failed to save review</string>
     <string name="write_review">Write review...</string>
     <string name="failed_to_upload_photo">Failed to upload photo</string>
@@ -51,5 +51,8 @@
     <string name="top_users">Highest scoring explorers:</string>
     <string name="number_of_reviews">Number of reviews: %d</string>
     <string name="number_of_check_ins">Places visited: %d</string>
+    <string name="short_review_error">Your review should be more than 150 characters</string>
+    <string name="review_not_valid">I suspect this is nonsense! Please try again.</string>
+
 
 </resources>

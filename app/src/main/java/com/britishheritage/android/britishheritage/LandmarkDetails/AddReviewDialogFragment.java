@@ -80,11 +80,11 @@ public class AddReviewDialogFragment extends DialogFragment {
         progressBar = view.findViewById(R.id.add_review_progress_bar);
 
         String titleError = getString(R.string.title_error);
-        String reviewTextError = getString(R.string.review_error);
+        String tooLongReviewError = getString(R.string.review_error);
+        String tooShortReview = getString(R.string.short_review_error);
+        String reviewNotValid = getString(R.string.review_not_valid);
         titleLayout.setError(titleError);
         titleLayout.setErrorEnabled(false);
-        reviewTextLayout.setError(reviewTextError);
-        reviewTextLayout.setErrorEnabled(false);
 
         Bundle arguments = getArguments();
         userId = arguments.getString(ARG_REVIEW_USER_ID);
@@ -115,13 +115,25 @@ public class AddReviewDialogFragment extends DialogFragment {
                     titleLayout.setErrorEnabled(false);
                 }
 
-                if (text.length() == 1 || text.length() > 400){
+                if (text.length() > 400){
+                    reviewTextLayout.setError(tooLongReviewError);
+                    reviewTextLayout.setErrorEnabled(false);
+                    return;
+                }
+
+                if (text.length() < 151){
+                    reviewTextLayout.setError(tooShortReview);
                     reviewTextLayout.setErrorEnabled(true);
                     return;
                 }
-                else{
-                    reviewTextLayout.setErrorEnabled(false);
+
+                if (!checkReviewIsValid(text)){
+                    reviewTextLayout.setError(reviewNotValid);
+                    reviewTextLayout.setErrorEnabled(true);
+                    return;
                 }
+
+                reviewTextLayout.setErrorEnabled(false);
 
                 if (userId!=null && !userId.isEmpty() && username!=null && !username.isEmpty() && mainLandmark!=null){
 
@@ -136,7 +148,6 @@ public class AddReviewDialogFragment extends DialogFragment {
                                 if (listener!=null){
                                     listener.onDismiss(review);
                                 }
-
                             }
                             else{
                                 FragmentActivity activity = getActivity();
@@ -145,7 +156,6 @@ public class AddReviewDialogFragment extends DialogFragment {
                                     String failedToAddReview = getString(R.string.failed_to_add_review);
                                     ((BaseActivity) activity).showSnackbar(failedToAddReview);
                                 }
-
                             }
                         }
                     });
@@ -158,10 +168,28 @@ public class AddReviewDialogFragment extends DialogFragment {
                     }
                     return;
                 }
-
             }
         });
+    }
 
+    public boolean checkReviewIsValid(String fullReview){
+
+        String reviewStr = fullReview.toLowerCase();
+        String[] commonWordsArray = {"the", "there", "this", "and", "it", "i",
+                "is", "see", "saw", "we", "has", "was", "were", "by", "have", "near", "could",
+                "find", "found", "in", "on", "really", "can", "you", "from", "but", "as", "would", "so",
+                "interest", "if", "also", "because", "only", "nothing", "no", "hard", "area", "our", "visit"};
+        int numberOfMatches = 0;
+        for (int i = 0; i < commonWordsArray.length; i++){
+            String word = commonWordsArray[i];
+            if (reviewStr.contains(word)){
+                numberOfMatches++;
+                if (numberOfMatches >= 5){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
