@@ -26,6 +26,7 @@ import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Global.Tools;
+import com.britishheritage.android.britishheritage.LandmarkDetails.LandmarkActivity;
 import com.britishheritage.android.britishheritage.Main.Dialogs.UsersAdapter;
 import com.britishheritage.android.britishheritage.Main.LandmarksAdapter;
 import com.britishheritage.android.britishheritage.Main.MainActivity;
@@ -51,7 +52,7 @@ import java.util.List;
 import static android.app.Activity.RESULT_OK;
 
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements LandmarksAdapter.Listener {
 
 
   private MainViewModel mainViewModel;
@@ -157,7 +158,7 @@ public class HomeFragment extends Fragment {
       tempLandmark.setType(Constants.LISTED_BUILDINGS_ID);
       landmarks.add(tempLandmark);
     }
-    favouritesAdapter = new LandmarksAdapter(landmarks, getContext());
+    favouritesAdapter = new LandmarksAdapter(landmarks, getContext(), this);
     favouriteRecyclerView.setLayoutManager(favouritesLayoutManager);
     favouriteRecyclerView.setAdapter(favouritesAdapter);
 
@@ -173,7 +174,7 @@ public class HomeFragment extends Fragment {
       tempLandmark.setType(Constants.SCHEDULED_MONUMENTS_ID);
       landmarks.add(tempLandmark);
     }
-    checkedInLandmarksAdapter = new LandmarksAdapter(landmarks, getContext());
+    checkedInLandmarksAdapter = new LandmarksAdapter(landmarks, getContext(), this);
     checkedInLandmarksRecyclerView.setLayoutManager(checkedInLandmarksManager);
     checkedInLandmarksRecyclerView.setAdapter(checkedInLandmarksAdapter);
 
@@ -284,4 +285,9 @@ public class HomeFragment extends Fragment {
   }
 
 
+  @Override
+  public void onLandmarkClicked(Landmark landmark) {
+      BaseActivity activity = (BaseActivity) getActivity();
+      activity.navigateWithLandmark(LandmarkActivity.class, landmark);
+  }
 }

@@ -22,10 +22,12 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
 
     private List<Landmark> favouritesList = new ArrayList<>();
     private Context context;
+    private Listener listener;
 
-    public LandmarksAdapter(List<Landmark> favouritesList, Context context){
+    public LandmarksAdapter(List<Landmark> favouritesList, Context context, Listener listener){
         this.favouritesList = favouritesList;
         this.context = context;
+        this.listener = listener;
     }
 
     @NonNull
@@ -38,7 +40,7 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
     @Override
     public void onBindViewHolder(@NonNull FavouritesViewHolder holder, int position) {
         Landmark landmark = favouritesList.get(position);
-        holder.setContent(landmark);
+        holder.setContent(landmark, this.listener);
     }
 
     @Override
@@ -48,31 +50,43 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
 
     public static class FavouritesViewHolder extends RecyclerView.ViewHolder{
 
-        TextView textView;
-        View hillfortBackground;
-        View listedBuildingBackground;
-        View scheduledMonumentBackground;
-        View parkAndGardenBackground;
-        View battlefieldBackground;
+        private TextView textView;
+        private View hillfortBackground;
+        private View listedBuildingBackground;
+        private View scheduledMonumentBackground;
+        private View parkAndGardenBackground;
+        private View battlefieldBackground;
+        private View itemView;
+        private Listener listener;
 
         public FavouritesViewHolder(@NonNull View itemView) {
             super(itemView);
+            this.itemView = itemView;
             textView = itemView.findViewById(R.id.favourites_text_view);
             hillfortBackground = itemView.findViewById(R.id.hillfort_background);
             listedBuildingBackground = itemView.findViewById(R.id.listed_building_background);
             scheduledMonumentBackground = itemView.findViewById(R.id.monument_background);
             parkAndGardenBackground = itemView.findViewById(R.id.park_garden_background);
             battlefieldBackground = itemView.findViewById(R.id.battlefield_background);
-
         }
 
-        public void setContent(Landmark landmark){
+        public void setContent(Landmark landmark, Listener listener){
 
+            this.listener = listener;
             hillfortBackground.setVisibility(View.INVISIBLE);
             listedBuildingBackground.setVisibility(View.INVISIBLE);
             scheduledMonumentBackground.setVisibility(View.INVISIBLE);
             parkAndGardenBackground.setVisibility(View.INVISIBLE);
             battlefieldBackground.setVisibility(View.INVISIBLE);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                   if (listener!=null){
+                       listener.onLandmarkClicked(landmark);
+                   }
+                }
+            });
 
             if (landmark.getName()!=null) {
                 textView.setText(landmark.getName());
@@ -102,6 +116,10 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
                 }
             }
         }
+    }
+
+    public interface Listener{
+        void onLandmarkClicked(Landmark landmark);
     }
 }
 
