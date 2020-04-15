@@ -9,6 +9,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,8 +25,10 @@ import android.widget.TextView;
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.Constants;
+import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.Main.Dialogs.UsersAdapter;
 import com.britishheritage.android.britishheritage.Main.LandmarksAdapter;
+import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.Main.MainViewModel;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.User;
@@ -66,6 +69,11 @@ public class HomeFragment extends Fragment {
   private TextView highestScorersTitleTv;
   private RecyclerView highestScorersRecyclerView;
 
+  //user profile
+  private TextView userNameTV;
+  private TextView userScoreTV;
+  private TextView userRankTV;
+
   public HomeFragment() {
     // Required empty public constructor
   }
@@ -94,6 +102,9 @@ public class HomeFragment extends Fragment {
     userPhotoIV = view.findViewById(R.id.home_fragment_photo);
     highestScorersTitleTv = view.findViewById(R.id.home_top_scores_text);
     highestScorersRecyclerView = view.findViewById(R.id.top_names_recycler_view);
+    userNameTV = view.findViewById(R.id.home_username_textview);
+    userScoreTV = view.findViewById(R.id.home_user_points_textview);
+    userRankTV = view.findViewById(R.id.home_user_rank_textview);
     mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel .class);
     favouritesLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false);
     checkedInLandmarksManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -118,6 +129,22 @@ public class HomeFragment extends Fragment {
       Drawable addPhotoDrawable = getResources().getDrawable(R.drawable.add_photo_white_icon);
       userPhotoIV.setImageDrawable(addPhotoDrawable);
     }
+
+    setUpUserInfo();
+  }
+
+  private void setUpUserInfo(){
+
+      if (currentUser!=null) {
+        userNameTV.setText(currentUser.getDisplayName());
+        int score = databaseInteractor.getCurrentPointsTotal(currentUser);
+        score = Math.abs(score);
+        userScoreTV.setText(getString(R.string.points, score));
+        String ranking = Tools.getRanking(score);
+        String rankingStr = getString(R.string.rank, ranking);
+        userRankTV.setText(rankingStr);
+      }
+
   }
 
   private void onFavouritesUpdated(List<Landmark> landmarks) {

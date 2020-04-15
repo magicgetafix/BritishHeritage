@@ -6,8 +6,8 @@
     <color name="colorPrimary">#049CD8</color>
     <color name="colorPrimaryDark">#027e84</color>
     <color name="colorPrimaryTrans">#80049CD8</color>
-    <color name="colorAccent">#D81B60</color>
-    <color name="transColorAccent">#80D81B60</color>
+    <color name="colorAccent">#D81B47</color>
+    <color name="transColorAccent">#80D81B47</color>
     <color name="trans_overlay">#4DD81B60</color>
     <color name="semitranswhite">#c8ffffff</color>
     <color name="transparent">#00FFFFFF</color>

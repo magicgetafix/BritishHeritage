@@ -47,6 +47,28 @@
         android:layout_height="wrap_content"
         >
 
+        <ImageView
+            android:id="@+id/union_flag_background"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:src="@drawable/union_flag"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toTopOf="@id/home_places_you_have_visited_text"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
+        <ImageView
+            android:id="@+id/white_gradient_background"
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:background="@drawable/white_gradient_from_bottom"
+            app:layout_constraintBottom_toBottomOf="@id/union_flag_background"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
         <TextView
             android:layout_marginStart="10dp"
             tools:visibility="visible"
@@ -143,23 +165,77 @@
             android:layout_height="50dp"/>
 
 
+        <ImageView
+            android:id="@+id/home_fragment_photo"
+            android:layout_width="176dp"
+            android:layout_height="176dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/transparent_circle_coloraccent_outline"
+            android:padding="8dp"
+            android:src="@drawable/add_photo_white_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/home_fragment_photo"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:maxHeight="280dp"
-        android:maxWidth="300dp"
-        android:layout_marginEnd="200dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginStart="12dp"
-        app:layout_constraintDimensionRatio="1:1.1"
-        android:src="@drawable/add_photo_white_icon"
-        android:padding="8dp"
-        android:background="@drawable/transparent_circle_coloraccent_outline"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/home_username_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:autoSizeMaxTextSize="22sp"
+            android:autoSizeMinTextSize="12sp"
+            android:background="@drawable/white_rounded"
+            android:gravity="end"
+            android:padding="4dp"
+            android:text="@string/username"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/home_fragment_photo"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/home_user_points_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/white_rounded"
+            android:gravity="end"
+            android:padding="4dp"
+            android:text="@string/points"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/home_fragment_photo"
+            app:layout_constraintTop_toBottomOf="@+id/home_user_rank_textview" />
+
+        <TextView
+            android:id="@+id/home_user_rank_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/white_rounded"
+            android:gravity="end"
+            android:padding="4dp"
+            android:text="@string/rank"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/home_fragment_photo"
+            app:layout_constraintTop_toBottomOf="@id/home_username_textview" />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

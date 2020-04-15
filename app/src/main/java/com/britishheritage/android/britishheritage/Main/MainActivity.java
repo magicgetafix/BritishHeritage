@@ -143,6 +143,10 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
         databaseSizeLiveData.observe(this, this::populateDatabase);
         navigationView.setBackgroundColor(getResources().getColor(R.color.white));
 
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar!=null){
+            actionBar.setElevation(0f);
+        }
 
 
     }

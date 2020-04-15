@@ -35,4 +35,20 @@ public class Constants {
     public final static String CHECKED_IN = "visits";
     public static final String REVIEWS = "reviews";
     public static final String USERS = "users";
+
+    //rankings
+    public static String[] RANKING_ARRAY = {"Itinerant",
+            "Rambler",
+            "Wanderer",
+            "Traveller",
+            "Trekker",
+            "Adventurer",
+            "Wayfarer",
+            "Surveyor",
+            "Pioneer",
+            "Explorer",
+            "Discoverer",
+            "Heritage Expert"
+    };
+
 }

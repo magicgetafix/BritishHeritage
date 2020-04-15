@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class Tools {
 
+
     public static ArrayList<View> getViewsByTag(ViewGroup root, String tag){
         ArrayList<View> views = new ArrayList<View>();
         final int childCount = root.getChildCount();
@@ -30,5 +31,15 @@ public class Tools {
                 .alpha(1)
                 .setDuration(milliSeconds)
                 .setListener(null);
+    }
+
+    public static String getRanking(int score){
+        int absScore = Math.abs(score);
+        int index = absScore/50;
+        if (index < Constants.RANKING_ARRAY.length){
+            return Constants.RANKING_ARRAY[index];
+        }
+        int finalIndex = Constants.RANKING_ARRAY.length - 1;
+        return Constants.RANKING_ARRAY[finalIndex];
     }
 }
