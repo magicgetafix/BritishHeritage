@@ -358,9 +358,11 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             }
 
             if (!updatedLocationHasBeenSet && gMap!=null){
-                currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
-                updatedLocationHasBeenSet = true;
+                if (currentLatLng.latitude != location.getLatitude()) {
+                    currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                    gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+                    updatedLocationHasBeenSet = true;
+                }
             }
         }
     }
