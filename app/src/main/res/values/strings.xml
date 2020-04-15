@@ -54,6 +54,7 @@
     <string name="short_review_error">Your review should be more than 150 characters</string>
     <string name="review_not_valid">I suspect this is nonsense! Please try again.</string>
     <string name="rank">Rank: %s</string>
+    <string name="logout">Sign out</string>
 
 
 </resources>

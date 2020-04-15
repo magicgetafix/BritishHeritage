@@ -388,4 +388,9 @@ public class SplashActivity extends BaseActivity {
       }
       return json;
   }
+
+  @Override
+  public void onBackPressed() {
+    finishAffinity();
+  }
 }

@@ -4,6 +4,8 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
+import android.util.SparseLongArray;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -29,8 +31,10 @@ import com.britishheritage.android.britishheritage.Maps.ListedBuildingMapFragmen
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.LandmarkList;
 import com.britishheritage.android.britishheritage.R;
+import com.britishheritage.android.britishheritage.SplashActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -284,5 +288,21 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
                 finishAffinity();
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.sign_out){
+            FirebaseAuth.getInstance().signOut();
+            Intent splashIntent = new Intent(this, SplashActivity.class);
+            startActivity(splashIntent);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.home_menu, menu);
+        return true;
     }
 }
