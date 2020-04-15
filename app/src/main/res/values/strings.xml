@@ -20,12 +20,14 @@
     <string name="enter_your_email">Email address...</string>
     <string name="choose_a_password">Choose a password...</string>
     <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="sign_up_with_google">Sign up with Google</string>
     <string name="or">or</string>
     <string name="please_enter_a_username">Please enter a username of between 8 and 25 characters</string>
     <string name="please_enter_an_email_address">Please enter a valid email address</string>
     <string name="please_enter_a_password_of_eight_chars">Please enter a password of 8 characters or more</string>
     <string name="login_failure">Login failed. Please try again!</string>
-    <string name="sign_in">Sign up</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
     <string name="points">Score: %d</string>
     <string name="username">UsernameUsernameUser1</string>
     <string name="review_feedback">Tell people about this place</string>
@@ -55,6 +57,7 @@
     <string name="review_not_valid">I suspect this is nonsense! Please try again.</string>
     <string name="rank">Rank: %s</string>
     <string name="logout">Sign out</string>
+    <string name="already_have_an_account">Already have an account?\nClick <b>here</b> to sign in </string>
 
 
 </resources>

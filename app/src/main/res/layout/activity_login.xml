@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/splash_viewgroup"
-        android:background="@drawable/avebury"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".SplashActivity">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/avebury"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
 
     <View
         tools:alpha="1f"
-        android:alpha="0"
         android:tag="splash_component"
         android:id="@+id/splash_transparency"
         android:layout_width="match_parent"
@@ -23,8 +20,8 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
+        android:visibility="invisible"
         tools:alpha="1f"
-        android:alpha="0"
         android:tag="splash_component"
         android:background="@drawable/white_circle_coloraccent_outline"
         android:id="@+id/splash_username"
@@ -43,10 +40,9 @@
         app:layout_constraintVertical_bias="0.1" />
 
     <TextView
+
         tools:alpha="1f"
-        android:alpha="0"
         android:tag="splash_component"
-        tools:visibility="visible"
         android:visibility="invisible"
         android:id="@+id/splash_username_error"
         android:layout_marginTop="4dp"
@@ -61,8 +57,6 @@
 
 
     <EditText
-        android:alpha="0"
-        tools:alpha="1f"
         android:tag="splash_component"
         android:background="@drawable/white_circle_coloraccent_outline"
         android:id="@+id/splash_email"
@@ -81,7 +75,6 @@
 
     <TextView
         tools:alpha="1f"
-        android:alpha="0"
         android:tag="splash_component"
         tools:visibility="visible"
         android:visibility="invisible"
@@ -98,7 +91,6 @@
 
     <EditText
         tools:alpha="1f"
-        android:alpha="0"
         android:tag="splash_component"
         android:background="@drawable/white_circle_coloraccent_outline"
         android:id="@+id/splash_password"
@@ -107,7 +99,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
-        android:inputType="textPassword"
+        android:inputType="text"
         android:maxLines="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -116,7 +108,6 @@
 
     <TextView
         tools:alpha="1f"
-        android:alpha="0"
         android:tag="splash_component"
         tools:visibility="visible"
         android:visibility="invisible"
@@ -134,14 +125,13 @@
 
     <Button
         android:tag="splash_component"
-        android:alpha="0"
         tools:alpha="1f"
         android:elevation="20dp"
         android:id="@+id/splash_sign_in_button"
         app:layout_constraintTop_toBottomOf="@id/login_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/sign_up_with_google"
+        android:text="@string/sign_in_with_google"
         android:background="@drawable/common_google_signin_btn_text_light_normal"
         android:foreground="@drawable/transparent_circle_coloraccent_outline"
         android:layout_marginTop="64dp"
@@ -152,7 +142,6 @@
 
     <View
         tools:alpha="1f"
-        android:alpha="0"
         android:tag="splash_component"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -166,7 +155,6 @@
 
     <TextView
         tools:alpha="1f"
-        android:alpha="0"
         android:tag="splash_component"
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -180,7 +168,6 @@
 
     <Button
         tools:alpha="1f"
-        android:alpha="0"
         android:tag="splash_component"
         android:id="@+id/login_button"
         android:layout_width="wrap_content"
@@ -191,7 +178,7 @@
         android:drawablePadding="16dp"
         android:padding="12dp"
         android:shadowColor="@color/trans_white"
-        android:text="@string/sign_up"
+        android:text="@string/sign_in"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -199,7 +186,6 @@
 
     <ProgressBar
         tools:alpha="1f"
-        android:alpha="0"
         android:tag="splash_component"
         android:visibility="invisible"
         android:elevation="20dp"
@@ -210,22 +196,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:tag="splash_component"
-        tools:alpha="1f"
-        android:alpha="0"
-        android:textColor="@color/colorPrimary"
-        android:gravity="center"
-        android:textSize="18sp"
-        android:id="@+id/switch_to_login_screen_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
-        android:text="@string/already_have_an_account"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 

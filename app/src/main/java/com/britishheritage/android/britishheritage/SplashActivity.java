@@ -61,6 +61,7 @@ public class SplashActivity extends BaseActivity {
   private TextView emailErrorTV;
   private TextView passwordErrorTV;
   private ProgressBar progressBar;
+  private TextView navigateToLoginTV;
 
   private GoogleSignInClient googleSignInClient;
   private static final int SIGN_IN_CODE = 583;
@@ -123,6 +124,8 @@ public class SplashActivity extends BaseActivity {
     passwordErrorTV = findViewById(R.id.splash_password_error);
     progressBar = findViewById(R.id.splash_progressbar);
     splashViewGroup = findViewById(R.id.splash_viewgroup);
+    navigateToLoginTV = findViewById(R.id.switch_to_login_screen_text);
+
 
     taggedViews = Tools.getViewsByTag(splashViewGroup, "splash_component");
     for (View view: taggedViews){
@@ -178,6 +181,13 @@ public class SplashActivity extends BaseActivity {
         if (checkUsernameValidity()){
           googleSignIn();
         }
+      }
+    });
+
+    navigateToLoginTV.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        startActivity(new Intent(SplashActivity.this, LoginActivity.class));
       }
     });
 
