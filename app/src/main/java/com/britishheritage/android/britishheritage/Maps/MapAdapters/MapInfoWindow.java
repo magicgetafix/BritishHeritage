@@ -60,6 +60,7 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
 
       locationName = locationName.replace(";", ",");
 
+
       DatabaseInteractor databaseInteractor = DatabaseInteractor.getInstance(context);
 
       LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
