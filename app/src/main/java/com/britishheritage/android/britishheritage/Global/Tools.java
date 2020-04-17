@@ -35,7 +35,7 @@ public class Tools {
 
     public static String getRanking(int score){
         int absScore = Math.abs(score);
-        int index = absScore/50;
+        int index = absScore/40;
         if (index < Constants.RANKING_ARRAY.length){
             return Constants.RANKING_ARRAY[index];
         }

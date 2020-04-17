@@ -460,7 +460,7 @@ public class DatabaseInteractor {
                     DataSnapshot snapshot = snapshotIterator.next();
                     Timber.d(snapshot.toString());
                     Review review = snapshot.getValue(Review.class);
-                    if (review!=null){
+                    if (review!=null && review.getUpvotes() > -4){
                         reviews.add(review);
                     }
                     if (currentUser!=null) {
