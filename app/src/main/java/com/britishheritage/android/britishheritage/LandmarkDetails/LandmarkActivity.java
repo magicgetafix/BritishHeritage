@@ -422,7 +422,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             userLocationMarker = gMap.addMarker(new MarkerOptions().position(userLatLng).icon(locationBitmapDescriptor));
         }
         LatLng locationLatLng = new LatLng(mainLandmark.getLatitude(), mainLandmark.getLongitude());
-        gMap.setMinZoomPreference(12);
+        gMap.setMinZoomPreference(13);
         gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationLatLng, 17));
         gMap.getUiSettings().setMapToolbarEnabled(false);
@@ -437,7 +437,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     public void onUserInteraction() {
         super.onUserInteraction();
         float zoomLevel = gMap.getCameraPosition().zoom;
-        if (zoomLevel <= 13.0){
+        if (zoomLevel <= 14.0){
             gMap.getUiSettings().setZoomControlsEnabled(false);
         }
         else{

@@ -125,7 +125,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
                 android:src="@drawable/thumb_up"
-                android:visibility="invisible"
+                android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="@+id/review_points"
                 app:layout_constraintEnd_toStartOf="@+id/review_downvote"
                 app:layout_constraintTop_toBottomOf="@id/review_username"
@@ -144,6 +144,8 @@
                 app:layout_constraintTop_toTopOf="@id/review_upvote" />
 
             <ImageView
+                tools:visibility="visible"
+                android:visibility="invisible"
                 android:id="@+id/review_upvoted"
                 android:layout_width="20dp"
                 android:layout_height="20dp"

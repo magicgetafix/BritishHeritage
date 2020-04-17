@@ -148,7 +148,7 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                                 ref.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot!=null) {
+                                        if (dataSnapshot.getValue(Integer.class)!=null) {
                                             int value = dataSnapshot.getValue(Integer.class);
                                             ref.setValue(value-1);
                                         }
@@ -173,6 +173,22 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                                 reviewUpvotedIV.setVisibility(View.INVISIBLE);
                                 review.downVote();
                                 setScore(review, context, reviewScoreTextView);
+
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users").child(review.getUserId()).child("pts");
+                                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.getValue(Integer.class)!=null) {
+                                            int value = dataSnapshot.getValue(Integer.class);
+                                            ref.setValue(value+1);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
                             }
                         }
                     }

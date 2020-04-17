@@ -358,7 +358,12 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             }
 
             if (!updatedLocationHasBeenSet && gMap!=null){
-                if (currentLatLng.latitude != location.getLatitude()) {
+
+                int currentApproxLat = (int) (currentLatLng.latitude * 10);
+                int newApproxLat = (int) (location.getLatitude() * 10);
+                int currentApproxLng = (int) (currentLatLng.longitude * 10);
+                int newApproxLng = (int) (location.getLongitude() * 10);
+                if ((currentApproxLat != newApproxLat) || (currentApproxLng != newApproxLng)) {
                     currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                     gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
                     updatedLocationHasBeenSet = true;

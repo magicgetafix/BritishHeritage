@@ -252,11 +252,13 @@
 
 
             <TextView
+                android:text="invisible text"
+                android:textColor="@color/transparent"
                 android:visibility="visible"
                 android:textSize="18sp"
                 android:id="@+id/filler"
                 android:layout_width="match_parent"
-                android:layout_height="20dp"
+                android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/landmark_title"
                 app:layout_constraintStart_toStartOf="parent"
                 android:background="@drawable/color_accent_gradient2"

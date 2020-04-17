@@ -450,12 +450,12 @@ public class DatabaseInteractor {
         List<Review> reviews = new ArrayList<>();
         Review firstReview = new Review();
         firstReview.setAsPlaceholder(true);
-        reviews.add(firstReview);
 
         reviewReference.child(landmarkId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Iterator<DataSnapshot> snapshotIterator = dataSnapshot.getChildren().iterator();
+                boolean hasUserReview = false;
                 while (snapshotIterator.hasNext()){
                     DataSnapshot snapshot = snapshotIterator.next();
                     Timber.d(snapshot.toString());
@@ -465,13 +465,17 @@ public class DatabaseInteractor {
                     }
                     if (currentUser!=null) {
                         if (review.getUserId().equals(currentUser.getUid())){
-                            reviews.remove(firstReview);
+                            hasUserReview = true;
                         }
                     }
                 }
                 Timber.d("Number of reviews: "+reviews.size());
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
                    sortReviews(reviews);
+                }
+                if (!hasUserReview) {
+                    reviews.add(0, firstReview);
                 }
                 reviewLiveData.setValue(reviews);
             }
