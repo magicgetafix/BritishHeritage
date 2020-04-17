@@ -79,14 +79,18 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
             parkAndGardenBackground.setVisibility(View.INVISIBLE);
             battlefieldBackground.setVisibility(View.INVISIBLE);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                   if (listener!=null){
-                       listener.onLandmarkClicked(landmark);
-                   }
-                }
-            });
+            //check not a temporary landmark
+            if (landmark.getLatitude() != null && landmark.getLongitude() != null) {
+
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (listener != null) {
+                            listener.onLandmarkClicked(landmark);
+                        }
+                    }
+                });
+            }
 
             if (landmark.getName()!=null) {
                 textView.setText(landmark.getName());

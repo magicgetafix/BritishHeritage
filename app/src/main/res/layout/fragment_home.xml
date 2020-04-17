@@ -235,6 +235,25 @@
             app:layout_constraintStart_toEndOf="@+id/home_fragment_photo"
             app:layout_constraintTop_toBottomOf="@id/home_username_textview" />
 
+        <ImageView
+            android:id="@+id/delete_checked_in_places"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/outline_delete_black_36"
+            app:layout_constraintBottom_toBottomOf="@+id/home_places_you_have_visited_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/home_places_you_have_visited_text" />
+
+        <ImageView
+            android:id="@+id/delete_favourites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/outline_delete_black_36"
+            app:layout_constraintBottom_toBottomOf="@+id/home_your_favourites_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/home_your_favourites_text" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

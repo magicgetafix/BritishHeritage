@@ -1,5 +1,6 @@
 package com.britishheritage.android.britishheritage.Home;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -69,6 +71,8 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
   private DatabaseInteractor databaseInteractor;
   private TextView highestScorersTitleTv;
   private RecyclerView highestScorersRecyclerView;
+  private ImageView deleteFavouritesIV;
+  private ImageView deleteCheckedInPropertiesIV;
 
   //user profile
   private TextView userNameTV;
@@ -106,6 +110,8 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
     userNameTV = view.findViewById(R.id.home_username_textview);
     userScoreTV = view.findViewById(R.id.home_user_points_textview);
     userRankTV = view.findViewById(R.id.home_user_rank_textview);
+    deleteFavouritesIV = view.findViewById(R.id.delete_favourites);
+    deleteCheckedInPropertiesIV = view.findViewById(R.id.delete_checked_in_places);
     mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel .class);
     favouritesLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false);
     checkedInLandmarksManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -130,8 +136,46 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
       Drawable addPhotoDrawable = getResources().getDrawable(R.drawable.add_photo_white_icon);
       userPhotoIV.setImageDrawable(addPhotoDrawable);
     }
-
     setUpUserInfo();
+
+    deleteFavouritesIV.setOnClickListener(v->{
+      String confirm = getString(R.string.confirm);
+      String deleteFavsStr = getString(R.string.delete_favs);
+      DialogInterface.OnClickListener positiveClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          mainViewModel.deleteFavourites();
+          dialog.dismiss();
+        }
+      };
+      DialogInterface.OnClickListener negativeClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          dialog.dismiss();
+        }
+      };
+      showDialog(confirm, deleteFavsStr, positiveClickListener, negativeClickListener);
+    });
+
+    deleteCheckedInPropertiesIV.setOnClickListener(v->{
+      String confirm = getString(R.string.confirm);
+      String deletePlacesStr = getString(R.string.delete_checked_in);
+      DialogInterface.OnClickListener positiveClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          mainViewModel.deleteCheckedInProperties();
+          dialog.dismiss();
+        }
+      };
+      DialogInterface.OnClickListener negativeClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          dialog.dismiss();
+        }
+      };
+      showDialog(confirm, deletePlacesStr, positiveClickListener, negativeClickListener);
+    });
+
   }
 
   private void setUpUserInfo(){
@@ -177,8 +221,6 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
     checkedInLandmarksAdapter = new LandmarksAdapter(landmarks, getContext(), this);
     checkedInLandmarksRecyclerView.setLayoutManager(checkedInLandmarksManager);
     checkedInLandmarksRecyclerView.setAdapter(checkedInLandmarksAdapter);
-
-
   }
 
   private void onTopScoringUsersUpdated(List<User> userList){
@@ -289,5 +331,23 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
   public void onLandmarkClicked(Landmark landmark) {
       BaseActivity activity = (BaseActivity) getActivity();
       activity.navigateWithLandmark(LandmarkActivity.class, landmark);
+  }
+
+
+  public void showDialog(String title, String message, DialogInterface.OnClickListener positiveClickListener, DialogInterface.OnClickListener negativeClickListener){
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+    builder.setTitle(title);
+    builder.setMessage(message);
+
+    String yes = getString(R.string.yes);
+    builder.setPositiveButton(yes, positiveClickListener);
+
+    String no = getString(R.string.no);
+    builder.setNegativeButton(no, negativeClickListener);
+
+    AlertDialog alert = builder.create();
+    alert.show();
+
   }
 }

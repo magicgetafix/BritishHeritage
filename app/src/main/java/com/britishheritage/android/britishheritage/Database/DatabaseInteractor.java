@@ -182,6 +182,14 @@ public class DatabaseInteractor {
                 .findAllAsync();
     }
 
+
+    public void deleteFavourites(){
+        realm.beginTransaction();
+        realm.where(FavouriteLandmarkRealmObj.class).findAll().deleteAllFromRealm();
+        realm.commitTransaction();
+
+    }
+
     public void addWikiLandmarks(List<Geoname> geonameList){
 
         realm.beginTransaction();
@@ -245,6 +253,14 @@ public class DatabaseInteractor {
 
     public boolean isCheckedInLandmark(String landmarkId){
         return checkedInLandmarksSharedPrefs.getBoolean(landmarkId, false);
+    }
+
+    public void deleteCheckedInLandmarks(){
+
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser!=null){
+            checkedInReviewsRef.child(currentUser.getUid()).setValue(null);
+        }
     }
 
     public LiveData<List<Landmark>> getCheckedInLandmarks(FirebaseUser currentUser){
@@ -441,7 +457,6 @@ public class DatabaseInteractor {
         }
         return 0;
     }
-
 
     public LiveData<List<Review>> getReviews(String landmarkId){
 

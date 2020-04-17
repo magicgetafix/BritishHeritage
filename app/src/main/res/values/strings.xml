@@ -58,6 +58,11 @@
     <string name="rank">Rank: %s</string>
     <string name="logout">Sign out</string>
     <string name="already_have_an_account">Already have an account?\nClick <b>here</b> to sign in </string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="delete_favs">Delete all your favourites?</string>
+    <string name="confirm">Confirm:</string>
+    <string name="delete_checked_in">"Delete the places you have visited? "</string>
 
 
 </resources>

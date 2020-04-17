@@ -89,4 +89,16 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
         });
         return topScoringUserLiveData;
     }
+
+    public void deleteFavourites(){
+
+        favouriteListLiveData.setValue(new ArrayList<Landmark>());
+        databaseInteractor.deleteFavourites();
+    }
+
+    public void deleteCheckedInProperties(){
+
+        checkedInLandmarksLiveData.setValue(new ArrayList<Landmark>());
+        databaseInteractor.deleteCheckedInLandmarks();
+    }
 }
