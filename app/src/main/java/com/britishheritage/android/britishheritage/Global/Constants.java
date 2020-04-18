@@ -33,6 +33,7 @@ public class Constants {
 
     //checked in landmark keys
     public final static String CHECKED_IN = "visits";
+    public final static String FAVOURITES = "fav";
     public static final String REVIEWS = "reviews";
     public static final String USERS = "users";
 

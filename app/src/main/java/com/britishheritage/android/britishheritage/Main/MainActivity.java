@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
+import androidx.lifecycle.ViewModelProvider;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -60,6 +61,7 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
     private DatabaseInteractor databaseInteractor;
     private ProgressBar progressBar;
     private LiveData<Integer> databaseSizeLiveData;
+    private MainViewModel mainViewModel;
     //private FirebaseDatabase database;
     public static Landmark lastClickedLandmark = null;
     private int currentMenuId = -999999999;
@@ -294,6 +296,8 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.sign_out){
             FirebaseAuth.getInstance().signOut();
+            mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+            mainViewModel.deleteFavourites();
             Intent splashIntent = new Intent(this, SplashActivity.class);
             startActivity(splashIntent);
         }

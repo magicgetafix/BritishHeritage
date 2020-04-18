@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 
 import com.britishheritage.android.britishheritage.Daos.LandmarkDao;
 import com.britishheritage.android.britishheritage.Global.Constants;
@@ -65,6 +66,7 @@ public class DatabaseInteractor {
     private SharedPreferences checkedInLandmarksSharedPrefs;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference reviewReference;
+    private DatabaseReference favouritesReference;
     private FirebaseUser currentUser;
     private StorageReference profileImageGalleryRef;
     private DatabaseReference checkedInReviewsRef;
@@ -104,6 +106,8 @@ public class DatabaseInteractor {
         firebaseDatabase = FirebaseDatabase.getInstance();
         reviewReference = firebaseDatabase.getReference().child(Constants.REVIEWS);
         checkedInReviewsRef = firebaseDatabase.getReference().child(Constants.CHECKED_IN);
+        favouritesReference = firebaseDatabase.getReference().child(Constants.FAVOURITES);
+
         userRef = firebaseDatabase.getReference().child(Constants.USERS);
         profileImageGalleryRef = FirebaseStorage.getInstance().getReference().child("images").child("profile");
 
@@ -157,6 +161,11 @@ public class DatabaseInteractor {
         realm.beginTransaction();
         realm.copyToRealmOrUpdate(favourite);
         realm.commitTransaction();
+        FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser!=null && landmark != null) {
+            //adds to Firebase Database
+            favouritesReference.child(currentUser.getUid()).child(landmark.getId()).setValue(true);
+        }
     }
 
     public void removeFavourite(String landmarkId){
@@ -166,6 +175,10 @@ public class DatabaseInteractor {
             landmarkRealmObj.deleteFromRealm();
         }
         realm.commitTransaction();
+        if (currentUser!=null) {
+            //delete from Firebase Database
+            favouritesReference.child(currentUser.getUid()).child(landmarkId).setValue(null);
+        }
     }
 
     public boolean isFavourite(String landmarkId){
@@ -177,9 +190,15 @@ public class DatabaseInteractor {
     }
 
     public RealmResults<FavouriteLandmarkRealmObj> getFavourites(){
-        return realm.where(FavouriteLandmarkRealmObj.class)
+        RealmResults<FavouriteLandmarkRealmObj> results = realm.where(FavouriteLandmarkRealmObj.class)
                 .sort("latitude", Sort.DESCENDING)
                 .findAllAsync();
+
+        if (results.isEmpty()){
+            //this is done so favourites stored in local db can be deleted and restored on login/log-out
+            syncFavouritesDatabase();
+        }
+        return results;
     }
 
 
@@ -261,6 +280,70 @@ public class DatabaseInteractor {
         if (currentUser!=null){
             checkedInReviewsRef.child(currentUser.getUid()).setValue(null);
         }
+    }
+
+    private void syncFavouritesDatabase(){
+
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser!=null) {
+
+            List<FavouriteLandmarkRealmObj> favouriteLandmarkRealmObjList = new ArrayList<>();
+            //create handler and runnable so writing to realm can be delayed until
+            //final result is processed
+            Handler handler = new Handler();
+            Runnable runnable = () -> {
+                try {
+                    realm.beginTransaction();
+                    realm.copyToRealmOrUpdate(favouriteLandmarkRealmObjList);
+                    realm.commitTransaction();
+                }
+                catch (Exception e){
+                    Timber.d(e);
+                }
+            };
+
+            favouritesReference.child(currentUser.getUid()).addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                    String landmarkRef = dataSnapshot.getKey();
+                    LiveData<Landmark> landmarkLiveData = getLandmark(landmarkRef);
+                    landmarkLiveData.observeForever(new Observer<Landmark>() {
+                        @Override
+                        public void onChanged(Landmark landmark) {
+                            if (handler!=null){
+                                handler.removeCallbacks(runnable);
+                            }
+                            FavouriteLandmarkRealmObj favourite = new FavouriteLandmarkRealmObj(landmark);
+                            favouriteLandmarkRealmObjList.add(favourite);
+                            landmarkLiveData.removeObserver(this);
+                            handler.postDelayed(runnable, 300);
+
+                        }
+                    });
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+
     }
 
     public LiveData<List<Landmark>> getCheckedInLandmarks(FirebaseUser currentUser){
