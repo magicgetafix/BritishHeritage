@@ -58,6 +58,7 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
         locationName = newLocationString;
       }
 
+      locationName = locationName.replaceAll("\"", "");
       locationName = locationName.replace(";", ",");
 
 

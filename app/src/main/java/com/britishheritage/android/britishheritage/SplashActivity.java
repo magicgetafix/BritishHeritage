@@ -1,6 +1,7 @@
 package com.britishheritage.android.britishheritage;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.LiveData;
 import io.reactivex.Observable;
@@ -8,6 +9,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,7 +48,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends BaseActivity implements DialogInterface.OnClickListener {
 
   private DatabaseInteractor databaseInteractor;
   private LiveData<Integer> databaseSizeLiveData;
@@ -162,6 +164,12 @@ public class SplashActivity extends BaseActivity {
             .build();
     googleSignInClient = GoogleSignIn.getClient(this, gso);
     setUpButtons();
+    if (databaseInteractor.isFirstRun()) {
+
+      String title = getString(R.string.important_info);
+      String terms = getString(R.string.scheduled_monument_laws);
+      showDialog(title, terms, this);
+    }
   }
 
   public void setUpButtons(){
@@ -402,5 +410,24 @@ public class SplashActivity extends BaseActivity {
   @Override
   public void onBackPressed() {
     finishAffinity();
+  }
+
+  public void showDialog(String title, String message, DialogInterface.OnClickListener positiveClickListener){
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setTitle(title);
+    builder.setMessage(message);
+    String yes = getString(R.string.ok);
+    builder.setPositiveButton(yes, positiveClickListener);
+    AlertDialog alert = builder.create();
+    alert.show();
+
+  }
+
+  @Override
+  public void onClick(DialogInterface dialog, int which) {
+    if (dialog!=null){
+      dialog.dismiss();
+    }
   }
 }

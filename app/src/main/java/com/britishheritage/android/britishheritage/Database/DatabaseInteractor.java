@@ -75,7 +75,7 @@ public class DatabaseInteractor {
     private ChildEventListener scoreChildEventListener;
 
     private static final String CHECKED_IN_PREFS = "checked_in_prefs";
-    private static final String POINTS_SHARED_PREFS = "points";
+    private static final String FIRST_RUN_KEY = "first_run";
 
 
     public static DatabaseInteractor getInstance(Context context){
@@ -112,6 +112,16 @@ public class DatabaseInteractor {
         profileImageGalleryRef = FirebaseStorage.getInstance().getReference().child("images").child("profile");
 
 
+    }
+
+    public boolean isFirstRun(){
+        boolean isFirstRun= sharedPrefs.getBoolean(FIRST_RUN_KEY, true);
+        appHasBeenRun();
+        return isFirstRun;
+    }
+
+    private void appHasBeenRun(){
+        sharedPrefs.edit().putBoolean(FIRST_RUN_KEY, false).commit();
     }
 
     public void addAllLandmarks(List<Landmark> landmarks){
