@@ -1,5 +1,6 @@
 package com.britishheritage.android.britishheritage.Model.Realm;
 
+import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 
 import io.realm.RealmObject;
@@ -22,7 +23,7 @@ public class FavouriteLandmarkRealmObj extends RealmObject {
         this.id = landmark.getId();
         this.latitude = landmark.getLatitude();
         this.longitude = landmark.getLongitude();
-        this.name = landmark.getName();
+        this.name = Tools.formatTitle(landmark.getName());
         this.type = landmark.getType();
     }
 

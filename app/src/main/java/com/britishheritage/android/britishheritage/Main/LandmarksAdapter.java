@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Global.Constants;
+import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.R;
 
@@ -93,7 +94,7 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
             }
 
             if (landmark.getName()!=null) {
-                textView.setText(landmark.getName());
+                textView.setText(Tools.formatTitle(landmark.getName()));
             }
             if (landmark.getType()!=null){
 

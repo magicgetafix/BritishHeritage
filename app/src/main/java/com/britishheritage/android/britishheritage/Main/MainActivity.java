@@ -35,6 +35,7 @@ import com.britishheritage.android.britishheritage.SplashActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.gson.Gson;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -295,9 +296,10 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.sign_out){
-            FirebaseAuth.getInstance().signOut();
+            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-            mainViewModel.deleteFavourites();
+            mainViewModel.deleteFavourites(currentUser);
+            FirebaseAuth.getInstance().signOut();
             Intent splashIntent = new Intent(this, SplashActivity.class);
             startActivity(splashIntent);
         }

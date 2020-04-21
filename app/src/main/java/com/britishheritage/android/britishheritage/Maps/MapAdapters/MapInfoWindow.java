@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
+import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.R;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
@@ -58,8 +59,9 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
         locationName = newLocationString;
       }
 
-      locationName = locationName.replaceAll("\"", "");
       locationName = locationName.replace(";", ",");
+      locationName = Tools.formatTitle(locationName);
+
 
 
       DatabaseInteractor databaseInteractor = DatabaseInteractor.getInstance(context);

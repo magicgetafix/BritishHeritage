@@ -37,6 +37,7 @@ import android.widget.TextView;
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
+import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.LandmarkReviewAdapter;
 import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.WikiLandmarkAdapter;
 import com.britishheritage.android.britishheritage.Model.Landmark;
@@ -357,7 +358,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     }
 
     private void setUpToolbar(){
-        String name = mainLandmark.getName();
+        String name = Tools.formatTitle(mainLandmark.getName());
         if (name!=null) {
             landmarkTitleTV.setText(name);
             setSupportActionBar(toolbar);

@@ -144,8 +144,10 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
       DialogInterface.OnClickListener positiveClickListener = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-          mainViewModel.deleteFavourites();
-          dialog.dismiss();
+          if (currentUser!=null) {
+            mainViewModel.deleteFavourites(currentUser);
+            dialog.dismiss();
+          }
         }
       };
       DialogInterface.OnClickListener negativeClickListener = new DialogInterface.OnClickListener() {
@@ -165,6 +167,7 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
         public void onClick(DialogInterface dialog, int which) {
           mainViewModel.deleteCheckedInProperties();
           dialog.dismiss();
+          setUpUserInfo();
         }
       };
       DialogInterface.OnClickListener negativeClickListener = new DialogInterface.OnClickListener() {
@@ -217,7 +220,9 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
       tempLandmark.setId("0");
       tempLandmark.setType(Constants.SCHEDULED_MONUMENTS_ID);
       landmarks.add(tempLandmark);
+      setUpUserInfo();
     }
+    Tools.sortLandmarksAtoZ(landmarks);
     checkedInLandmarksAdapter = new LandmarksAdapter(landmarks, getContext(), this);
     checkedInLandmarksRecyclerView.setLayoutManager(checkedInLandmarksManager);
     checkedInLandmarksRecyclerView.setAdapter(checkedInLandmarksAdapter);
@@ -231,6 +236,7 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
       topScoresLayoutManager.setStackFromEnd(true);
       highestScorersRecyclerView.setLayoutManager(topScoresLayoutManager);
       highestScorersRecyclerView.setAdapter(topScoresAdapter);
+      setUpUserInfo();
     }
     else{
       highestScorersTitleTv.setVisibility(View.GONE);

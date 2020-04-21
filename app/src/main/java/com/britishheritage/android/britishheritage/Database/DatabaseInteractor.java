@@ -40,6 +40,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -74,6 +75,7 @@ public class DatabaseInteractor {
     private List<User> topScorersList;
     private ChildEventListener scoreChildEventListener;
 
+    private MutableLiveData<List<User>> topScoringUserliveData;
     private static final String CHECKED_IN_PREFS = "checked_in_prefs";
     private static final String FIRST_RUN_KEY = "first_run";
 
@@ -201,7 +203,7 @@ public class DatabaseInteractor {
 
     public RealmResults<FavouriteLandmarkRealmObj> getFavourites(){
         RealmResults<FavouriteLandmarkRealmObj> results = realm.where(FavouriteLandmarkRealmObj.class)
-                .sort("latitude", Sort.DESCENDING)
+                .sort("name", Sort.ASCENDING)
                 .findAllAsync();
 
         if (results.isEmpty()){
@@ -212,10 +214,15 @@ public class DatabaseInteractor {
     }
 
 
-    public void deleteFavourites(){
+    public void deleteFavourites(FirebaseUser user){
         realm.beginTransaction();
         realm.where(FavouriteLandmarkRealmObj.class).findAll().deleteAllFromRealm();
         realm.commitTransaction();
+
+        if (user!=null) {
+            HashMap<String, Boolean> emptyHashMap = new HashMap<>();
+            favouritesReference.child(user.getUid()).removeValue();
+        }
 
     }
 
@@ -289,6 +296,24 @@ public class DatabaseInteractor {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser!=null){
             checkedInReviewsRef.child(currentUser.getUid()).setValue(null);
+            userRef.child(currentUser.getUid()).removeValue();
+            //delete from live data
+            List<User> userList = topScoringUserliveData.getValue();
+            if (userList!=null){
+                for (User user: userList){
+                    if (user.getId().equals(currentUser.getUid())){
+                        userList.remove(user);
+                    }
+                }
+            }
+            topScoringUserliveData.setValue(userList);
+            //wipe user's points from realm database
+            User newUser = new User(currentUser.getUid(), currentUser.getDisplayName(), 0, 0, 0);
+            realm.beginTransaction();
+            UserRealmObj realmUserObj = new UserRealmObj(newUser);
+            realm.copyToRealmOrUpdate(realmUserObj);
+            realm.commitTransaction();
+
         }
     }
 
@@ -419,7 +444,7 @@ public class DatabaseInteractor {
 
     public LiveData<List<User>> getTopScoringUsers(int limit){
 
-        MutableLiveData<List<User>> liveData = new MutableLiveData<>();
+        topScoringUserliveData = new MutableLiveData<>();
         topScorersList = new ArrayList<>();
         scoreChildEventListener = new ChildEventListener() {
             @Override
@@ -427,7 +452,7 @@ public class DatabaseInteractor {
                 User user = dataSnapshot.getValue(User.class);
                 if (user!=null){
                     topScorersList.add(user);
-                    liveData.setValue(topScorersList);
+                    topScoringUserliveData.setValue(topScorersList);
                 }
             }
 
@@ -441,7 +466,7 @@ public class DatabaseInteractor {
                 User user = dataSnapshot.getValue(User.class);
                 if (user!=null){
                     topScorersList.remove(user);
-                    liveData.setValue(topScorersList);
+                    topScoringUserliveData.setValue(topScorersList);
                 }
             }
 
@@ -456,7 +481,7 @@ public class DatabaseInteractor {
             }
         };
         userRef.orderByChild("pts").limitToFirst(limit).addChildEventListener(scoreChildEventListener);
-        return liveData;
+        return topScoringUserliveData;
     }
 
     /**This method synchronises the local database with the remote FirebaseRealtimeDatabase

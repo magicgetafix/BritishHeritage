@@ -3,6 +3,7 @@ package com.britishheritage.android.britishheritage.Main;
 import android.app.Application;
 
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
+import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.Model.Realm.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.User;
@@ -90,10 +91,9 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
         return topScoringUserLiveData;
     }
 
-    public void deleteFavourites(){
-
+    public void deleteFavourites(FirebaseUser currentUser){
         favouriteListLiveData.setValue(new ArrayList<Landmark>());
-        databaseInteractor.deleteFavourites();
+        databaseInteractor.deleteFavourites(currentUser);
     }
 
     public void deleteCheckedInProperties(){

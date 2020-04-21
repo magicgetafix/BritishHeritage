@@ -62,7 +62,7 @@
     <string name="no">No</string>
     <string name="delete_favs">Delete all your favourites?</string>
     <string name="confirm">Confirm:</string>
-    <string name="delete_checked_in">"Delete the places you have visited? "</string>
+    <string name="delete_checked_in">"Delete the places you have visited?\n\nThis will also reset your score to zero"</string>
     <string name="important_info">Important Information</string>
     <string name="scheduled_monument_laws"><b>The 1979 Ancient Monuments Act makes it illegal to:</b>\n\n• Destroy or damage a scheduled monument\n\n• Use a metal detector without prior consent\n\n• Remove any historical or archaeological object from a site without prior consent\n</string>
     <string name="ok">O.K</string>

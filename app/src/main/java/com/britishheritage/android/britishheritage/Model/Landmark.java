@@ -90,7 +90,7 @@ public class Landmark implements Comparable, Parcelable {
   }
 
   public void setName(String name) {
-    this.name = name;
+    this.name = name.replaceAll("\"", "");
   }
 
   public void setType(String type) {
