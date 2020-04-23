@@ -3,7 +3,6 @@ package com.britishheritage.android.britishheritage.Main;
 import android.app.Application;
 
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
-import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.Model.Realm.FavouriteLandmarkRealmObj;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.User;
@@ -18,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 
@@ -27,7 +27,7 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
     private List<Landmark> favouriteLandmarkList = new ArrayList<>();
     private DatabaseInteractor databaseInteractor;
     private MutableLiveData<List<Landmark>> favouriteListLiveData = new MutableLiveData<>();
-    private RealmResults<FavouriteLandmarkRealmObj> realmResults;
+    private RealmResults<FavouriteLandmarkRealmObj> favouriteLandmarkRealmObjRealmResults;
     private MutableLiveData<List<Landmark>> checkedInLandmarksLiveData = new MutableLiveData<>();
     private MutableLiveData<List<User>> topScoringUserLiveData = new MutableLiveData<>();
 
@@ -55,8 +55,8 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
 
     private void getUserData(FirebaseUser user){
         if (user!=null) {
-            realmResults = databaseInteractor.getFavourites();
-            realmResults.addChangeListener(this);
+            favouriteLandmarkRealmObjRealmResults = databaseInteractor.getFavourites();
+            favouriteLandmarkRealmObjRealmResults.addChangeListener(this);
             databaseInteractor.getCheckedInLandmarks(user).observeForever(landmarks -> {
                 checkedInLandmarksLiveData.setValue(landmarks);
             });
@@ -91,9 +91,22 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
         return topScoringUserLiveData;
     }
 
-    public void deleteFavourites(FirebaseUser currentUser){
+    public void deleteFavouritesLocally(FirebaseUser currentUser){
         favouriteListLiveData.setValue(new ArrayList<Landmark>());
-        databaseInteractor.deleteFavourites(currentUser);
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        favouriteLandmarkRealmObjRealmResults.deleteAllFromRealm();
+        realm.commitTransaction();
+        databaseInteractor.deleteFavourites(currentUser, false);
+    }
+
+    public void deleteFavouritesCompletely(FirebaseUser currentUser){
+        favouriteListLiveData.setValue(new ArrayList<Landmark>());
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        favouriteLandmarkRealmObjRealmResults.deleteAllFromRealm();
+        realm.commitTransaction();
+        databaseInteractor.deleteFavourites(currentUser, true);
     }
 
     public void deleteCheckedInProperties(){

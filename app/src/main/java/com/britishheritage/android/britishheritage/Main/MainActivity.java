@@ -298,7 +298,7 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
         if (item.getItemId() == R.id.sign_out){
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
-            mainViewModel.deleteFavourites(currentUser);
+            mainViewModel.deleteFavouritesLocally(currentUser);
             FirebaseAuth.getInstance().signOut();
             Intent splashIntent = new Intent(this, SplashActivity.class);
             startActivity(splashIntent);

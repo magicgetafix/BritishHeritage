@@ -214,14 +214,14 @@ public class DatabaseInteractor {
     }
 
 
-    public void deleteFavourites(FirebaseUser user){
+    public void deleteFavourites(FirebaseUser user, boolean deleteFromServer){
         realm.beginTransaction();
         realm.where(FavouriteLandmarkRealmObj.class).findAll().deleteAllFromRealm();
         realm.commitTransaction();
-
-        if (user!=null) {
-            HashMap<String, Boolean> emptyHashMap = new HashMap<>();
-            favouritesReference.child(user.getUid()).removeValue();
+        if (deleteFromServer) {
+            if (user != null) {
+                favouritesReference.child(user.getUid()).removeValue();
+            }
         }
 
     }

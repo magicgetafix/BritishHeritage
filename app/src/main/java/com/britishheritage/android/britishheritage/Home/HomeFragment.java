@@ -145,7 +145,7 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
         @Override
         public void onClick(DialogInterface dialog, int which) {
           if (currentUser!=null) {
-            mainViewModel.deleteFavourites(currentUser);
+            mainViewModel.deleteFavouritesCompletely(currentUser);
             dialog.dismiss();
           }
         }
