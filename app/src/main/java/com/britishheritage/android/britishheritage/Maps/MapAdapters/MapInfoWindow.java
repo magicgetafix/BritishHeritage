@@ -25,11 +25,11 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
 
     if (marker.getSnippet()!=null) {
 
-      String[] dataCSV = marker.getSnippet().split("//");
+      String[] dataCSV = marker.getSnippet().split("@@");
       String locationName = "";
       String typeOfLocation = "";
       String id = "";
-      if (dataCSV.length == 5){
+      if (dataCSV.length == 6){
         id = dataCSV[0];
         locationName = dataCSV[1];
         typeOfLocation = dataCSV[4];

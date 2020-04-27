@@ -394,7 +394,7 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
   public String loadJSONFromAsset() {
       String json = null;
       try {
-        InputStream is = getAssets().open("formatted_heritage_data.json");
+        InputStream is = getAssets().open("formatted_heritage_data_with_urls.json");
         int size = is.available();
         byte[] buffer = new byte[size];
         is.read(buffer);

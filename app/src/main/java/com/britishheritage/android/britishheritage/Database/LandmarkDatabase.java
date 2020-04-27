@@ -7,7 +7,7 @@ import androidx.room.Dao;
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
 
-@Database(entities = Landmark.class, version = 1, exportSchema = false)
+@Database(entities = Landmark.class, version = 2, exportSchema = false)
 public abstract class LandmarkDatabase extends RoomDatabase {
     public abstract LandmarkDao landmarkDao();
 }

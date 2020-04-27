@@ -95,7 +95,9 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
         favouriteListLiveData.setValue(new ArrayList<Landmark>());
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-        favouriteLandmarkRealmObjRealmResults.deleteAllFromRealm();
+        if (favouriteLandmarkRealmObjRealmResults!=null) {
+            favouriteLandmarkRealmObjRealmResults.deleteAllFromRealm();
+        }
         realm.commitTransaction();
         databaseInteractor.deleteFavourites(currentUser, false);
     }
@@ -104,7 +106,9 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
         favouriteListLiveData.setValue(new ArrayList<Landmark>());
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
-        favouriteLandmarkRealmObjRealmResults.deleteAllFromRealm();
+        if (favouriteLandmarkRealmObjRealmResults!=null) {
+            favouriteLandmarkRealmObjRealmResults.deleteAllFromRealm();
+        }
         realm.commitTransaction();
         databaseInteractor.deleteFavourites(currentUser, true);
     }

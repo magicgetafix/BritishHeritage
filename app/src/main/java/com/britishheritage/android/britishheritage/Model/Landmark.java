@@ -25,6 +25,8 @@ public class Landmark implements Comparable, Parcelable {
   public String name;
   @ColumnInfo(name = "type")
   public String type;
+  @ColumnInfo(name = "webUrl")
+  public String webUrl;
 
   //Room requires empty constructor
   public Landmark(){
@@ -37,6 +39,7 @@ public class Landmark implements Comparable, Parcelable {
     this.longitude = favouriteLandmark.getLongitude();
     this.type = favouriteLandmark.getType();
     this.name = favouriteLandmark.getName();
+    this.webUrl = favouriteLandmark.getWebUrl();
   }
 
 
@@ -46,15 +49,17 @@ public class Landmark implements Comparable, Parcelable {
     longitude = in.readByte() == 0x00 ? null : in.readDouble();
     name = in.readString();
     type = in.readString();
+    webUrl = in.readString();
   }
 
   @Ignore
-  public Landmark(@NonNull String id, Double latitude, Double longitude, String name, String type){
+  public Landmark(@NonNull String id, Double latitude, Double longitude, String name, String type, String webUrl){
     this.id = id;
     this.latitude = latitude;
     this.longitude = longitude;
     this.name = name;
     this.type = type;
+    this.webUrl = webUrl;
   }
 
   public String getId() {
@@ -95,6 +100,14 @@ public class Landmark implements Comparable, Parcelable {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public void setWebUrl(String webUrl){
+    this.webUrl = webUrl;
+  }
+
+  public String getWebUrl(){
+    return this.webUrl;
   }
 
   @Override
@@ -139,6 +152,7 @@ public class Landmark implements Comparable, Parcelable {
     }
     dest.writeString(name);
     dest.writeString(type);
+    dest.writeString(webUrl);
   }
 
   @SuppressWarnings("unused")

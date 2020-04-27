@@ -211,20 +211,22 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             public void onInfoWindowClick(Marker marker) {
 
                 String snippetData = marker.getSnippet();
-                String[] snippetCSV = snippetData.split("//");
+                String[] snippetCSV = snippetData.split("@@");
                 double latitude = 0.0;
                 double longitude = 0.0;
                 String name = "";
                 String id = "";
                 String type = "";
-                if (snippetCSV.length == 5){
+                String webUrl = "";
+                if (snippetCSV.length == 6){
                     id = snippetCSV[0];
                     name = snippetCSV[1];
                     latitude = Double.parseDouble(snippetCSV[2]);
                     longitude = Double.parseDouble(snippetCSV[3]);
                     type = snippetCSV[4];
+                    webUrl = snippetCSV[5];
 
-                    Landmark landmark = new Landmark(id,latitude, longitude, name, type);
+                    Landmark landmark = new Landmark(id,latitude, longitude, name, type, webUrl);
                     MainActivity.lastClickedLandmark = landmark;
                     showBottomSheet();
 
@@ -266,13 +268,17 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         String longitude = entityLong.toString();
         String type = getString(R.string.scheduled_monument);
         String id = landmark.getId();
-        String csvData = id+"//"+name+"//"+latitude+"//"+longitude+"//";
+        String csvData = id+"@@"+name+"@@"+latitude+"@@"+longitude+"@@";
+        String webUrl = landmark.getWebUrl();
+        if (webUrl == null){
+            webUrl = "";
+        }
 
         if (landmark.getType().equals(Constants.SCHEDULED_MONUMENTS_ID)
             && this instanceof ArchMapFragment){
 
             type = getString(R.string.scheduled_monument);
-            csvData +=type;
+            csvData +=type+"@@"+webUrl;
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(monumentIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
                     .icon(bitmapDescriptor)
@@ -283,7 +289,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         && this instanceof ArchMapFragment){
 
             type = getString(R.string.hillfort);
-            csvData +=type;
+            csvData +=type+"@@"+webUrl;
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(hillIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
                     .icon(bitmapDescriptor)
@@ -294,7 +300,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         && this instanceof ArchMapFragment){
 
             type = getString(R.string.battlefield);
-            csvData +=type;
+            csvData +=type+"@@"+webUrl;
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(battleIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
                     .icon(bitmapDescriptor)
@@ -305,7 +311,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         && this instanceof ListedBuildingMapFragment){
 
             type = getString(R.string.listedbuilding);
-            csvData +=type;
+            csvData +=type+"@@"+webUrl;
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(buildingIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
                     .icon(bitmapDescriptor)
@@ -316,7 +322,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         && this instanceof ListedBuildingMapFragment){
 
             type = getString(R.string.park);
-            csvData +=type;
+            csvData +=type+"@@"+webUrl;
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(parkIcon);
             gMap.addMarker(new MarkerOptions().position(entLatLng)
                     .icon(bitmapDescriptor)

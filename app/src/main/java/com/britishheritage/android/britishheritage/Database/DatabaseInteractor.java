@@ -89,7 +89,7 @@ public class DatabaseInteractor {
 
     public DatabaseInteractor(Context context){
         this.context = context;
-        db = Room.databaseBuilder(context, LandmarkDatabase.class, Constants.DATABASE_NAME).build();
+        db = Room.databaseBuilder(context, LandmarkDatabase.class, Constants.DATABASE_NAME).fallbackToDestructiveMigration().build();
         Realm.init(context);
         try{
             realm = Realm.getDefaultInstance();

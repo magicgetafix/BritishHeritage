@@ -14,6 +14,7 @@ public class FavouriteLandmarkRealmObj extends RealmObject {
     private Double longitude;
     private String name;
     private String type;
+    private String webUrl;
 
     public FavouriteLandmarkRealmObj(){
 
@@ -25,6 +26,7 @@ public class FavouriteLandmarkRealmObj extends RealmObject {
         this.longitude = landmark.getLongitude();
         this.name = Tools.formatTitle(landmark.getName());
         this.type = landmark.getType();
+        this.webUrl = landmark.getWebUrl();
     }
 
     public String getId() {
@@ -45,5 +47,9 @@ public class FavouriteLandmarkRealmObj extends RealmObject {
 
     public String getType() {
         return type;
+    }
+
+    public String getWebUrl(){
+        return webUrl;
     }
 }
