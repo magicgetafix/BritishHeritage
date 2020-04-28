@@ -13,6 +13,10 @@ import com.britishheritage.android.britishheritage.Response.Geoname;
 import com.britishheritage.android.britishheritage.Response.NearbyWikipediaResponse;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.reactivestreams.Subscription;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -98,12 +102,21 @@ public class LandmarkViewModel extends AndroidViewModel {
             wikiLandmarkRealmResults.removeChangeListener(wikiLandmarkChangeListener);
         }
 
+
+
+        Double lat = latLng.latitude;
+        BigDecimal bigDecimalLat = new BigDecimal(lat).setScale(4, RoundingMode.HALF_DOWN);
+        lat = bigDecimalLat.doubleValue();
+        Double lng = latLng.longitude;
+        BigDecimal bigDecimalLng = new BigDecimal(lng).setScale(4, RoundingMode.HALF_DOWN);
+        lng = bigDecimalLng.doubleValue();
+
         FindNearbyWikipediaApi findNearbyWikipediaApi = getRetrofit().create(FindNearbyWikipediaApi.class);
-        Observable<NearbyWikipediaResponse> wikiResponse = findNearbyWikipediaApi.getWikiResponse(true,
-                latLng.latitude,
-                latLng.longitude,
+        Observable<NearbyWikipediaResponse> wikiResponse = findNearbyWikipediaApi.getWikiResponse(
+                lat,
+                lng,
                 Constants.GEOCODE_USERNAME,
-                Constants.GEOCODE_STYLE);
+                "20");
         wikiResponse.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(geoCodeObserver);
         wikiLandmarkRealmResults = databaseInteractor.getNearbyWikiLandmarks(latLng);
         wikiLandmarkRealmResults.addChangeListener(wikiLandmarkChangeListener);

@@ -15,11 +15,11 @@ import io.realm.annotations.PrimaryKey;
 public class WikiLandmarkRealmObj extends RealmObject {
 
     @PrimaryKey
-    private String url;
-    private String summary;
-    private String title;
-    private double lat;
-    private double lng;
+    private String url = "";
+    private String summary = "";
+    private String title = "";
+    private double lat = 0.0;
+    private double lng = 0.0;
 
     public WikiLandmarkRealmObj(){
 
@@ -34,27 +34,33 @@ public class WikiLandmarkRealmObj extends RealmObject {
                 webUrl = "https://"+webUrl;
             }
         }
-        this.url = webUrl;
-        String summary = geoname.getSummary();
-        summary = Html.fromHtml(summary).toString();
-        //removing any weblinks
-        summary = summary.replaceAll(Constants.URL_REGEX, "");
-        String dots = "(...)";
-        if (summary.contains(dots)){
-            summary = summary.substring(0, summary.length()-dots.length());
-            summary = summary.trim();
-            String finalCharacter = String.valueOf(summary.charAt(summary.length()-1));
-            if (!finalCharacter.equalsIgnoreCase(".")){
-                summary = summary+"...";
-            }
+        if (webUrl!=null) {
+            this.url = webUrl;
         }
-        this.summary = summary;
-        this.title = geoname.getTitle();
+        String summary = geoname.getSummary();
+        if (summary!=null) {
+            summary = Html.fromHtml(summary).toString();
+            //removing any weblinks
+            summary = summary.replaceAll(Constants.URL_REGEX, "");
+            String dots = "(...)";
+            if (summary.contains(dots)) {
+                summary = summary.substring(0, summary.length() - dots.length());
+                summary = summary.trim();
+                String finalCharacter = String.valueOf(summary.charAt(summary.length() - 1));
+                if (!finalCharacter.equalsIgnoreCase(".")) {
+                    summary = summary + "...";
+                }
+            }
+            this.summary = summary;
+        }
+        if (geoname.getTitle()!=null) {
+            this.title = geoname.getTitle();
+        }
         //latitude and longitude of two decimal places are accurate to a km- this will allow us to index by more results
         //from around the area
-        BigDecimal bigDecimalLat = new BigDecimal(geoname.getLat()).setScale(1, RoundingMode.HALF_DOWN);
+        BigDecimal bigDecimalLat = new BigDecimal(geoname.getLat()).setScale(Constants.BIG_DEC_SCALE, RoundingMode.HALF_DOWN);
         this.lat = bigDecimalLat.doubleValue();
-        BigDecimal bigDecimalLng = new BigDecimal(geoname.getLng()).setScale(1, RoundingMode.HALF_DOWN);
+        BigDecimal bigDecimalLng = new BigDecimal(geoname.getLng()).setScale(Constants.BIG_DEC_SCALE, RoundingMode.HALF_DOWN);
         this.lng = bigDecimalLng.doubleValue();
     }
 

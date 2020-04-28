@@ -250,23 +250,6 @@
                 app:layout_constraintTop_toBottomOf="@+id/landmark_check_in_button_text"
                 tools:text="Church Cross; in Churchyard; 10 Metres South of Church of St Andrew" />
 
-
-            <TextView
-                android:text="invisible text"
-                android:textColor="@color/transparent"
-                android:visibility="visible"
-                android:textSize="18sp"
-                android:id="@+id/filler"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/landmark_title"
-                app:layout_constraintStart_toStartOf="parent"
-                android:background="@drawable/color_accent_gradient2"
-                android:padding="10dp"
-                android:paddingEnd="100dp"
-                android:paddingStart="40dp"
-                />
-
             <TextView
                 tools:visibility="visible"
                 android:visibility="gone"
@@ -277,7 +260,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/landmark_title"
                 app:layout_constraintStart_toStartOf="parent"
-                android:background="@drawable/color_accent_gradient2"
+                android:background="@drawable/color_accent_gradient_long"
                 android:padding="10dp"
                 android:paddingEnd="100dp"
                 android:paddingStart="40dp"
@@ -285,12 +268,15 @@
 
 
             <androidx.recyclerview.widget.RecyclerView
+                android:visibility="gone"
+                tools:visibility="visible"
                 android:paddingStart="30dp"
                 android:clipToPadding="false"
                 android:id="@+id/landmark_geonames_recylerview"
                 app:layout_constraintTop_toBottomOf="@id/landmark_point_of_interest"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                android:paddingBottom="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
@@ -298,8 +284,8 @@
                 android:id="@+id/landmark_suggestions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/color_accent_gradient"
+                android:layout_marginTop="0dp"
+                android:background="@drawable/color_accent_gradient_long"
                 android:padding="10dp"
                 android:paddingStart="40dp"
                 android:paddingEnd="100dp"
@@ -318,6 +304,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
+            <Button
+                android:id="@+id/landmark_visit_website_button"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_bottom_left_rounded"
+                android:padding="8dp"
+                android:paddingStart="20dp"
+                android:text="@string/view_website"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/landmark_title" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

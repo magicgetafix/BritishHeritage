@@ -116,6 +116,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
                 searchString = searchString.trim();
                 if (!searchString.isEmpty()) {
                     searchForLatLng(searchString);
+                    updatedLocationHasBeenSet = true;
                 }
                 else{
                     Toast.makeText(getContext(), "Please type a location name into the search bar", Toast.LENGTH_LONG).show();

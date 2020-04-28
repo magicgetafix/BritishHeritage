@@ -54,9 +54,10 @@ public class Tools {
 
     public static String formatTitle(String title){
 
-        String newTitle = title.replaceAll(" i ", " II ");
+        String newTitle = title.replaceAll(" i ", " I ");
         newTitle = newTitle.replaceAll(" ii ", " II ");
-        newTitle = newTitle.replaceAll("\"", "");
+        newTitle = newTitle.replaceAll("\"", "").replaceAll("Ww", "WW");
+
         return newTitle;
     }
 

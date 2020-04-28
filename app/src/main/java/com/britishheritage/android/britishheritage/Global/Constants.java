@@ -21,6 +21,7 @@ public class Constants {
     public final static String GEOCODE_USERNAME = "britishheritage";
     public final static String GEOCODE_STYLE = "full";
     public final static String URL_REGEX = "(?:www|https?)[^\\s]+";
+    public final static int BIG_DEC_SCALE = 1;
 
     //review database keys
     public final static String REVIEW_TEXT_KEY = "txt";

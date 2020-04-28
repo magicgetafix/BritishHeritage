@@ -84,6 +84,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     private LandmarkViewModel landmarkViewModel;
     private RecyclerView.LayoutManager wikiLayoutManager;
     private RecyclerView.LayoutManager reviewLayoutManager;
+    private Button visitWebsiteButton;
     public static final String WIKI_URL_KEY = "british_heritage_wiki_url";
     private List<Review> reviewList = new ArrayList<>();
     private Toolbar toolbar;
@@ -138,6 +139,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         isFavouriteDrawable = getDrawable(R.drawable.favourite_heart_full);
         notFavouriteDrawable = getDrawable(R.drawable.favourite_heart_empty);
         starDrawable = getDrawable(R.drawable.star_drawable);
+        visitWebsiteButton = findViewById(R.id.landmark_visit_website_button);
         BitmapDrawable locationDrawable = (BitmapDrawable) getDrawable(R.drawable.baseline_my_location_white_36);
         if (locationDrawable != null){
             locationDrawable.setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.CLEAR);
@@ -180,6 +182,15 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             checkInStarIV.setVisibility(View.INVISIBLE);
             setUpCheckInButton();
         }
+
+        visitWebsiteButton.setOnClickListener(v->{
+            String webUrl = mainLandmark.getWebUrl();
+            if (webUrl!=null){
+                Intent wikiWebViewIntent = new Intent(this, WebActivity.class);
+                wikiWebViewIntent.putExtra(WIKI_URL_KEY, webUrl);
+                startActivity(wikiWebViewIntent);
+            }
+        });
     }
 
     private void setUpCheckInButton() {
@@ -391,6 +402,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
         pointOfInterestTitleTV.setVisibility(View.VISIBLE);
         WikiLandmarkAdapter wikiLandmarkAdapter = new WikiLandmarkAdapter(wikiLandmarkList, this, this);
+        geoNamesRecyclerView.setVisibility(View.VISIBLE);
         geoNamesRecyclerView.setLayoutManager(wikiLayoutManager);
         wikiLayoutManager.offsetChildrenHorizontal(40);
         geoNamesRecyclerView.setAdapter(wikiLandmarkAdapter);

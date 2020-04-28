@@ -43,6 +43,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -230,16 +231,29 @@ public class DatabaseInteractor {
 
         realm.beginTransaction();
         for (Geoname geoname: geonameList){
-            WikiLandmarkRealmObj wikiLandmark = new WikiLandmarkRealmObj(geoname);
-            realm.copyToRealmOrUpdate(wikiLandmark);
+            if (geoname.getTitle() != null && geoname.getSummary() != null && !geoname.getSummary().isEmpty() && geoname.getWikipediaUrl()!=null && !geoname.getWikipediaUrl().isEmpty()) {
+
+                //to remove dates
+                boolean beginsWithDate = false;
+                Pattern fourDigitPattern = Pattern.compile("(\\d{4})");
+                if (geoname.getTitle().length() > 4){
+                    String firstFourChars = geoname.getTitle().substring(0, 4);
+                    beginsWithDate = fourDigitPattern.matcher(firstFourChars).matches();
+                }
+                if (!beginsWithDate) {
+                    WikiLandmarkRealmObj wikiLandmark = new WikiLandmarkRealmObj(geoname);
+                    realm.copyToRealmOrUpdate(wikiLandmark);
+                }
+            }
         }
         realm.commitTransaction();
+
     }
 
     public RealmResults<WikiLandmarkRealmObj> getNearbyWikiLandmarks(LatLng latLng){
 
-        BigDecimal bigDecimalLat = new BigDecimal(latLng.latitude).setScale(1, RoundingMode.HALF_DOWN);
-        BigDecimal bigDecimalLng = new BigDecimal(latLng.longitude).setScale(1, RoundingMode.HALF_DOWN);
+        BigDecimal bigDecimalLat = new BigDecimal(latLng.latitude).setScale(Constants.BIG_DEC_SCALE, RoundingMode.HALF_DOWN);
+        BigDecimal bigDecimalLng = new BigDecimal(latLng.longitude).setScale(Constants.BIG_DEC_SCALE, RoundingMode.HALF_DOWN);
 
         return realm.where(WikiLandmarkRealmObj.class)
                 .equalTo("lat", bigDecimalLat.doubleValue())
@@ -348,10 +362,12 @@ public class DatabaseInteractor {
                             if (handler!=null){
                                 handler.removeCallbacks(runnable);
                             }
-                            FavouriteLandmarkRealmObj favourite = new FavouriteLandmarkRealmObj(landmark);
-                            favouriteLandmarkRealmObjList.add(favourite);
-                            landmarkLiveData.removeObserver(this);
-                            handler.postDelayed(runnable, 300);
+                            if (landmark!=null) {
+                                FavouriteLandmarkRealmObj favourite = new FavouriteLandmarkRealmObj(landmark);
+                                favouriteLandmarkRealmObjList.add(favourite);
+                                landmarkLiveData.removeObserver(this);
+                                handler.postDelayed(runnable, 300);
+                            }
 
                         }
                     });
