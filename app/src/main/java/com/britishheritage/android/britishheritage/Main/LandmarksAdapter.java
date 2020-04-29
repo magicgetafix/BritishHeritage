@@ -31,10 +31,17 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
         this.listener = listener;
     }
 
+
     @NonNull
     @Override
     public FavouritesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.favourite_landmark, parent, false);
+        View view = null;
+        try {
+            view = LayoutInflater.from(context).inflate(R.layout.favourite_landmark, parent, false);
+        }
+        catch (OutOfMemoryError outOfMemoryError){
+            view = LayoutInflater.from(context).inflate(R.layout.favourite_landmark_no_drawables, parent, false);
+        }
         return new FavouritesViewHolder(view);
     }
 

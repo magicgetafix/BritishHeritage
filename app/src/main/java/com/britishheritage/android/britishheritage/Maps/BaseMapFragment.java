@@ -96,17 +96,43 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         }
 
         //setting up icon size
-        BitmapDrawable bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_hill_silhouette_small);
+        BitmapDrawable bitmapDrawable = null;
+        try {
+            bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_hill_silhouette_small);
+            hillIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
+        }
+        catch(OutOfMemoryError outOfMemoryError){
+            Timber.e(outOfMemoryError);
+        }
+        try {
+            bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_battlefield);
+            battleIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
+        }
+        catch(OutOfMemoryError outOfMemoryError){
+            Timber.e(outOfMemoryError);
+        }
+        try {
+            bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_menhir);
+            monumentIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
+        }
+        catch(OutOfMemoryError outOfMemoryError){
+            Timber.e(outOfMemoryError);
+        }
+        try {
+            bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_museum_medium);
+            buildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
+        }
+        catch(OutOfMemoryError outOfMemoryError){
+            Timber.e(outOfMemoryError);
+        }
+        try {
+            bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_park);
+            parkIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
+        }
+        catch(OutOfMemoryError outOfMemoryError){
+            Timber.e(outOfMemoryError);
+        }
 
-        hillIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
-        bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_battlefield);
-        battleIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
-        bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_menhir);
-        monumentIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
-        bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_museum_medium);
-        buildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
-        bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_park);
-        parkIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
         locationBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.baseline_my_location_black_36);
 
         searchIcon.setOnClickListener(new View.OnClickListener() {
@@ -280,10 +306,16 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
             type = getString(R.string.scheduled_monument);
             csvData +=type+"@@"+webUrl;
-            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(monumentIcon);
-            gMap.addMarker(new MarkerOptions().position(entLatLng)
-                    .icon(bitmapDescriptor)
-                    .snippet(csvData).draggable(false));
+            if (monumentIcon!=null) {
+                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(monumentIcon);
+                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                        .icon(bitmapDescriptor)
+                        .snippet(csvData).draggable(false));
+            }
+            else{
+                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                        .snippet(csvData).draggable(false));
+            }
         }
 
         else if (landmark.getType().equals(Constants.HILLFORTS_ID)
@@ -291,10 +323,16 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
             type = getString(R.string.hillfort);
             csvData +=type+"@@"+webUrl;
-            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(hillIcon);
-            gMap.addMarker(new MarkerOptions().position(entLatLng)
-                    .icon(bitmapDescriptor)
-                    .snippet(csvData).draggable(false));
+            if (hillIcon!=null) {
+                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(hillIcon);
+                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                        .icon(bitmapDescriptor)
+                        .snippet(csvData).draggable(false));
+            }
+            else{
+                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                        .snippet(csvData).draggable(false));
+            }
         }
 
         else if (landmark.getType().equals(Constants.BATTLEFIELDS_ID)
@@ -302,10 +340,16 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
             type = getString(R.string.battlefield);
             csvData +=type+"@@"+webUrl;
-            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(battleIcon);
-            gMap.addMarker(new MarkerOptions().position(entLatLng)
-                    .icon(bitmapDescriptor)
-                    .snippet(csvData).draggable(false));
+            if (battleIcon!=null) {
+                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(battleIcon);
+                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                        .icon(bitmapDescriptor)
+                        .snippet(csvData).draggable(false));
+            }
+            else{
+                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                            .snippet(csvData).draggable(false));
+            }
         }
 
         else if (landmark.getType().equals(Constants.LISTED_BUILDINGS_ID)
@@ -313,10 +357,16 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
             type = getString(R.string.listedbuilding);
             csvData +=type+"@@"+webUrl;
-            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(buildingIcon);
-            gMap.addMarker(new MarkerOptions().position(entLatLng)
-                    .icon(bitmapDescriptor)
-                    .snippet(csvData).draggable(false));
+            if (buildingIcon!=null) {
+                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(buildingIcon);
+                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                        .icon(bitmapDescriptor)
+                        .snippet(csvData).draggable(false));
+            }
+            else{
+                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                        .snippet(csvData).draggable(false));
+            }
         }
 
         else if (landmark.getType().equals(Constants.PARKS_AND_GARDENS_ID)
@@ -324,10 +374,16 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
             type = getString(R.string.park);
             csvData +=type+"@@"+webUrl;
-            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(parkIcon);
-            gMap.addMarker(new MarkerOptions().position(entLatLng)
-                    .icon(bitmapDescriptor)
-                    .snippet(csvData).draggable(false));
+            if (parkIcon!=null) {
+                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(parkIcon);
+                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                        .icon(bitmapDescriptor)
+                        .snippet(csvData).draggable(false));
+            }
+            else{
+                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                        .snippet(csvData).draggable(false));
+            }
         }
 
     }
