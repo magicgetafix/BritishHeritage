@@ -43,22 +43,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
 
-            <ImageView
-                android:id="@+id/top_score_user_frame"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_marginStart="0dp"
-                android:layout_marginEnd="0dp"
-                android:layout_marginTop="0dp"
-                android:layout_marginBottom="0dp"
-                android:elevation="8dp"
-                android:scaleType="centerInside"
-                android:tint="@color/colorPrimary"
-                app:layout_constraintBottom_toBottomOf="@id/top_score_user_photo"
-                app:layout_constraintStart_toStartOf="@id/top_score_user_photo"
-                app:layout_constraintTop_toTopOf="@id/top_score_user_photo"
-                app:layout_constraintEnd_toEndOf="@id/top_score_user_photo"
-                app:srcCompat="@drawable/user_icon" />
 
             <ImageView
                 android:id="@+id/top_score_user_photo"
@@ -86,14 +70,13 @@
                 android:textStyle="bold"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:gravity="end"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/top_score_points_star_image"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toEndOf="@+id/top_score_user_frame"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.0"
-                tools:text="@string/username2" />
+                tools:text="@string/username" />
 
             <TextView
                 android:gravity="end"

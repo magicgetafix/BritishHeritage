@@ -1,6 +1,7 @@
-package com.britishheritage.android.britishheritage.Main.Dialogs;
+package com.britishheritage.android.britishheritage.Main;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,17 +17,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
+import timber.log.Timber;
 
 public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder> {
 
     private List<User> userList = new ArrayList<>();
     private Context context;
     private LifecycleOwner lifecycleOwner;
+    private boolean noDrawables = false;
 
     public UsersAdapter(Context context, List<User> userList, LifecycleOwner lifecycleOwner){
         this.userList = userList;
@@ -41,14 +45,22 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.top_users_card, parent, false);
+        View view = null;
+        try {
+            view = LayoutInflater.from(context).inflate(R.layout.top_users_card, parent, false);
+        }
+        catch (OutOfMemoryError error){
+            view = LayoutInflater.from(context).inflate(R.layout.top_users_card_no_drawables, parent, false);
+            Timber.e(error);
+            noDrawables = true;
+        }
         return new UserViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = userList.get(position);
-        holder.setContent(user);
+        holder.setContent(user, noDrawables);
     }
 
     @Override
@@ -63,7 +75,9 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         private TextView numReviews;
         private TextView numOfCheckIns;
         private ImageView userPhotoIV;
+        private ImageView genericUserImage;
         private DatabaseInteractor databaseInteractor;
+        private Random random = new Random();
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -72,11 +86,21 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
             userPhotoIV = itemView.findViewById(R.id.top_score_user_photo);
             numOfCheckIns = itemView.findViewById(R.id.top_score_num_check_ins);
             numReviews = itemView.findViewById(R.id.top_score_num_reviews);
+            try {
+                genericUserImage = itemView.findViewById(R.id.top_score_user_frame);
+            }
+            catch (Exception exception){
+
+            }
             databaseInteractor = DatabaseInteractor.getInstance(context);
         }
 
-        public void setContent(User user){
+        public void setContent(User user, boolean noDrawables){
             if (user!=null) {
+                if (genericUserImage!=null) {
+                    int color = Color.argb(255, 216, random.nextInt(), random.nextInt());
+                    genericUserImage.setColorFilter(color);
+                }
                 usernameTv.setText(user.getUsername());
                 //have to use absolute value because Firebase database is only
                 //able to order integers in descending order
@@ -92,9 +116,12 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
                     fileLiveData.observe(lifecycleOwner, file -> {
                         Glide.with(context).load(file).circleCrop().into(userPhotoIV);
                     });
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+            if (!noDrawables){
+
             }
         }
     }

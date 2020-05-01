@@ -30,6 +30,7 @@
     <string name="sign_up">Sign up</string>
     <string name="points">Score: %d</string>
     <string name="username">UsernameUsernameUser1</string>
+    <string name="username2">User2</string>
     <string name="review_feedback">Tell people about this place</string>
     <string name="review_title">Give your review a descriptive title</string>
     <string name="save_review">Add Review</string>

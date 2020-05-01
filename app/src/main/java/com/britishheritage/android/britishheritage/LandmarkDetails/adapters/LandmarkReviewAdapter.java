@@ -1,6 +1,7 @@
 package com.britishheritage.android.britishheritage.LandmarkDetails.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +26,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.RecyclerView;
+import timber.log.Timber;
 
 public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAdapter.ReviewViewHolder> {
 
@@ -48,7 +51,14 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
     @NonNull
     @Override
     public ReviewViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.review, parent, false);
+        View view = null;
+        try {
+            view = LayoutInflater.from(context).inflate(R.layout.review, parent, false);
+        }
+        catch (OutOfMemoryError error){
+            view = LayoutInflater.from(context).inflate(R.layout.review_no_drawables, parent, false);
+            Timber.e(error);
+        }
         return new ReviewViewHolder(view, this.context, this.listener, this.lifecycleOwner);
     }
 
@@ -69,11 +79,13 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
         private DatabaseInteractor databaseInteractor;
         private OnClickListener listener;
         private LifecycleOwner lifecycleOwner;
+        private Random random = new Random();
         View itemView;
         TextView usernameTextView;
         TextView reviewTitle;
         TextView reviewScoreTextView;
         ImageView userProfilePhoto;
+        ImageView genericUserIcon;
         ImageButton addReviewButton;
         TextView reviewTextView;
         ImageView upvoteReviewIcon;
@@ -118,6 +130,7 @@ public class LandmarkReviewAdapter extends RecyclerView.Adapter<LandmarkReviewAd
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
                 addReviewButton.setVisibility(View.INVISIBLE);
                 usernameTextView.setText(review.getUsername());
                 reviewTitle.setText(review.getReviewTitle());

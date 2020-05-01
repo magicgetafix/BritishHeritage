@@ -467,8 +467,10 @@ public class DatabaseInteractor {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                 User user = dataSnapshot.getValue(User.class);
                 if (user!=null){
-                    topScorersList.add(user);
-                    topScoringUserliveData.setValue(topScorersList);
+                    if (user.getTotalPoints() != 0) {
+                        topScorersList.add(user);
+                        topScoringUserliveData.setValue(topScorersList);
+                    }
                 }
             }
 

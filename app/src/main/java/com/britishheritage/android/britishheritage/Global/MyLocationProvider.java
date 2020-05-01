@@ -61,6 +61,10 @@ public class MyLocationProvider {
 
     public static void addLocationListener(LocationListener listener, Activity activity) throws SecurityException {
 
+        if (activity == null){
+            return;
+        }
+        appContext = activity.getApplicationContext();
         if (locationManager == null) {
             locationManager = (LocationManager) appContext.getSystemService(Context.LOCATION_SERVICE);
         }
