@@ -74,6 +74,21 @@
                 app:layout_constraintTop_toBottomOf="@id/wiki_landmark_title"
                 tools:text="Crypt Chambers (or Crypt Building) is at 28–34 Eastgate Street and 34–40 Eastgate Row, Chester, Cheshire, England. It is recorded in the National Heritage List for England as a designated Grade I listed building and incorporates a section of the Chester Rows..." />
 
+            <Button
+
+                android:background="@drawable/white_rounded_blue_outline"
+                android:textColor="@color/colorPrimary"
+                android:id="@+id/wiki_landmark_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:text="@string/view_more"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

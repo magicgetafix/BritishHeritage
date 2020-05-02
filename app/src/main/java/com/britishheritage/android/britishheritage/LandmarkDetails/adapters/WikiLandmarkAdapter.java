@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
@@ -51,12 +52,14 @@ public class WikiLandmarkAdapter extends RecyclerView.Adapter<WikiLandmarkAdapte
         TextView summaryTextView;
         View itemView;
         OnWikiLandmarkClickListener wikiLandmarkClickListener;
+        Button viewMoreButton;
 
         public WikiLandmarkViewHolder(@NonNull View itemView, OnWikiLandmarkClickListener wikiLandmarkClickListener) {
             super(itemView);
             this.itemView = itemView;
             titleTextView = itemView.findViewById(R.id.wiki_landmark_title);
             summaryTextView = itemView.findViewById(R.id.wiki_land_summary);
+            viewMoreButton = itemView.findViewById(R.id.wiki_landmark_button);
             this.wikiLandmarkClickListener = wikiLandmarkClickListener;
 
         }
@@ -68,6 +71,15 @@ public class WikiLandmarkAdapter extends RecyclerView.Adapter<WikiLandmarkAdapte
                 summaryTextView.setText(wikilandmark.getSummary());
             }
             this.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (wikiLandmarkClickListener!=null){
+                        wikiLandmarkClickListener.onItemClick(wikilandmark.getUrl());
+                    }
+                }
+            });
+
+            viewMoreButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (wikiLandmarkClickListener!=null){

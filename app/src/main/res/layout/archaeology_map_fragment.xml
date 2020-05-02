@@ -27,17 +27,35 @@
                   style="@style/SearchBar" app:layout_constraintTop_toTopOf="parent"
                   app:layout_constraintStart_toStartOf="parent"
                   app:layout_constraintEnd_toStartOf="@+id/arch_search_button"/>
+
         <ImageView
-                android:src="@drawable/search_icon"
-                android:background="@drawable/white_circle"
-                android:tint="@color/colorAccent"
-                android:padding="4dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/arch_search_button"
-                app:layout_constraintTop_toTopOf="@+id/arch_searchbar"
-                app:layout_constraintBottom_toBottomOf="@+id/arch_searchbar"
-                app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="16dp"/>
+            android:id="@+id/arch_search_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/white_circle"
+            android:padding="4dp"
+            android:src="@drawable/search_icon"
+            android:tint="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="@+id/arch_searchbar"
+            app:layout_constraintEnd_toStartOf="@id/switch_map_button"
+            app:layout_constraintTop_toTopOf="@+id/arch_searchbar" />
+
+        <ImageView
+            android:background="@drawable/white_rounded"
+            android:id="@+id/switch_map_button"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/baseline_layers_white_48"
+            android:tint="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="@+id/arch_search_button"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/arch_searchbar"
+            app:layout_constraintTop_toTopOf="@+id/arch_search_button" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

@@ -51,9 +51,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Dash;
+import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PatternItem;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -102,6 +107,8 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     private BitmapDescriptor locationBitmapDescriptor;
     private Marker userLocationMarker;
     private LatLng userLatLng;
+    //initial LatLngBounds
+    private LatLngBounds initialLatLngBounds;
 
     private GoogleMap gMap;
     public static int LANDMARK_EXITED = 452;
@@ -205,8 +212,9 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             anim.start();
 
             if (gMap!=null) {
-                if (userLatLng!=null) {
-                    boolean userIsWithinArea = gMap.getProjection().getVisibleRegion().latLngBounds.contains(userLatLng);
+                if (userLatLng!=null && initialLatLngBounds!=null) {
+
+                    boolean userIsWithinArea = initialLatLngBounds.contains(userLatLng);
                     if (userIsWithinArea) {
                         checkIn(anim);
                     } else {
@@ -443,7 +451,28 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         gMap.getUiSettings().setAllGesturesEnabled(false);
         gMap.setPadding(10, 10, 14 ,30);
         gMap.addMarker(new MarkerOptions().position(locationLatLng).alpha(new Float(0.5)));
+        initialLatLngBounds = gMap.getProjection().getVisibleRegion().latLngBounds;
+        LatLng neLatLng = initialLatLngBounds.northeast;
+        LatLng swLatLng = initialLatLngBounds.southwest;
+        LatLng seLatLng = new LatLng(swLatLng.latitude, neLatLng.longitude);
+        LatLng nwLatLng = new LatLng(neLatLng.latitude, swLatLng.longitude);
 
+        try {
+            List<LatLng> latLngList = new ArrayList<>();
+            latLngList.add(nwLatLng);
+            latLngList.add(neLatLng);
+            latLngList.add(seLatLng);
+            latLngList.add(swLatLng);
+            latLngList.add(nwLatLng);
+
+            List<PatternItem> patternItemList = new ArrayList<>();
+            patternItemList.add(new Dash(20));
+            patternItemList.add(new Gap(30));
+            gMap.addPolyline(new PolylineOptions().pattern(patternItemList).width(3).addAll(latLngList).color(Color.argb(255, 255, 255, 255)));
+        }
+        catch (Exception e){
+            Timber.e(e);
+        }
     }
 
     @Override

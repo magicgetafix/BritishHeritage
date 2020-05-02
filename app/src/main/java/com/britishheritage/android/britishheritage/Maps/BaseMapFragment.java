@@ -55,6 +55,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     private Marker currentLocationMarker;
     private BitmapDescriptor locationBitmapDescriptor;
     private boolean updatedLocationHasBeenSet = false;
+    private ImageView mapLayerButton;
 
 
     public static BaseMapFragment newInstance(LatLng targetLatLng) {
@@ -68,12 +69,45 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         return inflater.inflate(R.layout.archaeology_map_fragment, container, false);
     }
 
+    private void switchMapLayer(){
+        try {
+            if (gMap != null) {
+                int mapType = gMap.getMapType();
+                if (mapType == GoogleMap.MAP_TYPE_NORMAL) {
+                    locationBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.baseline_my_location_white_36);
+                    if (currentLocationMarker!=null) {
+                        currentLocationMarker.remove();
+                        currentLocationMarker = gMap.addMarker(new MarkerOptions().icon(locationBitmapDescriptor).position(currentLatLng));
+                    }
+                    gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                    gMap.getUiSettings().setCompassEnabled(false);
+                } else {
+                    locationBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.baseline_my_location_black_36);
+                    if (currentLocationMarker!=null) {
+                        currentLocationMarker.remove();
+                        currentLocationMarker = gMap.addMarker(new MarkerOptions().icon(locationBitmapDescriptor).position(currentLatLng));
+                    }
+                    gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                    gMap.getUiSettings().setCompassEnabled(false);
+                }
+            }
+        }
+        catch (Exception e){
+            Timber.e(e);
+        }
+    }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mViewModel = ViewModelProviders.of(this).get(MapViewModel.class);
         searchIcon = view.findViewById(R.id.arch_search_button);
         searchText = view.findViewById(R.id.arch_searchbar);
+        mapLayerButton = view.findViewById(R.id.switch_map_button);
+
+        mapLayerButton.setOnClickListener(v->{
+            switchMapLayer();
+        });
 
         // Get the screen's density scale
         pixelDensityScale = getResources().getDisplayMetrics().density;
@@ -182,8 +216,8 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-
         gMap = googleMap;
+        gMap.getUiSettings().setCompassEnabled(false);
         gMap.setMinZoomPreference(11);
         gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         gMap.moveCamera(CameraUpdateFactory.zoomTo(14));
