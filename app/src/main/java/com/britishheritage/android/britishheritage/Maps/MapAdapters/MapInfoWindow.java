@@ -20,6 +20,8 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
     this.context = context;
 
   }
+
+
   @Override
   public View getInfoWindow(Marker marker) {
 
@@ -42,35 +44,28 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
       //to reorder in cases where String ends with "east of, north-east of" etc...
       if (locationName.endsWith("of")){
 
-        String[] locationNameSegments = locationName.split(";");
-        String direction = locationNameSegments[locationNameSegments.length-1];
-        String nearbyLoc;
-        if (locationNameSegments.length>1){
-          nearbyLoc = locationNameSegments[locationNameSegments.length-2];
-          locationNameSegments[locationNameSegments.length-1] = nearbyLoc;
+        String[] locationNameSegments = locationName.split(",");
+        String newStr = "";
+        if (locationNameSegments.length > 1) {
+          newStr = locationNameSegments[locationNameSegments.length -1];
+          for (int i = 0; i < locationNameSegments.length-1; i++){
+            newStr += " "+ locationNameSegments[i];
+          }
         }
 
-        locationNameSegments[locationNameSegments.length-2] = direction;
-
-        String newLocationString = "";
-        for (int i = 0; i < locationNameSegments.length; i++){
-          newLocationString +=locationNameSegments[i];
+        if (!newStr.isEmpty()){
+          locationName = newStr;
+          locationName = locationName.trim();
         }
-        locationName = newLocationString;
       }
 
-      locationName = locationName.replace(";", ",");
       locationName = Tools.formatTitle(locationName);
 
-
-
       DatabaseInteractor databaseInteractor = DatabaseInteractor.getInstance(context);
-
       LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
       View v = inflater.inflate(R.layout.map_info_window, null);
       TextView title = v.findViewById(R.id.map_entity_title);
       TextView type = v.findViewById(R.id.type_of_marker);
-      ImageView image = v.findViewById(R.id.map_info_window_image);
       ImageView star = v.findViewById(R.id.map_checked_in_star);
       title.setText(locationName);
       type.setText(typeOfLocation);
@@ -84,7 +79,9 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
 
     }
 
-    else return null;
+    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    View v = inflater.inflate(R.layout.map_info_window, null);
+    return v;
   }
 
   @Override

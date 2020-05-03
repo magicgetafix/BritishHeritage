@@ -271,26 +271,31 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             @Override
             public void onInfoWindowClick(Marker marker) {
 
-                String snippetData = marker.getSnippet();
-                String[] snippetCSV = snippetData.split("@@");
-                double latitude = 0.0;
-                double longitude = 0.0;
-                String name = "";
-                String id = "";
-                String type = "";
-                String webUrl = "";
-                if (snippetCSV.length == 6){
-                    id = snippetCSV[0];
-                    name = snippetCSV[1];
-                    latitude = Double.parseDouble(snippetCSV[2]);
-                    longitude = Double.parseDouble(snippetCSV[3]);
-                    type = snippetCSV[4];
-                    webUrl = snippetCSV[5];
+                if (marker.getSnippet()!=null) {
+                    String snippetData = marker.getSnippet();
+                    String[] snippetCSV = snippetData.split("@@");
+                    double latitude = 0.0;
+                    double longitude = 0.0;
+                    String name = "";
+                    String id = "";
+                    String type = "";
+                    String webUrl = "";
+                    if (snippetCSV.length == 6) {
+                        id = snippetCSV[0];
+                        name = snippetCSV[1];
+                        latitude = Double.parseDouble(snippetCSV[2]);
+                        longitude = Double.parseDouble(snippetCSV[3]);
+                        type = snippetCSV[4];
+                        webUrl = snippetCSV[5];
 
-                    Landmark landmark = new Landmark(id,latitude, longitude, name, type, webUrl);
-                    MainActivity.lastClickedLandmark = landmark;
-                    showBottomSheet();
+                        Landmark landmark = new Landmark(id, latitude, longitude, name, type, webUrl);
+                        MainActivity.lastClickedLandmark = landmark;
+                        showBottomSheet();
 
+                    }
+                    else{
+                        Timber.e("Snippet wrong format");
+                    }
                 }
                 else{
                     Timber.e("Snippet wrong format");
@@ -307,7 +312,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             @Override
             public void onCameraIdle() {
 
-                currentLatLng = gMap.getCameraPosition().target;
                 LatLng[] latLngs = getMapCorners(gMap);
                 mViewModel.getLandmarks(latLngs[0], latLngs[1]);
             }
