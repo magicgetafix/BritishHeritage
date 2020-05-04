@@ -385,6 +385,8 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
         if (landmarkList!=null) {
           databaseInteractor.addAllLandmarks(landmarkList.getLandmarks());
         }
+      }).doOnError(error->{
+        Timber.e(error);
       }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe();
 
     }

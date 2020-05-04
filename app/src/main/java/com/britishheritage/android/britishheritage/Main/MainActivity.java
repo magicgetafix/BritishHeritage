@@ -147,7 +147,7 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
         Location location = MyLocationProvider.getLastLocation(this);
         databaseInteractor = DatabaseInteractor.getInstance(getApplicationContext());
         databaseSizeLiveData = databaseInteractor.getDatabaseSize();
-        databaseSizeLiveData.observe(this, this::populateDatabase);
+        databaseSizeLiveData.observe(this, size -> {populateDatabase(size, "formatted_heritage_data_with_urls.json", true);});
         navigationView.setBackgroundColor(getResources().getColor(R.color.white));
 
         ActionBar actionBar = getSupportActionBar();
@@ -155,40 +155,48 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
             actionBar.setElevation(0f);
         }
 
+        populateDatabase(0, "grade_2_buildings.json", false);
+
 
     }
 
-    private void populateDatabase(int databaseSize){
+    private void populateDatabase(int databaseSize, String fileName, boolean startUp){
         Timber.d("Database size is: "+databaseSize);
         if (databaseSize == 0){
 
             Observable.just(0).doOnNext(o->{
-                String jsonDatabaseString = loadJSONFromAsset();
+                String jsonDatabaseString = loadJSONFromAsset(fileName);
                 Gson gson = new Gson();
                 LandmarkList landmarkList = gson.fromJson(jsonDatabaseString, LandmarkList.class);
                 if (landmarkList!=null) {
                     databaseInteractor.addAllLandmarks(landmarkList.getLandmarks());
                     o++;
                 }
+            }).doOnError(error->{
+                Timber.e(error);
             }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(finished->{
-                progressBar.setVisibility(View.INVISIBLE);
-                navigationView.setOnNavigationItemSelectedListener(navListener);
-                navigationView.setSelectedItemId(R.id.home);
+                if (startUp) {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    navigationView.setOnNavigationItemSelectedListener(navListener);
+                    navigationView.setSelectedItemId(R.id.home);
+                }
             });
 
         }
         else{
-            progressBar.setVisibility(View.INVISIBLE);
-            navigationView.setOnNavigationItemSelectedListener(navListener);
-            navigationView.setSelectedItemId(R.id.home);
+            if (startUp) {
+                progressBar.setVisibility(View.INVISIBLE);
+                navigationView.setOnNavigationItemSelectedListener(navListener);
+                navigationView.setSelectedItemId(R.id.home);
+            }
         }
 
     }
 
-    public String loadJSONFromAsset() {
+    public String loadJSONFromAsset(String filename) {
         String json = null;
         try {
-            InputStream is = getAssets().open("formatted_heritage_data_with_urls.json");
+            InputStream is = getAssets().open(filename);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
