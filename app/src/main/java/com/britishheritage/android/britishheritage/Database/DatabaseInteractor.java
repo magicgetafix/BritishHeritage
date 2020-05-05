@@ -411,10 +411,12 @@ public class DatabaseInteractor {
                     landmarkLiveData.observeForever(new Observer<Landmark>() {
                         @Override
                         public void onChanged(Landmark landmark) {
-                            landmarkList.add(landmark);
-                            landmarkLiveData.removeObserver(this);
-                            checkedInLandmarks.setValue(landmarkList);
-                            checkedInLandmarksSharedPrefs.edit().putBoolean(landmarkRef, true).apply();
+                            if (landmarkList.size() < 1000) {
+                                landmarkList.add(landmark);
+                                landmarkLiveData.removeObserver(this);
+                                checkedInLandmarks.setValue(landmarkList);
+                                checkedInLandmarksSharedPrefs.edit().putBoolean(landmarkRef, true).apply();
+                            }
                         }
                     });
                 }
@@ -670,6 +672,24 @@ public class DatabaseInteractor {
             }
         });
         return fileLiveData;
+    }
+
+    public boolean grade2BuildingsHaveBeenAdded(){
+        boolean bool = sharedPrefs.getBoolean("grade2", false);
+        sharedPrefs.edit().putBoolean("grade2", true).apply();
+        return bool;
+    }
+
+    public boolean bluePlaquesHaveBeenAdded(){
+        boolean bool = sharedPrefs.getBoolean("blue_plaques", false);
+        sharedPrefs.edit().putBoolean("blue_plaques", true).apply();
+        return bool;
+    }
+
+    public void resetDatabaseSharedPrefs(){
+        sharedPrefs.edit().putBoolean("blue_plaques", false).apply();
+        sharedPrefs.edit().putBoolean("grade2", false).apply();
+
     }
 
     public enum Status {

@@ -235,16 +235,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         MyLocationProvider.removeLocationListeners(this);
         MyLocationProvider.addLocationListener(this, getActivity());
 
-        for (Landmark landmark: mViewModel.getBattleFieldSet()){
-            setUpMarker(landmark);
-        }
-        for (Landmark landmark: mViewModel.getHillfortsSet()){
-            setUpMarker(landmark);
-        }
-        for (Landmark landmark: mViewModel.getScheduledMonumentsSet()){
-            setUpMarker(landmark);
-        }
-
         setDragMapBehaviour(gMap);
 
         LatLng[] latLngs = getMapCorners(gMap);
@@ -253,6 +243,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         mViewModel.getBattleFieldLiveData().observe(this, this::setUpMarker);
         mViewModel.getPublicGardenLiveData().observe(this, this::setUpMarker);
         mViewModel.getListedBuildingLiveData().observe(this, this::setUpMarker);
+        mViewModel.getBluePlaqueLiveData().observe(this, this::setUpMarker);
 
         mViewModel.getLandmarks(latLngs[0], latLngs[1]);
 
@@ -422,6 +413,15 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
                 gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .snippet(csvData).draggable(false));
             }
+        }
+
+        else if (landmark.getType().equals(Constants.BLUE_PLAQUES) && this instanceof BluePlaqueMapFragment){
+
+            type = getString(R.string.blue_plaque);
+            csvData +=type+"@@"+webUrl;
+            gMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).position(entLatLng)
+                        .snippet(csvData).draggable(false));
+
         }
 
     }

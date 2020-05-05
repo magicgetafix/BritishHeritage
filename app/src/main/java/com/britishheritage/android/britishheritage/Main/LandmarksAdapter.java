@@ -66,6 +66,7 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
         private View battlefieldBackground;
         private View itemView;
         private Listener listener;
+        private View overlay;
 
         public FavouritesViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -76,6 +77,8 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
             scheduledMonumentBackground = itemView.findViewById(R.id.monument_background);
             parkAndGardenBackground = itemView.findViewById(R.id.park_garden_background);
             battlefieldBackground = itemView.findViewById(R.id.battlefield_background);
+            overlay = itemView.findViewById(R.id.overlay);
+
         }
 
         public void setContent(Landmark landmark, Listener listener){
@@ -86,6 +89,8 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
             scheduledMonumentBackground.setVisibility(View.INVISIBLE);
             parkAndGardenBackground.setVisibility(View.INVISIBLE);
             battlefieldBackground.setVisibility(View.INVISIBLE);
+            overlay.setVisibility(View.VISIBLE);
+            overlay.setBackgroundColor(itemView.getContext().getResources().getColor(R.color.trans_overlay));
 
             //check not a temporary landmark
             if (landmark.getLatitude() != null && landmark.getLongitude() != null) {
@@ -125,6 +130,18 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
                 }
                 else if (landmark.getType().equalsIgnoreCase("Battlefield") || type.equals(Constants.BATTLEFIELDS_ID)){
                     battlefieldBackground.setVisibility(View.VISIBLE);
+                }
+                else if (landmark.getType().equalsIgnoreCase("Blue Plaque") || type.equals(Constants.BLUE_PLAQUES)){
+                    String title = landmark.getName().split("!!")[0];
+                    title = Tools.convertToTitleCase(title);
+                    textView.setText(title);
+                    scheduledMonumentBackground.setVisibility(View.INVISIBLE);
+                    battlefieldBackground.setVisibility(View.INVISIBLE);
+                    parkAndGardenBackground.setVisibility(View.INVISIBLE);
+                    hillfortBackground.setVisibility(View.INVISIBLE);
+                    listedBuildingBackground.setVisibility(View.INVISIBLE);
+                    overlay.setBackground(itemView.getContext().getResources().getDrawable(R.drawable.diagonal_primary_fade));
+
                 }
             }
         }

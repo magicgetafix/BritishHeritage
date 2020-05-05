@@ -41,6 +41,11 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
         typeOfLocation = "Listed Building";
       }
 
+      if (typeOfLocation.equalsIgnoreCase(context.getString(R.string.blue_plaque))){
+        locationName = locationName.split("!!")[0];
+        locationName = Tools.convertToTitleCase(locationName);
+      }
+
       //to reorder in cases where String ends with "east of, north-east of" etc...
       if (locationName.endsWith("of")){
 

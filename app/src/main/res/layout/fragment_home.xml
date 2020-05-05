@@ -164,8 +164,20 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"/>
 
+        <ImageView
+            android:id="@+id/photo"
+            android:layout_width="176dp"
+            android:layout_height="176dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/transparent_circle_coloraccent_outline"
+            android:padding="8dp"
+            android:src="@drawable/add_photo_white_icon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:elevation="4dp"
             android:id="@+id/home_fragment_photo"
             android:layout_width="176dp"
             android:layout_height="176dp"

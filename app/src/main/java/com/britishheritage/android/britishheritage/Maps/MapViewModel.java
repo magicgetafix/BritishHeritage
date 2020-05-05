@@ -3,6 +3,7 @@ package com.britishheritage.android.britishheritage.Maps;
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.britishheritage.android.britishheritage.Global.Constants;
@@ -22,6 +23,7 @@ public class MapViewModel extends AndroidViewModel {
     private Set<Landmark> scheduledMonumentsSet = new TreeSet<>();
     private Set<Landmark> battleFieldSet = new TreeSet<>();
     private Set<Landmark> hillfortsSet = new TreeSet<>();
+    private Set<Landmark> bluePlaqueSet = new TreeSet<>();
 
     private HashMap<String, Landmark> landmarksHashMap = new HashMap<>();
     private Landmark lastClickedLandMark = null;
@@ -31,6 +33,7 @@ public class MapViewModel extends AndroidViewModel {
     private MutableLiveData<Landmark> publicGardenLiveData = new MutableLiveData<>();
     private MutableLiveData<Landmark> battleFieldLiveData = new MutableLiveData<>();
     private MutableLiveData<Landmark> hillfortLiveData = new MutableLiveData<>();
+    private MutableLiveData<Landmark> bluePlaqueLiveData = new MutableLiveData<>();
 
     private List<FavouriteLandmarkRealmObj> favouritesList;
     private MutableLiveData<List<FavouriteLandmarkRealmObj>> favouritesListLiveData = new MutableLiveData<>();
@@ -92,6 +95,14 @@ public class MapViewModel extends AndroidViewModel {
                    landmarksHashMap.put(landmark.getId(), landmark);
                }
            }
+
+           else if (type.equals(Constants.BLUE_PLAQUES)){
+               if (!bluePlaqueSet.contains(landmark)) {
+                   bluePlaqueLiveData.setValue(landmark);
+                   bluePlaqueSet.add(landmark);
+                   landmarksHashMap.put(landmark.getId(), landmark);
+               }
+           }
         }
 
     }
@@ -141,5 +152,11 @@ public class MapViewModel extends AndroidViewModel {
         return landmarksHashMap;
     }
 
+    public LiveData<Landmark> getBluePlaqueLiveData() {
+        return bluePlaqueLiveData;
+    }
 
+    public void setBluePlaqueLiveData(MutableLiveData<Landmark> bluePlaqueLiveData) {
+        this.bluePlaqueLiveData = bluePlaqueLiveData;
+    }
 }

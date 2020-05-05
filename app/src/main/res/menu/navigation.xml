@@ -20,4 +20,10 @@
             android:icon="@drawable/icon_museum_small"
     />
 
+    <item
+        android:id="@+id/blue_plaques_map"
+        android:title="@string/plaques"
+        android:icon="@drawable/baseline_directions_walk_black_48"
+        />
+
 </menu>

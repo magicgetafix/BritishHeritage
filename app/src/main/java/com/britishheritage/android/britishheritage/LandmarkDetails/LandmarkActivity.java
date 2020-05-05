@@ -36,6 +36,7 @@ import android.widget.TextView;
 
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
+import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
 import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.LandmarkReviewAdapter;
@@ -82,6 +83,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     private ImageView checkInStarIV;
     private ImageView favouriteIcon;
     private TextView landmarkTitleTV;
+    private TextView bluPlaqueTV;
     private TextView pointOfInterestTitleTV;
     private RecyclerView geoNamesRecyclerView;
     private TextView userReviewsTitleTV;
@@ -115,6 +117,8 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
     public static int CHECK_IN_BONUS = 10;
     public static int WRITE_REVIEW_BONUS = 5;
+    public static int BLUE_PLAQUE_CHECK_IN = 1;
+    public static int SCHEDULED_MON_BONUS = 30;
 
 
     @Override
@@ -140,6 +144,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         userReviewsTitleTV = findViewById(R.id.landmark_suggestions);
         toolbar = findViewById(R.id.landmark_activity_toolbar);
         favouriteIcon = findViewById(R.id.favourite_icon);
+        bluPlaqueTV = findViewById(R.id.blue_plaque_title);
         userReviewsRecyclerView = findViewById(R.id.landmark_user_descriptions_recylerview);
         wikiLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
         reviewLayoutManager  = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
@@ -213,7 +218,6 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
             if (gMap!=null) {
                 if (userLatLng!=null && initialLatLngBounds!=null) {
-
                     boolean userIsWithinArea = initialLatLngBounds.contains(userLatLng);
                     if (userIsWithinArea) {
                         checkIn(anim);
@@ -291,6 +295,12 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
                                             @Override
                                             public void onAnimationEnd(Animator animation) {
+                                                if (mainLandmark.getType().equalsIgnoreCase(getString(R.string.blue_plaque)) || mainLandmark.getType().equalsIgnoreCase(Constants.BLUE_PLAQUES)){
+                                                    addPoints(BLUE_PLAQUE_CHECK_IN);
+                                                }
+                                                else if (mainLandmark.getType().equalsIgnoreCase(getString(R.string.scheduled_monument)) || mainLandmark.getType().equalsIgnoreCase(Constants.SCHEDULED_MONUMENTS_ID)){
+                                                    addPoints(SCHEDULED_MON_BONUS);
+                                                }
                                                 addPoints(CHECK_IN_BONUS);
                                             }
 
@@ -346,7 +356,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             public void run() {
                 int checkIn = 0;
                 int review = 0;
-                if (points == CHECK_IN_BONUS){
+                if (points == CHECK_IN_BONUS || points == BLUE_PLAQUE_CHECK_IN || points == SCHEDULED_MON_BONUS){
                     checkIn = 1;
                 }
                 else if (points == WRITE_REVIEW_BONUS){
@@ -354,7 +364,12 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
                 }
                 databaseInteractor.addPoints(user, points, review, checkIn).observe(LandmarkActivity.this, status->{
                     if (status == DatabaseInteractor.Status.SUCCESS){
-                        showSnackbar(getString(R.string.points_added, points));
+                        if (points == BLUE_PLAQUE_CHECK_IN){
+                            showSnackbar(getString(R.string.point_added, points));
+                        }
+                        else {
+                            showSnackbar(getString(R.string.points_added, points));
+                        }
                     }
                 });
             }
@@ -377,9 +392,22 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     }
 
     private void setUpToolbar(){
-        String name = Tools.formatTitle(mainLandmark.getName());
-        if (name!=null) {
+        String name = "";
+        if (!mainLandmark.getType().equalsIgnoreCase(getString(R.string.blue_plaque))) {
+            name = Tools.formatTitle(mainLandmark.getName());
             landmarkTitleTV.setText(name);
+        }
+        else{
+            String[] nameArray = mainLandmark.getName().split("!!");
+            if (nameArray.length > 1)
+            name = Tools.convertToTitleCase(nameArray[0]);
+            String description = nameArray[1];
+            bluPlaqueTV.setVisibility(View.VISIBLE);
+            bluPlaqueTV.setText(name);
+            landmarkTitleTV.setText(description);
+        }
+        if (name!=null) {
+
             setSupportActionBar(toolbar);
             if (getSupportActionBar()!=null) {
                 final Drawable upArrow = getResources().getDrawable(R.drawable.baseline_arrow_back_white_24);
@@ -447,10 +475,18 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationLatLng, 17));
         gMap.getUiSettings().setMapToolbarEnabled(false);
-        gMap.getUiSettings().setZoomControlsEnabled(true);
         gMap.getUiSettings().setAllGesturesEnabled(false);
         gMap.setPadding(10, 10, 14 ,30);
         gMap.addMarker(new MarkerOptions().position(locationLatLng).alpha(new Float(0.5)));
+
+        if (mainLandmark.getType().equalsIgnoreCase(getString(R.string.blue_plaque)) || mainLandmark.getType().equalsIgnoreCase(Constants.BLUE_PLAQUES)){
+            gMap.getUiSettings().setZoomControlsEnabled(false);
+            gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locationLatLng, 18));
+        }
+        else{
+            gMap.getUiSettings().setZoomControlsEnabled(true);
+        }
+
         initialLatLngBounds = gMap.getProjection().getVisibleRegion().latLngBounds;
         LatLng neLatLng = initialLatLngBounds.northeast;
         LatLng swLatLng = initialLatLngBounds.southwest;
@@ -483,7 +519,9 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             gMap.getUiSettings().setZoomControlsEnabled(false);
         }
         else{
-            gMap.getUiSettings().setZoomControlsEnabled(true);
+            if (!mainLandmark.getType().equalsIgnoreCase(getString(R.string.blue_plaque)) && !mainLandmark.getType().equalsIgnoreCase(Constants.BLUE_PLAQUES)) {
+                gMap.getUiSettings().setZoomControlsEnabled(true);
+            }
         }
     }
 

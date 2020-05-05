@@ -51,6 +51,7 @@
     <string name="temp_favourite_text">This is where your favourite places will be shown</string>
     <string name="temp_checked_in_landmarks">This is where any sites you have visited will be shown</string>
     <string name="points_added">"You have earned %d points  "</string>
+    <string name="point_added">"You have earned %d point  "</string>
     <string name="top_users">Highest scoring explorers:</string>
     <string name="number_of_reviews">Number of reviews: %d</string>
     <string name="number_of_check_ins">Places visited: %d</string>
@@ -69,6 +70,8 @@
     <string name="ok">O.K</string>
     <string name="view_website">Visit\nWebsite</string>
     <string name="view_more">View More</string>
+    <string name="blue_plaque">Blue Plaque</string>
+    <string name="plaques">Plaques</string>
 
 
 </resources>

@@ -9,6 +9,7 @@ public class Constants {
     public static final String SCHEDULED_MONUMENTS_ID = "SM";
     public static final String HILLFORTS_ID = "HF";
     public static final String PARKS_AND_GARDENS_ID = "PG";
+    public static final String BLUE_PLAQUES = "BP";
     public static final String SHARED_PREFERENCES_FILE = "british_heritage_shared_preferences";
     public static final String SHARED_PREF_BOOLEAN = "shared_preferences_boolean";
 

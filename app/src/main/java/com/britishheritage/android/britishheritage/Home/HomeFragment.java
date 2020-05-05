@@ -250,7 +250,7 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
             .setAspectRatio(1, 1)
             .setCropShape(CropImageView.CropShape.OVAL)
             .setOutputCompressFormat(Bitmap.CompressFormat.JPEG)
-            .setOutputCompressQuality(30)
+            .setOutputCompressQuality(50)
             .start(getContext(), this);
 
   }

@@ -27,6 +27,7 @@ import com.britishheritage.android.britishheritage.Home.HomeFragment;
 import com.britishheritage.android.britishheritage.LandmarkDetails.LandmarkActivity;
 import com.britishheritage.android.britishheritage.Main.Dialogs.BottomDialogFragment;
 import com.britishheritage.android.britishheritage.Maps.ArchMapFragment;
+import com.britishheritage.android.britishheritage.Maps.BluePlaqueMapFragment;
 import com.britishheritage.android.britishheritage.Maps.ListedBuildingMapFragment;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.LandmarkList;
@@ -56,6 +57,7 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
     private Fragment selectedFragment;
     private Fragment archMapFragment;
     private Fragment listedBuildingFragment;
+    private Fragment bluePlaqueFragment;
     private Fragment previousFragment;
     private Fragment homeFragment;
     private BottomDialogFragment bottomDialogFragment;
@@ -81,6 +83,9 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
                 break;
 
                 case (R.id.listed_buildings_map): selectedFragment = getListedBuildingFragment();
+                break;
+
+                case (R.id.blue_plaques_map): selectedFragment = getBluePlaqueFragment();
                 break;
 
                 case (R.id.home): selectedFragment = getHomeFragment();
@@ -127,6 +132,14 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
         return listedBuildingFragment;
     }
 
+    private Fragment getBluePlaqueFragment(){
+
+        if (bluePlaqueFragment == null){
+            bluePlaqueFragment = new BluePlaqueMapFragment();
+        }
+        return bluePlaqueFragment;
+    }
+
     private Fragment getHomeFragment(){
 
         if (homeFragment == null){
@@ -155,7 +168,12 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
             actionBar.setElevation(0f);
         }
 
-        populateDatabase(0, "grade_2_buildings.json", false);
+        if (!databaseInteractor.grade2BuildingsHaveBeenAdded()) {
+            populateDatabase(0, "grade_2_buildings.json", false);
+        }
+        if (!databaseInteractor.bluePlaquesHaveBeenAdded()) {
+            populateDatabase(0, "blue_plaques_formatted_with_wiki.json", false);
+        }
 
 
     }
@@ -173,6 +191,9 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
                     o++;
                 }
             }).doOnError(error->{
+                if (databaseInteractor!=null){
+                    databaseInteractor.resetDatabaseSharedPrefs();
+                }
                 Timber.e(error);
             }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(finished->{
                 if (startUp) {

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -87,5 +88,31 @@ public class Tools {
                 return o1.getName().compareTo(o2.getName());
             }
         });
+    }
+
+    public static String convertToTitleCase(String text) {
+        if (text == null || text.isEmpty()) {
+            return text;
+        }
+
+        String newStr = "";
+        String[] split = text.split(" ");
+        for (int i = 0; i<split.length; i++){
+            String word = split[i];
+            if (word.length() > 1){
+                word = word.substring(0, 1).toUpperCase()+word.substring(1,word.length());
+                if (i == 0){
+                    newStr = word;
+                }
+                else{
+                    newStr += " "+word;
+                }
+            }
+
+        }
+        if (!newStr.endsWith(".")){
+            newStr = newStr+".";
+        }
+        return newStr;
     }
 }
