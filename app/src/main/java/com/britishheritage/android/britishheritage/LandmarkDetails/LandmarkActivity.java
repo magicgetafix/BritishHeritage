@@ -513,15 +513,22 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
     @Override
     public void onUserInteraction() {
-        super.onUserInteraction();
-        float zoomLevel = gMap.getCameraPosition().zoom;
-        if (zoomLevel <= 14.0){
-            gMap.getUiSettings().setZoomControlsEnabled(false);
-        }
-        else{
-            if (!mainLandmark.getType().equalsIgnoreCase(getString(R.string.blue_plaque)) && !mainLandmark.getType().equalsIgnoreCase(Constants.BLUE_PLAQUES)) {
-                gMap.getUiSettings().setZoomControlsEnabled(true);
+
+        try {
+            super.onUserInteraction();
+            if (gMap!=null && gMap.getCameraPosition()!=null) {
+                float zoomLevel = gMap.getCameraPosition().zoom;
+                if (zoomLevel <= 14.0) {
+                    gMap.getUiSettings().setZoomControlsEnabled(false);
+                } else {
+                    if (!mainLandmark.getType().equalsIgnoreCase(getString(R.string.blue_plaque)) && !mainLandmark.getType().equalsIgnoreCase(Constants.BLUE_PLAQUES)) {
+                        gMap.getUiSettings().setZoomControlsEnabled(true);
+                    }
+                }
             }
+        }
+        catch (Exception e){
+            Timber.e(e);
         }
     }
 
