@@ -577,6 +577,12 @@ public class DatabaseInteractor {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
+                    realm.beginTransaction();
+                    userRealmObj.setPoints(totalPoints);
+                    userRealmObj.setNumOfReviews(reviews);
+                    userRealmObj.setNumOfCheckIns(checkIns);
+                    realm.copyToRealmOrUpdate(userRealmObj);
+                    realm.commitTransaction();
                     confirmationLiveData.setValue(Status.FAILURE);
                 }
             });

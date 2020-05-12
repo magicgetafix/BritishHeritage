@@ -258,6 +258,16 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
     private void animateSuccessfulCheckIn(ObjectAnimator anim){
 
+        if (mainLandmark.getType().equalsIgnoreCase(getString(R.string.blue_plaque)) || mainLandmark.getType().equalsIgnoreCase(Constants.BLUE_PLAQUES)){
+            addPoints(BLUE_PLAQUE_CHECK_IN);
+        }
+        else if (mainLandmark.getType().equalsIgnoreCase(getString(R.string.scheduled_monument)) || mainLandmark.getType().equalsIgnoreCase(Constants.SCHEDULED_MONUMENTS_ID)){
+            addPoints(SCHEDULED_MON_BONUS);
+        }
+        else {
+            addPoints(CHECK_IN_BONUS);
+        }
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -295,13 +305,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
                                             @Override
                                             public void onAnimationEnd(Animator animation) {
-                                                if (mainLandmark.getType().equalsIgnoreCase(getString(R.string.blue_plaque)) || mainLandmark.getType().equalsIgnoreCase(Constants.BLUE_PLAQUES)){
-                                                    addPoints(BLUE_PLAQUE_CHECK_IN);
-                                                }
-                                                else if (mainLandmark.getType().equalsIgnoreCase(getString(R.string.scheduled_monument)) || mainLandmark.getType().equalsIgnoreCase(Constants.SCHEDULED_MONUMENTS_ID)){
-                                                    addPoints(SCHEDULED_MON_BONUS);
-                                                }
-                                                addPoints(CHECK_IN_BONUS);
+
                                             }
 
                                             @Override
@@ -365,10 +369,22 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
                 databaseInteractor.addPoints(user, points, review, checkIn).observe(LandmarkActivity.this, status->{
                     if (status == DatabaseInteractor.Status.SUCCESS){
                         if (points == BLUE_PLAQUE_CHECK_IN){
-                            showSnackbar(getString(R.string.point_added, points));
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showSnackbar(getString(R.string.point_added, points));
+                                }
+                            }, 2000);
+
                         }
                         else {
-                            showSnackbar(getString(R.string.points_added, points));
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    showSnackbar(getString(R.string.points_added, points));
+                                }
+                            }, 2000);
+
                         }
                     }
                 });
