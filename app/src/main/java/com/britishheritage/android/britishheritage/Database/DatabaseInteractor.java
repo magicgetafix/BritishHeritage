@@ -451,12 +451,22 @@ public class DatabaseInteractor {
         if (user!=null && listener!= null) {
             String userId = user.getUid();
             String username = user.getDisplayName();
-            User newUser = new User(userId, username, points, 0, 0);
+            UserRealmObj userRealmObj = realm.where(UserRealmObj.class).equalTo("id", userId).findFirst();
+            User newUser;
+            if (userRealmObj == null) {
+                newUser = new User(userId, username, points, 0, 0);
+                realm.beginTransaction();
+                UserRealmObj realmUserObj = new UserRealmObj(newUser);
+                realm.copyToRealmOrUpdate(realmUserObj);
+                realm.commitTransaction();
+            }
+            else{
+                if (username == null || username.isEmpty()) {
+                    username = userRealmObj.getUsername();
+                }
+                newUser = new User(userRealmObj.getId(), username, userRealmObj.getPoints(), userRealmObj.getNumOfReviews(), userRealmObj.getNumOfCheckIns());
+                }
             userRef.child(userId).setValue(newUser).addOnCompleteListener(listener);
-            realm.beginTransaction();
-            UserRealmObj realmUserObj = new UserRealmObj(newUser);
-            realm.copyToRealmOrUpdate(realmUserObj);
-            realm.commitTransaction();
         }
     }
 

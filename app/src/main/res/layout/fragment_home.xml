@@ -165,7 +165,7 @@
             android:layout_height="50dp"/>
 
         <ImageView
-            android:id="@+id/photo"
+            android:id="@+id/photo_background"
             android:layout_width="176dp"
             android:layout_height="176dp"
             android:layout_marginStart="8dp"

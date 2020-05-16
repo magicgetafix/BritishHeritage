@@ -76,6 +76,9 @@ public class Tools {
             @Override
             public int compare(Landmark o1, Landmark o2) {
 
+                if (o1 == null || o2 == null){
+                    return 1;
+                }
                 if (o1.getName() == null || o2.getName() == null){
                     return 1;
                 }

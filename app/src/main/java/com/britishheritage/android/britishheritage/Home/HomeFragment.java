@@ -70,6 +70,7 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
   private RecyclerView highestScorersRecyclerView;
   private ImageView deleteFavouritesIV;
   private ImageView deleteCheckedInPropertiesIV;
+  private ImageView backgroundPhotoIV;
 
   //user profile
   private TextView userNameTV;
@@ -102,6 +103,7 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
     favouriteRecyclerView = view.findViewById(R.id.favourites_recycler_view);
     checkedInLandmarksRecyclerView = view.findViewById(R.id.home_checked_in_landmarks_recycler_view);
     userPhotoIV = view.findViewById(R.id.home_fragment_photo);
+    backgroundPhotoIV = view.findViewById(R.id.photo_background);
     highestScorersTitleTv = view.findViewById(R.id.home_top_scores_text);
     highestScorersRecyclerView = view.findViewById(R.id.top_names_recycler_view);
     userNameTV = view.findViewById(R.id.home_username_textview);
@@ -219,7 +221,12 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
       landmarks.add(tempLandmark);
       setUpUserInfo();
     }
-    Tools.sortLandmarksAtoZ(landmarks);
+    try {
+      Tools.sortLandmarksAtoZ(landmarks);
+    }
+    catch (Exception e){
+      Timber.e(e);
+    }
     checkedInLandmarksAdapter = new LandmarksAdapter(landmarks, getContext(), this);
     checkedInLandmarksRecyclerView.setLayoutManager(checkedInLandmarksManager);
     checkedInLandmarksRecyclerView.setAdapter(checkedInLandmarksAdapter);

@@ -98,7 +98,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         public void setContent(User user, boolean noDrawables){
             if (user!=null) {
                 if (genericUserImage!=null) {
-                    int color = Color.argb(255, 216, random.nextInt(), random.nextInt());
+                    int color = Color.argb(255, 216, random.nextInt(255), random.nextInt(180));
                     genericUserImage.setColorFilter(color);
                 }
                 usernameTv.setText(user.getUsername());
