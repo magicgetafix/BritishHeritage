@@ -26,4 +26,7 @@ public interface LandmarkDao {
     @Query("SELECT * FROM LANDMARK_TABLE WHERE latitude < :maxLat AND latitude > :minLat AND longitude < :maxLong AND longitude > :minLong")
     LiveData<List<Landmark>> getNearestLandmarks(double maxLat, double minLat, double maxLong, double minLong);
 
+    @Query("SELECT * FROM LANDMARK_TABLE WHERE name LIKE '%' || :searchTerm  || '%' LIMIT 1000" )
+    LiveData<List<Landmark>> getMatchingLandmarks(String searchTerm);
+
 }

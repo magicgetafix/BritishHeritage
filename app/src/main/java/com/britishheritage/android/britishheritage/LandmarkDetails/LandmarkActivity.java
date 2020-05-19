@@ -409,8 +409,11 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
     private void setUpToolbar(){
         String name = "";
-        if (!mainLandmark.getType().equalsIgnoreCase(getString(R.string.blue_plaque))) {
+        if (!mainLandmark.getType().equalsIgnoreCase(getString(R.string.blue_plaque)) && !mainLandmark.getType().equalsIgnoreCase(Constants.BLUE_PLAQUES)) {
             name = Tools.formatTitle(mainLandmark.getName());
+            if (name.contains("\u0027")) {
+                name = Tools.convertToTitleCase(name);
+            }
             landmarkTitleTV.setText(name);
         }
         else{

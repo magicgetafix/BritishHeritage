@@ -1,5 +1,6 @@
 package com.britishheritage.android.britishheritage.Global;
 
+import android.animation.Animator;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,33 @@ public class Tools {
                 .alpha(1)
                 .setDuration(milliSeconds)
                 .setListener(null);
+    }
+
+    public static void animateToTransAlpha(View view, int milliSeconds){
+        view.animate()
+                .alpha(0f)
+                .setDuration(milliSeconds)
+                .setListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        view.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
     }
 
     public static String getRanking(int score){
@@ -103,13 +131,19 @@ public class Tools {
         for (int i = 0; i<split.length; i++){
             String word = split[i];
             if (word.length() > 1){
-                word = word.substring(0, 1).toUpperCase()+word.substring(1,word.length());
-                if (i == 0){
-                    newStr = word;
+                String firstLetter = word.substring(0,1);
+                if (firstLetter.equals("\u0027") && word.length() > 2){
+                    word = word.substring(0, 2).toUpperCase()+word.substring(2,word.length());
                 }
-                else{
-                    newStr += " "+word;
+                else {
+                    word = word.substring(0, 1).toUpperCase() + word.substring(1, word.length());
                 }
+            }
+            if (i == 0){
+                newStr = word;
+            }
+            else{
+                newStr += " "+word;
             }
 
         }

@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import androidx.lifecycle.LiveData;
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
+import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.Home.HomeFragment;
 import com.britishheritage.android.britishheritage.LandmarkDetails.LandmarkActivity;
 import com.britishheritage.android.britishheritage.Main.Dialogs.BottomDialogFragment;
@@ -68,6 +70,8 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
     //private FirebaseDatabase database;
     public static Landmark lastClickedLandmark = null;
     private int currentMenuId = -999999999;
+    private View tempWhite;
+    private ImageView logoTempView;
 
     //To set up BottomNavigationView on select behaviour
     private BottomNavigationView.OnNavigationItemSelectedListener navListener = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -162,6 +166,12 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
         databaseSizeLiveData = databaseInteractor.getDatabaseSize();
         databaseSizeLiveData.observe(this, size -> {populateDatabase(size, "formatted_heritage_data_with_urls.json", true);});
         navigationView.setBackgroundColor(getResources().getColor(R.color.white));
+
+        tempWhite = findViewById(R.id.white_temp_view);
+        logoTempView = findViewById(R.id.logo_temp_view);
+
+        Tools.animateToTransAlpha(tempWhite, 3000);
+        Tools.animateToTransAlpha(logoTempView, 2500);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar!=null){

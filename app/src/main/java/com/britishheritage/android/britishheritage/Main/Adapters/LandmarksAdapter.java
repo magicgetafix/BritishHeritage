@@ -1,4 +1,4 @@
-package com.britishheritage.android.britishheritage.Main;
+package com.britishheritage.android.britishheritage.Main.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -16,14 +16,13 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import timber.log.Timber;
 
 
-public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.FavouritesViewHolder> {
+public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.LandmarksViewHolder> {
 
-    private List<Landmark> favouritesList = new ArrayList<>();
-    private Context context;
-    private Listener listener;
+    protected List<Landmark> favouritesList = new ArrayList<>();
+    protected Context context;
+    protected Listener listener;
 
     public LandmarksAdapter(List<Landmark> favouritesList, Context context, Listener listener){
         this.favouritesList = favouritesList;
@@ -34,7 +33,7 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
 
     @NonNull
     @Override
-    public FavouritesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public LandmarksViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = null;
         try {
             view = LayoutInflater.from(context).inflate(R.layout.favourite_landmark, parent, false);
@@ -42,11 +41,11 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
         catch (OutOfMemoryError outOfMemoryError){
             view = LayoutInflater.from(context).inflate(R.layout.favourite_landmark_no_drawables, parent, false);
         }
-        return new FavouritesViewHolder(view);
+        return new LandmarksViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FavouritesViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull LandmarksViewHolder holder, int position) {
         Landmark landmark = favouritesList.get(position);
         holder.setContent(landmark, this.listener);
     }
@@ -56,7 +55,7 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
         return favouritesList.size();
     }
 
-    public static class FavouritesViewHolder extends RecyclerView.ViewHolder{
+    public static class LandmarksViewHolder extends RecyclerView.ViewHolder{
 
         private TextView textView;
         private View hillfortBackground;
@@ -68,7 +67,7 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
         private Listener listener;
         private View overlay;
 
-        public FavouritesViewHolder(@NonNull View itemView) {
+        public LandmarksViewHolder(@NonNull View itemView) {
             super(itemView);
             this.itemView = itemView;
             textView = itemView.findViewById(R.id.favourites_text_view);
@@ -92,6 +91,10 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
             overlay.setVisibility(View.VISIBLE);
             overlay.setBackgroundColor(itemView.getContext().getResources().getColor(R.color.trans_overlay));
 
+            if (landmark == null){
+                return;
+            }
+
             //check not a temporary landmark
             if (landmark.getLatitude() != null && landmark.getLongitude() != null) {
 
@@ -105,31 +108,70 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Favo
                 });
             }
 
-            if (landmark.getName()!=null) {
-                textView.setText(Tools.formatTitle(landmark.getName()));
-            }
             if (landmark.getType()!=null){
 
                 String type = landmark.getType();
                 if (type.equalsIgnoreCase("Buildings") || type.equals(Constants.LISTED_BUILDINGS_ID)){
                     type = "Listed Building";
                     listedBuildingBackground.setVisibility(View.VISIBLE);
+                    if (landmark.getName()!=null) {
+                        String name = landmark.getName();
+                        if (name.contains("\u0027")) {
+                            landmark.setName(Tools.convertToTitleCase(name));
+                        }
+                        textView.setText(Tools.formatTitle(landmark.getName()));
+                    }
                 }
 
                 if (landmark.getType().equalsIgnoreCase("Scheduled Monument") || type.equals(Constants.SCHEDULED_MONUMENTS_ID)){
                     scheduledMonumentBackground.setVisibility(View.VISIBLE);
+                    if (landmark.getName()!=null) {
+                        String name = landmark.getName();
+                        if (name.contains("\u0027")) {
+                            landmark.setName(Tools.convertToTitleCase(name));
+                        }
+                        textView.setText(Tools.formatTitle(landmark.getName()));
+                    }
                 }
                 else if (landmark.getType().equalsIgnoreCase("Listed Building") || type.equals(Constants.LISTED_BUILDINGS_ID)){
                     listedBuildingBackground.setVisibility(View.VISIBLE);
+                    if (landmark.getName()!=null) {
+                        String name = landmark.getName();
+                        if (name.contains("\u0027")) {
+                            landmark.setName(Tools.convertToTitleCase(name));
+                        }
+                        textView.setText(Tools.formatTitle(landmark.getName()));
+                    }
                 }
                 else if (landmark.getType().equalsIgnoreCase("Hillfort") || type.equals(Constants.HILLFORTS_ID)){
                     hillfortBackground.setVisibility(View.VISIBLE);
+                    if (landmark.getName()!=null) {
+                        String name = landmark.getName();
+                        if (name.contains("\u0027")) {
+                            landmark.setName(Tools.convertToTitleCase(name));
+                        }
+                        textView.setText(Tools.formatTitle(landmark.getName()));
+                    }
                 }
                 else if (landmark.getType().equalsIgnoreCase("Park or Garden") || type.equals(Constants.PARKS_AND_GARDENS_ID)){
                     parkAndGardenBackground.setVisibility(View.VISIBLE);
+                    if (landmark.getName()!=null) {
+                        String name = landmark.getName();
+                        if (name.contains("\u0027")) {
+                            landmark.setName(Tools.convertToTitleCase(name));
+                        }
+                        textView.setText(Tools.formatTitle(landmark.getName()));
+                    }
                 }
                 else if (landmark.getType().equalsIgnoreCase("Battlefield") || type.equals(Constants.BATTLEFIELDS_ID)){
                     battlefieldBackground.setVisibility(View.VISIBLE);
+                    if (landmark.getName()!=null) {
+                        String name = landmark.getName();
+                        if (name.contains("\u0027")) {
+                            landmark.setName(Tools.convertToTitleCase(name));
+                        }
+                        textView.setText(Tools.formatTitle(landmark.getName()));
+                    }
                 }
                 else if (landmark.getType().equalsIgnoreCase("Blue Plaque") || type.equals(Constants.BLUE_PLAQUES)){
                     String title = landmark.getName().split("!!")[0];

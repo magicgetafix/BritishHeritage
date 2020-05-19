@@ -1,4 +1,4 @@
-package com.britishheritage.android.britishheritage.Main;
+package com.britishheritage.android.britishheritage.Main.Adapters;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -14,7 +14,6 @@ import com.britishheritage.android.britishheritage.R;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

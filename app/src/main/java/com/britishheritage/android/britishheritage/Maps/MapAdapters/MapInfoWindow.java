@@ -34,6 +34,9 @@ public class MapInfoWindow implements GoogleMap.InfoWindowAdapter {
       if (dataCSV.length == 6){
         id = dataCSV[0];
         locationName = dataCSV[1];
+        if (locationName.contains("\u0027")) {
+          locationName = Tools.convertToTitleCase(locationName);
+        }
         typeOfLocation = dataCSV[4];
       }
 

@@ -28,8 +28,8 @@ import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.LandmarkDetails.LandmarkActivity;
-import com.britishheritage.android.britishheritage.Main.UsersAdapter;
-import com.britishheritage.android.britishheritage.Main.LandmarksAdapter;
+import com.britishheritage.android.britishheritage.Main.Adapters.UsersAdapter;
+import com.britishheritage.android.britishheritage.Main.Adapters.LandmarksAdapter;
 import com.britishheritage.android.britishheritage.Main.MainViewModel;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.User;
@@ -71,6 +71,9 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
   private ImageView deleteFavouritesIV;
   private ImageView deleteCheckedInPropertiesIV;
   private ImageView backgroundPhotoIV;
+  private SearchLandmarkView searchLandmarkView;
+  private ImageView openButton;
+  private View shimView;
 
   //user profile
   private TextView userNameTV;
@@ -115,6 +118,31 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
     favouritesLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false);
     checkedInLandmarksManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
     topScoresLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+    searchLandmarkView = view.findViewById(R.id.home_search_pane);
+    openButton = view.findViewById(R.id.search_landmarks_button);
+    shimView = view.findViewById(R.id.shim_view);
+    openButton.setOnClickListener(v->{
+      if (searchLandmarkView!=null){
+        searchLandmarkView.openPane();
+      }
+    });
+    if (searchLandmarkView!=null){
+        searchLandmarkView.setShim(shimView);
+        searchLandmarkView.setOnLandmarkClickListener(this);
+    }
+
+    shimView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (searchLandmarkView!=null){
+                searchLandmarkView.closePane();
+            }
+        }
+    });
+
+
+
+
     //set up with default values
     onCheckedInLandmarksUpdated(new ArrayList<Landmark>());
     //set up with default values
@@ -360,4 +388,6 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
     alert.show();
 
   }
+
+
 }

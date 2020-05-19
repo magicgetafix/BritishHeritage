@@ -13,6 +13,7 @@
     <color name="transparent">#00FFFFFF</color>
     <color name="black">#050505</color>
     <color name="grey">#7A7A7A</color>
+    <color name="transGrey">#59000000</color>
     <color name="paleGrey">#D5D5D5</color>
     <color name="trans_white">#B3FFFFFF</color>
     <color name="white">#FFFFFF</color>

@@ -712,4 +712,9 @@ public class DatabaseInteractor {
         SUCCESS, FAILURE, PENDING
     }
 
+    public LiveData<List<Landmark>> searchDb(String searchTerm){
+        return db.landmarkDao().getMatchingLandmarks(searchTerm);
+    }
+
+
 }

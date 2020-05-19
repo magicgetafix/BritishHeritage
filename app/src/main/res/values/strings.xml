@@ -72,6 +72,7 @@
     <string name="view_more">View More</string>
     <string name="blue_plaque">Blue Plaque</string>
     <string name="plaques">Plaques</string>
+    <string name="enter_your_query">Search here...</string>
 
 
 </resources>

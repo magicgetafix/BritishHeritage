@@ -137,8 +137,11 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
     if (currentUser != null){
 
       for (View view: taggedViews){
-        if (view.getId() != R.id.splash_transparency) {
-          //set all views to invisible except transparency view which
+        if (view.getId() == R.id.logo_temp_view){
+          view.setVisibility(View.VISIBLE);
+        }
+        if (view.getId() != R.id.splash_transparency && view.getId() != R.id.logo_temp_view) {
+          //set all views to invisible except transparency and logo view which
           //will fade in over splash
           view.setVisibility(View.INVISIBLE);
         }
