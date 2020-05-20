@@ -54,4 +54,8 @@ public class Constants {
             "Heritage Expert"
     };
 
+    public static String ENG_START_OF_URL = "https://h";
+    public static String SCOT_START_OF_URL = "http://p";
+    public static String WALES_START_OF_URL = "http://c";
+
 }

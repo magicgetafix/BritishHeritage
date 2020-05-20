@@ -73,6 +73,9 @@
     <string name="blue_plaque">Blue Plaque</string>
     <string name="plaques">Plaques</string>
     <string name="enter_your_query">Search here...</string>
+    <string name="england">England</string>
+    <string name="scotland">Scotland</string>
+    <string name="wales">Wales</string>
 
 
 </resources>

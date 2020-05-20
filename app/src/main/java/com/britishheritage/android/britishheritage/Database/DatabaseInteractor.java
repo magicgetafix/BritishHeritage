@@ -712,8 +712,20 @@ public class DatabaseInteractor {
         SUCCESS, FAILURE, PENDING
     }
 
-    public LiveData<List<Landmark>> searchDb(String searchTerm){
-        return db.landmarkDao().getMatchingLandmarks(searchTerm);
+    public LiveData<List<Landmark>> searchDb(String searchTerm, List<String> countryUrls){
+        if (countryUrls.size() == 3) {
+            return db.landmarkDao().getMatchingLandmarks(searchTerm);
+        }
+        else if (countryUrls.size() == 2){
+            return db.landmarkDao().getMatchingLandmarksFromCountries(searchTerm, countryUrls.get(0), countryUrls.get(1));
+        }
+        else if (countryUrls.size() == 1){
+            return db.landmarkDao().getMatchingLandmarksFromCountries(searchTerm, countryUrls.get(0));
+        }
+
+        MutableLiveData<List<Landmark>> liveData = new MutableLiveData<>();
+        liveData.setValue(new ArrayList<Landmark>());
+        return liveData;
     }
 
 

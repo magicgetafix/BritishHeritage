@@ -29,4 +29,12 @@ public interface LandmarkDao {
     @Query("SELECT * FROM LANDMARK_TABLE WHERE name LIKE '%' || :searchTerm  || '%' LIMIT 1000" )
     LiveData<List<Landmark>> getMatchingLandmarks(String searchTerm);
 
+    @Query("SELECT * FROM LANDMARK_TABLE WHERE name LIKE '%' || :searchTerm  || '%' AND webUrl LIKE :countryUrl || '%' LIMIT 1000 " )
+    LiveData<List<Landmark>> getMatchingLandmarksFromCountries(String searchTerm, String countryUrl);
+
+    @Query("SELECT * FROM LANDMARK_TABLE WHERE name LIKE '%' || :searchTerm  || '%' AND webUrl LIKE :countryUrl1 || '%' OR (name LIKE '%' || :searchTerm  || '%' AND webUrl LIKE :countryUrl2 || '%') LIMIT 1000 " )
+    LiveData<List<Landmark>> getMatchingLandmarksFromCountries(String searchTerm, String countryUrl1, String countryUrl2);
+
+
+
 }
