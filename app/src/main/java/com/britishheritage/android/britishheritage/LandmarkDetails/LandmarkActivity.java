@@ -41,11 +41,15 @@ import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
 import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.LandmarkReviewAdapter;
 import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.WikiLandmarkAdapter;
+import com.britishheritage.android.britishheritage.Model.GeoMarker;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.Review;
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.R;
 import com.britishheritage.android.britishheritage.WebActivity;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.core.GeoHash;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -219,6 +223,23 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             if (gMap!=null) {
                 if (userLatLng!=null && initialLatLngBounds!=null) {
                     boolean userIsWithinArea = initialLatLngBounds.contains(userLatLng);
+                    if (!userIsWithinArea){
+                        //for some phones LatLngBounds doesn't exist so we do the calculation using geohashing instead
+                        //using 6 characters for a radius of 600 metres
+                        GeoHash landmarkGeoHash = new GeoHash(mainLandmark.getLatitude(), mainLandmark.getLongitude());
+                        GeoHash userGeoHash = new GeoHash(userLatLng.latitude, userLatLng.longitude);
+                        String landmarkGeoHashStr = landmarkGeoHash.getGeoHashString();
+                        String userGeoHashStr = userGeoHash.getGeoHashString();
+                        if (landmarkGeoHashStr!=null & landmarkGeoHashStr.length() >= 6) {
+                            landmarkGeoHashStr = landmarkGeoHashStr.substring(0, 6);
+                        }
+                        if (userGeoHashStr!=null && userGeoHashStr.length() >= 6) {
+                            userGeoHashStr = userGeoHashStr.substring(0, 6);
+                        }
+                        if (landmarkGeoHashStr.equals(userGeoHashStr)){
+                            userIsWithinArea = true;
+                        }
+                    }
                     if (userIsWithinArea) {
                         checkIn(anim);
                     } else {

@@ -185,6 +185,8 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
             populateDatabase(0, "blue_plaques_formatted_with_wiki.json", false);
         }
 
+        populateDatabase(0, "additional_landmarks.json", false);
+
 
     }
 

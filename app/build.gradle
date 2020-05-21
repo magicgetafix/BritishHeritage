@@ -10,8 +10,8 @@ android {
         applicationId "com.britishheritage.android.britishheritage"
         minSdkVersion 22
         targetSdkVersion 28
-        versionCode 17
-        versionName "2.6"
+        versionCode 18
+        versionName "2.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
