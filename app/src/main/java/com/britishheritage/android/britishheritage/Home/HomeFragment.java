@@ -30,6 +30,7 @@ import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.LandmarkDetails.LandmarkActivity;
 import com.britishheritage.android.britishheritage.Main.Adapters.UsersAdapter;
 import com.britishheritage.android.britishheritage.Main.Adapters.LandmarksAdapter;
+import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.Main.MainViewModel;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.User;
@@ -366,9 +367,15 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
 
 
   @Override
-  public void onLandmarkClicked(Landmark landmark) {
-      BaseActivity activity = (BaseActivity) getActivity();
-      activity.navigateWithLandmark(LandmarkActivity.class, landmark);
+  public void onLandmarkClicked(Landmark landmark, boolean requiresNav) {
+
+    try {
+      MainActivity activity = (MainActivity) getActivity();
+      activity.navigateWithLandmark(LandmarkActivity.class, landmark, requiresNav);
+    }
+    catch (Exception e){
+      Timber.d(e);
+    }
   }
 
 

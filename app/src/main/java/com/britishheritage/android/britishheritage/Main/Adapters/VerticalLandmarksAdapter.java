@@ -16,6 +16,7 @@ public class VerticalLandmarksAdapter extends LandmarksAdapter {
 
     public VerticalLandmarksAdapter(List<Landmark> favouritesList, Context context, Listener listener) {
         super(favouritesList, context, listener);
+        isVerticalLandmarkAdapter = true;
     }
 
     @NonNull
@@ -28,6 +29,6 @@ public class VerticalLandmarksAdapter extends LandmarksAdapter {
         catch (OutOfMemoryError outOfMemoryError){
             view = LayoutInflater.from(context).inflate(R.layout.landmark_elongated_no_drawables, parent, false);
         }
-        return new LandmarksViewHolder(view);
+        return new LandmarksViewHolder(view, isVerticalLandmarkAdapter);
     }
 }

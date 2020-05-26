@@ -17,24 +17,28 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.LiveData;
 
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
+import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
 import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.Home.HomeFragment;
 import com.britishheritage.android.britishheritage.LandmarkDetails.LandmarkActivity;
 import com.britishheritage.android.britishheritage.Main.Dialogs.BottomDialogFragment;
 import com.britishheritage.android.britishheritage.Maps.ArchMapFragment;
+import com.britishheritage.android.britishheritage.Maps.BaseMapFragment;
 import com.britishheritage.android.britishheritage.Maps.BluePlaqueMapFragment;
 import com.britishheritage.android.britishheritage.Maps.ListedBuildingMapFragment;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.LandmarkList;
 import com.britishheritage.android.britishheritage.R;
 import com.britishheritage.android.britishheritage.SplashActivity;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -79,7 +83,14 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
         public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
             if (menuItem.getItemId() == currentMenuId){
-                return false;
+                //resets back to current location on bottom tap
+                if (previousFragment!=null && previousFragment instanceof BaseMapFragment){
+                    ((BaseMapFragment) previousFragment).navBackToCurrentLatLng();
+                }
+                return true;
+            }
+            if (previousFragment!=null && previousFragment instanceof BaseMapFragment){
+                ((BaseMapFragment) previousFragment).resetMap();
             }
             switch (menuItem.getItemId()){
 
@@ -96,28 +107,33 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
             }
 
             if (selectedFragment!= null) {
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(android.R.animator.fade_in,
-                        android.R.animator.fade_out);
-                if (selectedFragment.isHidden()){
-                    if (previousFragment!=null){
-                        fragmentTransaction.hide(previousFragment);
-                    }
-                    fragmentTransaction.show(selectedFragment);
-                }
-                else{
-                    if (previousFragment!=null){
-                        fragmentTransaction.hide(previousFragment);
-                    }
-                    fragmentTransaction.add(R.id.main_frame_layout, selectedFragment);
-                }
-                previousFragment = selectedFragment;
-                fragmentTransaction.commit();
+                executeFragmentTransaction(selectedFragment);
             }
             currentMenuId = menuItem.getItemId();
             return true;
         }
     };
+
+    private void executeFragmentTransaction(Fragment selectedFragment) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.setCustomAnimations(android.R.animator.fade_in,
+                android.R.animator.fade_out);
+        if (selectedFragment.isHidden()){
+            if (previousFragment!=null){
+                fragmentTransaction.hide(previousFragment);
+            }
+            fragmentTransaction.show(selectedFragment);
+        }
+        else{
+            if (previousFragment!=null){
+                fragmentTransaction.hide(previousFragment);
+            }
+            fragmentTransaction.add(R.id.main_frame_layout, selectedFragment);
+        }
+        previousFragment = selectedFragment;
+        fragmentTransaction.commit();
+        navigationView.setOnNavigationItemSelectedListener(navListener);
+    }
 
 
     private Fragment getArchMapFragment(){
@@ -351,5 +367,42 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.home_menu, menu);
         return true;
+    }
+
+    public void navigateWithLandmark(Class<? extends AppCompatActivity> destinationActivity, Landmark landmark, boolean requiresNav) {
+        if (!requiresNav) {
+            navigateWithLandmark(destinationActivity, landmark);
+        }
+        else{
+            if (landmark!=null) {
+                navigationView.setOnNavigationItemSelectedListener(null);
+                if (landmark.getType().equalsIgnoreCase(Constants.SCHEDULED_MONUMENTS_ID) || landmark.getType().equalsIgnoreCase(getString(R.string.scheduled_monument))
+                || landmark.getType().equalsIgnoreCase(getString(R.string.hillfort)) || landmark.getType().equalsIgnoreCase(Constants.HILLFORTS_ID) ||
+                landmark.getType().equalsIgnoreCase(getString(R.string.battlefield)) || landmark.getType().equalsIgnoreCase(Constants.BATTLEFIELDS_ID)) {
+                    navigationView.setSelectedItemId(R.id.arch_map);
+                    currentMenuId = R.id.arch_map;
+                    selectedFragment = getArchMapFragment();
+                    ((BaseMapFragment) selectedFragment).setTargetLatLng(new LatLng(landmark.latitude, landmark.longitude), landmark.getId());
+                    executeFragmentTransaction(selectedFragment);
+
+                }
+
+                else if (landmark.getType().equalsIgnoreCase(Constants.LISTED_BUILDINGS_ID) || landmark.getType().equalsIgnoreCase(getString(R.string.listedbuilding)) || landmark.getType().equalsIgnoreCase(getString(R.string.listed_building_string))
+                        || landmark.getType().equalsIgnoreCase(getString(R.string.park)) || landmark.getType().equalsIgnoreCase(Constants.PARKS_AND_GARDENS_ID)) {
+                    navigationView.setSelectedItemId(R.id.listed_buildings_map);
+                    selectedFragment = getListedBuildingFragment();
+                    currentMenuId = R.id.listed_buildings_map;
+                    ((BaseMapFragment) selectedFragment).setTargetLatLng(new LatLng(landmark.latitude, landmark.longitude), landmark.getId());
+                    executeFragmentTransaction(selectedFragment);
+                }
+                else if (landmark.getType().equalsIgnoreCase(Constants.BLUE_PLAQUES) || landmark.getType().equalsIgnoreCase(getString(R.string.blue_plaque))) {
+                    navigationView.setSelectedItemId(R.id.blue_plaques_map);
+                    selectedFragment = getBluePlaqueFragment();
+                    currentMenuId = R.id.blue_plaques_map;
+                    ((BaseMapFragment) selectedFragment).setTargetLatLng(new LatLng(landmark.latitude, landmark.longitude), landmark.getId());
+                    executeFragmentTransaction(selectedFragment);
+                }
+            }
+        }
     }
 }

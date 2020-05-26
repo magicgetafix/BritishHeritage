@@ -29,8 +29,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 
-import java.util.concurrent.ConcurrentNavigableMap;
-
 import timber.log.Timber;
 
 public class BaseMapFragment extends Fragment implements OnMapReadyCallback, LatLngQuery.LatLngResultListener, LocationListener {
@@ -38,8 +36,9 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     private MapViewModel mViewModel;
     private SupportMapFragment supportMapFragment;
     private GoogleMap gMap;
-    private LatLng currentLatLng;
+    private LatLng currentLatLng = Constants.DEFAULT_LATLNG;
     private static LatLng newLatLng;
+    private static String newId = "";
 
     private static Bitmap hillIcon;
     private static Bitmap monumentIcon;
@@ -56,11 +55,34 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     private BitmapDescriptor locationBitmapDescriptor;
     private boolean updatedLocationHasBeenSet = false;
     private ImageView mapLayerButton;
+    private static Marker tempMarker;
 
+    public void setTargetLatLng(LatLng latLng, String id){
+        newId = id;
+        newLatLng = latLng;
+        if (gMap!=null){
+            gMap.moveCamera(CameraUpdateFactory.newLatLng(newLatLng));
 
-    public static BaseMapFragment newInstance(LatLng targetLatLng) {
-        newLatLng = targetLatLng;
-        return new BaseMapFragment();
+        }
+    }
+
+    public void navBackToCurrentLatLng(){
+        if (gMap!=null && currentLatLng!=null){
+            gMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng), 500, null);
+        }
+    }
+
+    public void resetMap(){
+        if (newLatLng != null) {
+            if (gMap != null && currentLatLng != null) {
+                gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+            }
+            if (tempMarker!=null){
+                tempMarker.hideInfoWindow();
+            }
+        }
+        newLatLng = null;
+
     }
 
     @Override
@@ -117,17 +139,15 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_archaeology);
         supportMapFragment.getMapAsync(this);
         Location location = MyLocationProvider.getLastLocation(getActivity());
-        if (newLatLng==null) {
+
             if (location != null) {
                 currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
             }
             else{
                 currentLatLng = Constants.DEFAULT_LATLNG;
             }
-        }
-        else{
-            currentLatLng = newLatLng;
-        }
+
+
 
         //setting up icon size
         BitmapDrawable bitmapDrawable = null;
@@ -222,7 +242,12 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         gMap.moveCamera(CameraUpdateFactory.zoomTo(14));
         //moves map camera to current location
-        gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+        if (newLatLng == null && currentLatLng!=null) {
+            gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+        }
+        else{
+            gMap.moveCamera(CameraUpdateFactory.newLatLng(newLatLng));
+        }
         //adds marker
         if (currentLocationMarker == null){
             currentLocationMarker = gMap.addMarker(new MarkerOptions().position(currentLatLng).icon(locationBitmapDescriptor));
@@ -337,12 +362,12 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             csvData +=type+"@@"+webUrl;
             if (monumentIcon!=null) {
                 BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(monumentIcon);
-                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .icon(bitmapDescriptor)
                         .snippet(csvData).draggable(false));
             }
             else{
-                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .snippet(csvData).draggable(false));
             }
         }
@@ -354,12 +379,12 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             csvData +=type+"@@"+webUrl;
             if (hillIcon!=null) {
                 BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(hillIcon);
-                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .icon(bitmapDescriptor)
                         .snippet(csvData).draggable(false));
             }
             else{
-                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .snippet(csvData).draggable(false));
             }
         }
@@ -371,12 +396,12 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             csvData +=type+"@@"+webUrl;
             if (battleIcon!=null) {
                 BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(battleIcon);
-                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .icon(bitmapDescriptor)
                         .snippet(csvData).draggable(false));
             }
             else{
-                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                             .snippet(csvData).draggable(false));
             }
         }
@@ -388,12 +413,12 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             csvData +=type+"@@"+webUrl;
             if (buildingIcon!=null) {
                 BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(buildingIcon);
-                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .icon(bitmapDescriptor)
                         .snippet(csvData).draggable(false));
             }
             else{
-                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .snippet(csvData).draggable(false));
             }
         }
@@ -405,12 +430,12 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             csvData +=type+"@@"+webUrl;
             if (parkIcon!=null) {
                 BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(parkIcon);
-                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .icon(bitmapDescriptor)
                         .snippet(csvData).draggable(false));
             }
             else{
-                gMap.addMarker(new MarkerOptions().position(entLatLng)
+                tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .snippet(csvData).draggable(false));
             }
         }
@@ -419,9 +444,23 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
             type = getString(R.string.blue_plaque);
             csvData +=type+"@@"+webUrl;
-            gMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).position(entLatLng)
+            tempMarker = gMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).position(entLatLng)
                         .snippet(csvData).draggable(false));
 
+        }
+        try {
+
+            if (tempMarker != null && newId!= null && !newId.isEmpty()) {
+
+                if (tempMarker.getSnippet()!=null) {
+                    if (tempMarker.getSnippet().startsWith(newId)){
+                        tempMarker.showInfoWindow();
+                    }
+                }
+            }
+        }
+        catch (Exception e){
+            Timber.e(e);
         }
 
     }
@@ -449,7 +488,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     @Override
     public void onLocationChanged(Location location) {
 
-        if (location!=null && gMap != null) {
+        if (location!=null && gMap != null && newLatLng == null) {
             LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
             if (currentLocationMarker == null){
                 currentLocationMarker = gMap.addMarker(new MarkerOptions().position(latLng).icon(locationBitmapDescriptor));
@@ -466,7 +505,9 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
                 int newApproxLng = (int) (location.getLongitude() * 10);
                 if ((currentApproxLat != newApproxLat) || (currentApproxLng != newApproxLng)) {
                     currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-                    gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+                    if (newLatLng == null) {
+                        gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+                    }
                     updatedLocationHasBeenSet = true;
                 }
             }

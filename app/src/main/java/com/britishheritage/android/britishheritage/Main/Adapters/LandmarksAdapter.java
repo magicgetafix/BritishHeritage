@@ -23,6 +23,7 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Land
     protected List<Landmark> favouritesList = new ArrayList<>();
     protected Context context;
     protected Listener listener;
+    protected boolean isVerticalLandmarkAdapter = false;
 
     public LandmarksAdapter(List<Landmark> favouritesList, Context context, Listener listener){
         this.favouritesList = favouritesList;
@@ -41,7 +42,7 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Land
         catch (OutOfMemoryError outOfMemoryError){
             view = LayoutInflater.from(context).inflate(R.layout.favourite_landmark_no_drawables, parent, false);
         }
-        return new LandmarksViewHolder(view);
+        return new LandmarksViewHolder(view, isVerticalLandmarkAdapter);
     }
 
     @Override
@@ -66,10 +67,12 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Land
         private View itemView;
         private Listener listener;
         private View overlay;
+        private boolean isVerticalView = false;
 
-        public LandmarksViewHolder(@NonNull View itemView) {
+        public LandmarksViewHolder(@NonNull View itemView, boolean isVerticalView) {
             super(itemView);
             this.itemView = itemView;
+            this.isVerticalView = isVerticalView;
             textView = itemView.findViewById(R.id.favourites_text_view);
             hillfortBackground = itemView.findViewById(R.id.hillfort_background);
             listedBuildingBackground = itemView.findViewById(R.id.listed_building_background);
@@ -102,7 +105,12 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Land
                     @Override
                     public void onClick(View v) {
                         if (listener != null) {
-                            listener.onLandmarkClicked(landmark);
+                            if (!isVerticalView) {
+                                listener.onLandmarkClicked(landmark, false);
+                            }
+                            else{
+                                listener.onLandmarkClicked(landmark, true);
+                            }
                         }
                     }
                 });
@@ -190,7 +198,7 @@ public class LandmarksAdapter extends RecyclerView.Adapter<LandmarksAdapter.Land
     }
 
     public interface Listener{
-        void onLandmarkClicked(Landmark landmark);
+        void onLandmarkClicked(Landmark landmark, boolean shouldNavOnMap);
     }
 }
 
