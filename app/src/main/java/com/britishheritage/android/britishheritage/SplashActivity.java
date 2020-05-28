@@ -42,6 +42,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.gson.Gson;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -108,6 +109,7 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
   private String password = "";
   private String emailAddress = "";
   private List<View> taggedViews;
+
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {

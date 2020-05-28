@@ -9,8 +9,10 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import timber.log.Timber;
 
 import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Main.MainActivity;
@@ -34,7 +36,15 @@ public class MyLocationProvider {
         if (locationManager == null) {
             locationManager = (LocationManager) appContext.getSystemService(Context.LOCATION_SERVICE);
         }
-        boolean havePermissions = checkPermissions();
+        boolean havePermissions = true;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                havePermissions = checkPermissions();
+            }
+        }
+        catch (Exception e){
+            Timber.e(e);
+        }
         if (havePermissions){
 
         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -68,7 +78,15 @@ public class MyLocationProvider {
         if (locationManager == null) {
             locationManager = (LocationManager) appContext.getSystemService(Context.LOCATION_SERVICE);
         }
-        boolean havePermissions = checkPermissions();
+        boolean havePermissions = true;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+                havePermissions = checkPermissions();
+            }
+        }
+        catch (Exception e){
+            Timber.e(e);
+        }
         if (havePermissions){
             boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             if (gpsEnabled) {
