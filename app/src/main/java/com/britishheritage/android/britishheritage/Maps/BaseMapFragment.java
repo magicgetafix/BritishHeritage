@@ -79,7 +79,9 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     public void resetMap(){
         if (newLatLng != null) {
             if (gMap != null && currentLatLng != null) {
-                gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+                if (Constants.UK_BOUNDING_BOX.contains(currentLatLng)) {
+                    gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+                }
             }
             if (tempMarker!=null){
                 tempMarker.hideInfoWindow();
@@ -100,19 +102,9 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             if (gMap != null) {
                 int mapType = gMap.getMapType();
                 if (mapType == GoogleMap.MAP_TYPE_NORMAL) {
-                    locationBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.baseline_my_location_white_36);
-                    if (currentLocationMarker!=null) {
-                        currentLocationMarker.remove();
-                        currentLocationMarker = gMap.addMarker(new MarkerOptions().icon(locationBitmapDescriptor).position(currentLatLng));
-                    }
                     gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                     gMap.getUiSettings().setCompassEnabled(false);
                 } else {
-                    locationBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.baseline_my_location_black_36);
-                    if (currentLocationMarker!=null) {
-                        currentLocationMarker.remove();
-                        currentLocationMarker = gMap.addMarker(new MarkerOptions().icon(locationBitmapDescriptor).position(currentLatLng));
-                    }
                     gMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                     gMap.getUiSettings().setCompassEnabled(false);
                 }
@@ -189,8 +181,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             Timber.e(outOfMemoryError);
         }
 
-        locationBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.baseline_my_location_black_36);
-
         searchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -261,19 +251,16 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         gMap.moveCamera(CameraUpdateFactory.zoomTo(14));
         //moves map camera to current location
         if (newLatLng == null && currentLatLng!=null) {
-            gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+            if (Constants.UK_BOUNDING_BOX.contains(currentLatLng)) {
+                gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+            }
         }
         else{
             gMap.moveCamera(CameraUpdateFactory.newLatLng(newLatLng));
         }
-        //adds marker
-        if (currentLocationMarker == null){
-            currentLocationMarker = gMap.addMarker(new MarkerOptions().position(currentLatLng).icon(locationBitmapDescriptor));
-        }
-        else{
-            currentLocationMarker.setPosition(currentLatLng);
-        }
+
         gMap.setInfoWindowAdapter(new MapInfoWindow(getContext()));
+        gMap.setMyLocationEnabled(true);
 
         MyLocationProvider.removeLocationListeners(this);
         MyLocationProvider.addLocationListener(this, getActivity());
@@ -508,22 +495,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
         if (location!=null && gMap != null && newLatLng == null) {
             currentLatLng = new LatLng(location.getLatitude(),location.getLongitude());
-            if (currentLocationMarker == null){
-                if (Constants.UK_BOUNDING_BOX.contains(currentLatLng)) {
-                    currentLocationMarker = gMap.addMarker(new MarkerOptions().position(currentLatLng).icon(locationBitmapDescriptor));
-                }
-                else{
-                    return;
-                }
-            }
-            else{
-                if (Constants.UK_BOUNDING_BOX.contains(currentLatLng)) {
-                    currentLocationMarker.setPosition(currentLatLng);
-                }
-                else{
-                    return;
-                }
-            }
 
             if (!updatedLocationHasBeenSet && gMap!=null){
 
@@ -533,7 +504,9 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
                 int newApproxLng = (int) (location.getLongitude() * 10);
                 if ((currentApproxLat != newApproxLat) || (currentApproxLng != newApproxLng)) {
                     if (newLatLng == null) {
-                        gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+                        if (Constants.UK_BOUNDING_BOX.contains(currentLatLng)) {
+                            gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+                        }
                     }
                     updatedLocationHasBeenSet = true;
                 }

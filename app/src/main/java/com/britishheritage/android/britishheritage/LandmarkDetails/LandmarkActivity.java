@@ -1,7 +1,6 @@
 package com.britishheritage.android.britishheritage.LandmarkDetails;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.DrawableUtils;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
@@ -13,23 +12,14 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RotateDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,32 +31,25 @@ import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
 import com.britishheritage.android.britishheritage.Global.Tools;
 import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.LandmarkReviewAdapter;
 import com.britishheritage.android.britishheritage.LandmarkDetails.adapters.WikiLandmarkAdapter;
-import com.britishheritage.android.britishheritage.Model.GeoMarker;
 import com.britishheritage.android.britishheritage.Model.Landmark;
 import com.britishheritage.android.britishheritage.Model.Review;
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.R;
 import com.britishheritage.android.britishheritage.WebActivity;
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.core.GeoHash;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -87,7 +70,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     private ImageView checkInStarIV;
     private ImageView favouriteIcon;
     private TextView landmarkTitleTV;
-    private TextView bluPlaqueTV;
+    private TextView bluePlaqueTV;
     private TextView pointOfInterestTitleTV;
     private RecyclerView geoNamesRecyclerView;
     private TextView userReviewsTitleTV;
@@ -110,8 +93,6 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
     private ImageView star4;
     private View goldShimmerView;
     //user location
-    private BitmapDescriptor locationBitmapDescriptor;
-    private Marker userLocationMarker;
     private LatLng userLatLng;
     //initial LatLngBounds
     private LatLngBounds initialLatLngBounds;
@@ -148,7 +129,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         userReviewsTitleTV = findViewById(R.id.landmark_suggestions);
         toolbar = findViewById(R.id.landmark_activity_toolbar);
         favouriteIcon = findViewById(R.id.favourite_icon);
-        bluPlaqueTV = findViewById(R.id.blue_plaque_title);
+        bluePlaqueTV = findViewById(R.id.blue_plaque_title);
         userReviewsRecyclerView = findViewById(R.id.landmark_user_descriptions_recylerview);
         wikiLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
         reviewLayoutManager  = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
@@ -156,17 +137,6 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         notFavouriteDrawable = getDrawable(R.drawable.favourite_heart_empty);
         starDrawable = getDrawable(R.drawable.star_drawable);
         visitWebsiteButton = findViewById(R.id.landmark_visit_website_button);
-        BitmapDrawable locationDrawable = (BitmapDrawable) getDrawable(R.drawable.baseline_my_location_white_36);
-        if (locationDrawable != null){
-            locationDrawable.setColorFilter(getResources().getColor(R.color.colorAccent), PorterDuff.Mode.CLEAR);
-            Bitmap drawableBitmap = locationDrawable.getBitmap();
-            if (drawableBitmap!=null){
-                locationBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(drawableBitmap);
-            }
-        }
-        else{
-            locationBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.baseline_my_location_white_36);
-        }
 
         star1 = findViewById(R.id.star_award_image_view1);
         star2 = findViewById(R.id.star_award_image_view2);
@@ -442,8 +412,8 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
             if (nameArray.length > 1)
             name = Tools.convertToTitleCase(nameArray[0]);
             String description = nameArray[1];
-            bluPlaqueTV.setVisibility(View.VISIBLE);
-            bluPlaqueTV.setText(name);
+            bluePlaqueTV.setVisibility(View.VISIBLE);
+            bluePlaqueTV.setText(name);
             landmarkTitleTV.setText(description);
         }
         if (name!=null) {
@@ -508,8 +478,8 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         Location lastLocation = MyLocationProvider.getLastLocation(this);
         if (lastLocation != null){
             userLatLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-            userLocationMarker = gMap.addMarker(new MarkerOptions().position(userLatLng).icon(locationBitmapDescriptor));
         }
+        gMap.setMyLocationEnabled(true);
         LatLng locationLatLng = new LatLng(mainLandmark.getLatitude(), mainLandmark.getLongitude());
         gMap.setMinZoomPreference(13);
         gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
@@ -628,12 +598,6 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
 
         if (gMap!=null){
             userLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-            if (userLocationMarker == null){
-                userLocationMarker = gMap.addMarker(new MarkerOptions().position(userLatLng).icon(locationBitmapDescriptor));
-            }
-            else{
-                userLocationMarker.setPosition(userLatLng);
-            }
         }
 
     }
