@@ -18,6 +18,7 @@ import com.britishheritage.android.britishheritage.Base.BaseActivity;
 import com.britishheritage.android.britishheritage.Main.MainActivity;
 import com.britishheritage.android.britishheritage.R;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 public class MyLocationProvider {
 
@@ -25,7 +26,6 @@ public class MyLocationProvider {
     private static Context appContext;
     private static LocationManager locationManager;
     private static Location location;
-
 
     public static Location getLastLocation(Activity activity) throws SecurityException {
 
@@ -119,7 +119,20 @@ public class MyLocationProvider {
             Double latitude = location.getLatitude();
             Double longitude = location.getLongitude();
             LatLng latLng = new LatLng(latitude, longitude);
-            return latLng;
+            if (Constants.UK_BOUNDING_BOX.contains(latLng)) {
+                return latLng;
+            }
+            else return getRandomLatLng();
+        }
+        else return getRandomLatLng();
+
+    }
+
+    private static LatLng getRandomLatLng(){
+
+        int index = (int) Math.floor(Math.random() * Constants.DEFAULT_LOCATION_ARRAY.length);
+        if (index < Constants.DEFAULT_LOCATION_ARRAY.length){
+            return Constants.DEFAULT_LOCATION_ARRAY[index];
         }
         else return Constants.DEFAULT_LATLNG;
 

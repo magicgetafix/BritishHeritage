@@ -57,5 +57,21 @@
             app:layout_constraintStart_toEndOf="@+id/arch_searchbar"
             app:layout_constraintTop_toTopOf="@+id/arch_search_button" />
 
+        <ImageView
+            android:id="@+id/reset_location_button"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:background="@drawable/white_rounded"
+            android:scaleType="fitCenter"
+            android:src="@drawable/baseline_my_location_black_48"
+            android:tint="@color/colorAccent"
+            android:layout_marginBottom="16dp"
+            android:padding="4dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="@id/switch_map_button"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/switch_map_button" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

@@ -48,6 +48,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
     private EditText searchText;
     private ImageView searchIcon;
+    private ImageView resetLocationButton;
     private LatLngQuery latLngQuery;
     private float pixelDensityScale = 1.0f;
     private int iconBmapWidthHeight = 20;
@@ -56,6 +57,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     private boolean updatedLocationHasBeenSet = false;
     private ImageView mapLayerButton;
     private static Marker tempMarker;
+    private MyLocationProvider locationProvider;
 
     public void setTargetLatLng(LatLng latLng, String id){
         newId = id;
@@ -68,7 +70,9 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
     public void navBackToCurrentLatLng(){
         if (gMap!=null && currentLatLng!=null){
-            gMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng), 500, null);
+            if (Constants.UK_BOUNDING_BOX.contains(currentLatLng)) {
+                gMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng), 500, null);
+            }
         }
     }
 
@@ -126,9 +130,14 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         searchIcon = view.findViewById(R.id.arch_search_button);
         searchText = view.findViewById(R.id.arch_searchbar);
         mapLayerButton = view.findViewById(R.id.switch_map_button);
+        resetLocationButton = view.findViewById(R.id.reset_location_button);
 
         mapLayerButton.setOnClickListener(v->{
             switchMapLayer();
+        });
+
+        resetLocationButton.setOnClickListener(v->{
+            resetToCurrentLocation();
         });
 
         // Get the screen's density scale
@@ -138,17 +147,10 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         supportMapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_archaeology);
         supportMapFragment.getMapAsync(this);
-        Location location = MyLocationProvider.getLastLocation(getActivity());
-
-            if (location != null) {
-                currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-            }
-            else{
-                currentLatLng = Constants.DEFAULT_LATLNG;
-            }
-
-
-
+        currentLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
+        if (currentLatLng== null){
+            currentLatLng = Constants.DEFAULT_LATLNG;
+        }
         //setting up icon size
         BitmapDrawable bitmapDrawable = null;
         try {
@@ -205,10 +207,26 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         });
     }
 
+    private void resetToCurrentLocation() {
+
+        MyLocationProvider.removeLocationListeners(this);
+        MyLocationProvider.addLocationListener(this, getActivity());
+        LatLng lastLocationLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
+        if (gMap!=null && lastLocationLatLng!= null){
+            gMap.animateCamera(CameraUpdateFactory.newLatLng(lastLocationLatLng), 700, null);
+        }
+
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         updatedLocationHasBeenSet = false;
+        if (gMap!=null) {
+            MyLocationProvider.removeLocationListeners(this);
+            MyLocationProvider.addLocationListener(this, getActivity());
+        }
+
     }
 
     public void searchForLatLng(String cityQuery){
@@ -489,12 +507,22 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     public void onLocationChanged(Location location) {
 
         if (location!=null && gMap != null && newLatLng == null) {
-            LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+            currentLatLng = new LatLng(location.getLatitude(),location.getLongitude());
             if (currentLocationMarker == null){
-                currentLocationMarker = gMap.addMarker(new MarkerOptions().position(latLng).icon(locationBitmapDescriptor));
+                if (Constants.UK_BOUNDING_BOX.contains(currentLatLng)) {
+                    currentLocationMarker = gMap.addMarker(new MarkerOptions().position(currentLatLng).icon(locationBitmapDescriptor));
+                }
+                else{
+                    return;
+                }
             }
             else{
-                currentLocationMarker.setPosition(latLng);
+                if (Constants.UK_BOUNDING_BOX.contains(currentLatLng)) {
+                    currentLocationMarker.setPosition(currentLatLng);
+                }
+                else{
+                    return;
+                }
             }
 
             if (!updatedLocationHasBeenSet && gMap!=null){
@@ -504,7 +532,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
                 int currentApproxLng = (int) (currentLatLng.longitude * 10);
                 int newApproxLng = (int) (location.getLongitude() * 10);
                 if ((currentApproxLat != newApproxLat) || (currentApproxLng != newApproxLng)) {
-                    currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                     if (newLatLng == null) {
                         gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
                     }
