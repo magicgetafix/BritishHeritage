@@ -292,12 +292,19 @@ public class DatabaseInteractor {
 
     public void addReviewToLandmark(String landmarkId, Review review, OnCompleteListener<Void> listener){
         reviewReference.child(landmarkId).child(review.getUserId()).setValue(review).addOnCompleteListener(listener);
+        //allow user to check in when they have reviewed a landmark
+        checkInToLandmark(landmarkId, new OnCompleteListener() {
+            @Override
+            public void onComplete(@NonNull Task task) {
+
+            }
+        });
     }
 
-    public void checkInToLandmark(Landmark landmark, OnCompleteListener listener){
+    public void checkInToLandmark(String landmarkId, OnCompleteListener listener){
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser!=null && listener!=null) {
-            checkedInReviewsRef.child(currentUser.getUid()).child(landmark.getId()).setValue(true).addOnCompleteListener(listener);
+            checkedInReviewsRef.child(currentUser.getUid()).child(landmarkId).setValue(true).addOnCompleteListener(listener);
         }
     }
 

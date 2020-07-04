@@ -21,14 +21,11 @@
         <item name="colorControlNormal">@color/white</item>
     </style>
 
-
-
-
     <style name="SearchBar" parent="AppTheme">
         <item name="android:background">@drawable/white_rounded</item>
         <item name="android:layout_marginStart">16dp</item>
         <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginTop">24dp</item>
+        <item name="android:layout_marginTop">12dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:padding">8dp</item>
         <item name="android:maxLines">1</item>

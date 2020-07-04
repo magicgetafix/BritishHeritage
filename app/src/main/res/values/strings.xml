@@ -49,7 +49,7 @@
     <string name="places_you_have_explored">Places you have explored:</string>
     <string name="your_favourite_places">Your favourite places:</string>
     <string name="temp_favourite_text">This is where your favourite places will be shown</string>
-    <string name="temp_checked_in_landmarks">This is where any sites you have visited will be shown</string>
+    <string name="temp_checked_in_landmarks">This is where any sites you have visited or reviewed will be shown</string>
     <string name="points_added">"You have earned %d points  "</string>
     <string name="point_added">"You have earned %d point  "</string>
     <string name="top_users">Highest scoring explorers:</string>

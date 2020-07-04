@@ -340,7 +340,7 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
                     }
                 }
             };
-            databaseInteractor.checkInToLandmark(mainLandmark, listener);
+            databaseInteractor.checkInToLandmark(mainLandmark.getId(), listener);
         }
     }
 
