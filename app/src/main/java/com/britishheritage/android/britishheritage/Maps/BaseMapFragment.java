@@ -1,10 +1,10 @@
 package com.britishheritage.android.britishheritage.Maps;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.location.Location;
-import android.location.LocationListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -29,9 +29,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 
+import java.util.Date;
+
 import timber.log.Timber;
 
-public class BaseMapFragment extends Fragment implements OnMapReadyCallback, LatLngQuery.LatLngResultListener, LocationListener {
+public class BaseMapFragment extends Fragment implements OnMapReadyCallback, LatLngQuery.LatLngResultListener{
 
     private MapViewModel mViewModel;
     private SupportMapFragment supportMapFragment;
@@ -52,12 +54,10 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     private LatLngQuery latLngQuery;
     private float pixelDensityScale = 1.0f;
     private int iconBmapWidthHeight = 20;
-    private Marker currentLocationMarker;
-    private BitmapDescriptor locationBitmapDescriptor;
-    private boolean updatedLocationHasBeenSet = false;
     private ImageView mapLayerButton;
     private static Marker tempMarker;
-    private MyLocationProvider locationProvider;
+    private final static String LAST_TIME_OPENED_KEY = "last_time_opened";
+    private final static long FIFTEEN_MINUTES_IN_MILLISECONDS = 900000;
 
     public void setTargetLatLng(LatLng latLng, String id){
         newId = id;
@@ -69,6 +69,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     }
 
     public void navBackToCurrentLatLng(){
+        currentLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
         if (gMap!=null && currentLatLng!=null){
             if (Constants.UK_BOUNDING_BOX.contains(currentLatLng)) {
                 gMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng), 500, null);
@@ -126,10 +127,12 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
         mapLayerButton.setOnClickListener(v->{
             switchMapLayer();
+            recordInteraction();
         });
 
         resetLocationButton.setOnClickListener(v->{
             resetToCurrentLocation();
+            recordInteraction();
         });
 
         // Get the screen's density scale
@@ -188,7 +191,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
                 searchString = searchString.trim();
                 if (!searchString.isEmpty()) {
                     searchForLatLng(searchString);
-                    updatedLocationHasBeenSet = true;
+                    recordInteraction();
                 }
                 else{
                     Toast.makeText(getContext(), "Please type a location name into the search bar", Toast.LENGTH_LONG).show();
@@ -198,25 +201,46 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     }
 
     private void resetToCurrentLocation() {
-
-        MyLocationProvider.removeLocationListeners(this);
-        MyLocationProvider.addLocationListener(this, getActivity());
         LatLng lastLocationLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
         if (gMap!=null && lastLocationLatLng!= null){
             gMap.animateCamera(CameraUpdateFactory.newLatLng(lastLocationLatLng), 700, null);
         }
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updatedLocationHasBeenSet = false;
-        if (gMap!=null) {
-            MyLocationProvider.removeLocationListeners(this);
-            MyLocationProvider.addLocationListener(this, getActivity());
-        }
 
+            if (gMap != null && appHasBeenInactive()) {
+                currentLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
+                gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+            }
+    }
+
+    private boolean appHasBeenInactive(){
+
+        boolean appHasBeenInactive = false;
+        if (getContext()!=null) {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(getContext().getPackageName(), Context.MODE_PRIVATE);
+
+        long retrievedTime = sharedPreferences.getLong(LAST_TIME_OPENED_KEY, 0L);
+        if (retrievedTime != 0L){
+            long currentTime = new Date().getTime();
+            long timeDifference = currentTime - retrievedTime;
+            if (timeDifference > FIFTEEN_MINUTES_IN_MILLISECONDS){
+                appHasBeenInactive = true;
+            }
+        }
+        long time = new Date().getTime();
+        sharedPreferences.edit().putLong(LAST_TIME_OPENED_KEY, time).apply();
+        }
+        return appHasBeenInactive;
+    }
+
+    private void recordInteraction(){
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(getContext().getPackageName(), Context.MODE_PRIVATE);
+        long time = new Date().getTime();
+        sharedPreferences.edit().putLong(LAST_TIME_OPENED_KEY, time).apply();
     }
 
     public void searchForLatLng(String cityQuery){
@@ -252,7 +276,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         //moves map camera to current location
         if (newLatLng == null && currentLatLng!=null) {
             if (Constants.UK_BOUNDING_BOX.contains(currentLatLng)) {
-                gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
+                    gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
             }
         }
         else{
@@ -261,10 +285,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
         gMap.setInfoWindowAdapter(new MapInfoWindow(getContext()));
         gMap.setMyLocationEnabled(true);
-
-        MyLocationProvider.removeLocationListeners(this);
-        MyLocationProvider.addLocationListener(this, getActivity());
-
         setDragMapBehaviour(gMap);
 
         LatLng[] latLngs = getMapCorners(gMap);
@@ -281,6 +301,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                recordInteraction();
                 marker.showInfoWindow();
                 newLatLng = marker.getPosition();
                 gMap.animateCamera(CameraUpdateFactory.newLatLng(newLatLng), 700, null);
@@ -291,7 +312,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-
+                recordInteraction();
                 if (marker.getSnippet()!=null) {
                     String snippetData = marker.getSnippet();
                     String[] snippetCSV = snippetData.split("@@");
@@ -332,7 +353,7 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         gMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
-
+                recordInteraction();
                 LatLng[] latLngs = getMapCorners(gMap);
                 mViewModel.getLandmarks(latLngs[0], latLngs[1]);
             }
@@ -472,8 +493,8 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
     @Override
     public void foundLatLng(LatLng latLng) {
-        newLatLng = latLng;
-        gMap.animateCamera(CameraUpdateFactory.newLatLng(newLatLng), 700, null);
+        currentLatLng = latLng;
+        gMap.animateCamera(CameraUpdateFactory.newLatLng(currentLatLng), 700, null);
     }
 
     @Override
@@ -483,49 +504,10 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     }
 
     public void showBottomSheet(){
-
         MainActivity mainActivity = (MainActivity) getActivity();
         if (mainActivity!=null) {
             mainActivity.showBottomSheet();
         }
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-
-        if (location!=null && gMap != null && newLatLng == null) {
-            currentLatLng = new LatLng(location.getLatitude(),location.getLongitude());
-
-            if (!updatedLocationHasBeenSet && gMap!=null){
-
-                int currentApproxLat = (int) (currentLatLng.latitude * 10);
-                int newApproxLat = (int) (location.getLatitude() * 10);
-                int currentApproxLng = (int) (currentLatLng.longitude * 10);
-                int newApproxLng = (int) (location.getLongitude() * 10);
-                if ((currentApproxLat != newApproxLat) || (currentApproxLng != newApproxLng)) {
-                    if (newLatLng == null) {
-                        if (Constants.UK_BOUNDING_BOX.contains(currentLatLng)) {
-                            gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
-                        }
-                    }
-                    updatedLocationHasBeenSet = true;
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 }

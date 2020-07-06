@@ -65,6 +65,7 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
   private TextView passwordErrorTV;
   private ProgressBar progressBar;
   private TextView navigateToLoginTV;
+  private TextView skipLoginTV;
 
   private GoogleSignInClient googleSignInClient;
   private static final int SIGN_IN_CODE = 583;
@@ -129,6 +130,8 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
     progressBar = findViewById(R.id.splash_progressbar);
     splashViewGroup = findViewById(R.id.splash_viewgroup);
     navigateToLoginTV = findViewById(R.id.switch_to_login_screen_text);
+    skipLoginTV = findViewById(R.id.skip_login_text);
+    progressBar.setVisibility(View.INVISIBLE);
 
 
     taggedViews = Tools.getViewsByTag(splashViewGroup, "splash_component");
@@ -205,6 +208,62 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
     });
 
     usernameTV.addTextChangedListener(userNameTextWatcher);
+
+    skipLoginTV.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+
+        DialogInterface.OnClickListener onConfirmListener = new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            signUpAnonymously();
+          }
+        };
+
+        DialogInterface.OnClickListener onCancelListener = new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            dialog.dismiss();
+          }
+        };
+
+        String silentLoginMessage = getString(R.string.login_silently);
+        String title = getString(R.string.ignore_sign_in);
+        showDialog(title, silentLoginMessage, onConfirmListener, onCancelListener);
+
+      }
+    });
+  }
+
+  private void signUpAnonymously(){
+
+    firebaseAuth.signInAnonymously().addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+      @Override
+      public void onComplete(@NonNull Task<AuthResult> task) {
+
+        if (task.isSuccessful()){
+          FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+          if (currentUser!=null){
+            username = "A Heritage Fan";
+            progressBar.setVisibility(View.VISIBLE);
+            new Handler().postDelayed(new Runnable() {
+              @Override
+              public void run() {
+                saveUserName(currentUser);
+              }
+            }, 3000);
+
+          }
+          else{
+            showSnackbar(getString(R.string.login_failure));
+          }
+        }
+        else{
+          showSnackbar(getString(R.string.login_failure));
+        }
+
+      }
+    });
   }
 
   private void signUp(){
@@ -426,6 +485,21 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
     builder.setMessage(message);
     String yes = getString(R.string.ok);
     builder.setPositiveButton(yes, positiveClickListener);
+    AlertDialog alert = builder.create();
+    alert.show();
+
+  }
+
+  public void showDialog(String title, String message, DialogInterface.OnClickListener positiveClickListener, DialogInterface.OnClickListener negativeClickListener){
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setTitle(title);
+    builder.setMessage(message);
+    String yes = getString(R.string.ok);
+    String cancel = getString(R.string.cancel);
+    builder.setPositiveButton(yes, positiveClickListener);
+    builder.setNegativeButton(cancel, negativeClickListener);
+
     AlertDialog alert = builder.create();
     alert.show();
 

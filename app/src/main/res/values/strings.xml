@@ -76,6 +76,10 @@
     <string name="england">England</string>
     <string name="scotland">Scotland</string>
     <string name="wales">Wales</string>
+    <string name="skip_login">Skip sign-up process</string>
+    <string name="cancel">Cancel</string>
+    <string name="login_silently">Continuing without signing up will mean that you won\'t be able to retrieve your favourite landmarks or the places you have visited should you switch devices or sign-out. Is this ok?</string>
+    <string name="ignore_sign_in">Don\'t Sign In?</string>
 
 
 </resources>
