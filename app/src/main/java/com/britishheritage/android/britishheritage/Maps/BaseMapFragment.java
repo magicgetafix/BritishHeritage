@@ -61,8 +61,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     private int iconBmapWidthHeight = 20;
     private ImageView mapLayerButton;
     private static Marker tempMarker;
-    private final static String LAST_TIME_OPENED_KEY = "last_time_opened";
-    private final static long FIFTEEN_MINUTES_IN_MILLISECONDS = 900000;
 
     public void setTargetLatLng(LatLng latLng, String id){
         newId = id;
@@ -132,12 +130,10 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
         mapLayerButton.setOnClickListener(v->{
             switchMapLayer();
-            recordInteraction();
         });
 
         resetLocationButton.setOnClickListener(v->{
             resetToCurrentLocation();
-            recordInteraction();
         });
 
         // Get the screen's density scale
@@ -199,7 +195,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
                 searchString = searchString.trim();
                 if (!searchString.isEmpty()) {
                     searchForLatLng(searchString);
-                    recordInteraction();
                 }
                 else{
                     Toast.makeText(getContext(), "Please type a location name into the search bar", Toast.LENGTH_LONG).show();
@@ -218,38 +213,9 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     @Override
     public void onResume() {
         super.onResume();
-
-            if (gMap != null && appHasBeenInactive()) {
-                currentLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
-                gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLatLng));
-            }
+        currentLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
     }
 
-    private boolean appHasBeenInactive(){
-
-        boolean appHasBeenInactive = false;
-        if (getContext()!=null) {
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(getContext().getPackageName(), Context.MODE_PRIVATE);
-
-        long retrievedTime = sharedPreferences.getLong(LAST_TIME_OPENED_KEY, 0L);
-        if (retrievedTime != 0L){
-            long currentTime = new Date().getTime();
-            long timeDifference = currentTime - retrievedTime;
-            if (timeDifference > FIFTEEN_MINUTES_IN_MILLISECONDS){
-                appHasBeenInactive = true;
-            }
-        }
-        long time = new Date().getTime();
-        sharedPreferences.edit().putLong(LAST_TIME_OPENED_KEY, time).apply();
-        }
-        return appHasBeenInactive;
-    }
-
-    private void recordInteraction(){
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences(getContext().getPackageName(), Context.MODE_PRIVATE);
-        long time = new Date().getTime();
-        sharedPreferences.edit().putLong(LAST_TIME_OPENED_KEY, time).apply();
-    }
 
     public void searchForLatLng(String cityQuery){
         if (latLngQuery == null){
@@ -309,7 +275,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         gMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                recordInteraction();
                 marker.showInfoWindow();
                 newLatLng = marker.getPosition();
                 gMap.animateCamera(CameraUpdateFactory.newLatLng(newLatLng), 700, null);
@@ -320,7 +285,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                recordInteraction();
                 if (marker.getSnippet()!=null) {
                     String snippetData = marker.getSnippet();
                     String[] snippetCSV = snippetData.split("@@");
@@ -361,7 +325,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         gMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
-                recordInteraction();
                 LatLng[] latLngs = getMapCorners(gMap);
                 mViewModel.getLandmarks(latLngs[0], latLngs[1]);
             }
