@@ -65,7 +65,7 @@
 
             <fragment
                 android:id="@+id/landmark_map"
-                class="com.google.android.gms.maps.SupportMapFragment"
+                class="com.google.android.libraries.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="360dp"
                 app:layout_constraintEnd_toEndOf="parent"

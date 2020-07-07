@@ -2,7 +2,7 @@ package com.britishheritage.android.britishheritage.Maps.LocationQueries;
 
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.maps.model.LatLng;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;

@@ -23,11 +23,16 @@ import com.britishheritage.android.britishheritage.Maps.LocationQueries.LatLngQu
 import com.britishheritage.android.britishheritage.Maps.MapAdapters.MapInfoWindow;
 import com.britishheritage.android.britishheritage.Model.*;
 import com.britishheritage.android.britishheritage.R;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.*;
+import com.google.android.libraries.maps.CameraUpdateFactory;
+import com.google.android.libraries.maps.GoogleMap;
+import com.google.android.libraries.maps.OnMapReadyCallback;
+import com.google.android.libraries.maps.SupportMapFragment;
+import com.google.android.libraries.maps.model.BitmapDescriptor;
+import com.google.android.libraries.maps.model.BitmapDescriptorFactory;
+import com.google.android.libraries.maps.model.LatLng;
+import com.google.android.libraries.maps.model.Marker;
+import com.google.android.libraries.maps.model.MarkerOptions;
+
 
 import java.util.Date;
 
@@ -139,9 +144,12 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         pixelDensityScale = getResources().getDisplayMetrics().density;
         iconBmapWidthHeight = (int)(pixelDensityScale * 20 + 0.5f);
 
-        supportMapFragment =
-                (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_archaeology);
-        supportMapFragment.getMapAsync(this);
+        if (supportMapFragment == null) {
+            supportMapFragment =
+                    (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_archaeology);
+
+            supportMapFragment.getMapAsync(this);
+        }
         currentLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
         if (currentLatLng== null){
             currentLatLng = Constants.DEFAULT_LATLNG;

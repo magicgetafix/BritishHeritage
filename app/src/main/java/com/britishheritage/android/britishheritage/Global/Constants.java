@@ -1,7 +1,8 @@
 package com.britishheritage.android.britishheritage.Global;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
+
+import com.google.android.libraries.maps.model.LatLng;
+import com.google.android.libraries.maps.model.LatLngBounds;
 
 public class Constants {
 

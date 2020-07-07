@@ -11,7 +11,7 @@ import com.britishheritage.android.britishheritage.Model.Review;
 import com.britishheritage.android.britishheritage.Model.WikiLandmark;
 import com.britishheritage.android.britishheritage.Response.Geoname;
 import com.britishheritage.android.britishheritage.Response.NearbyWikipediaResponse;
-import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.maps.model.LatLng;
 
 import org.reactivestreams.Subscription;
 
