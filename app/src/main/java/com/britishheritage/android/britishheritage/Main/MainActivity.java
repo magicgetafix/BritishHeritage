@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.util.SparseLongArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -115,58 +116,84 @@ public class MainActivity extends BaseActivity implements BottomDialogFragment.I
     };
 
     private void executeFragmentTransaction(Fragment selectedFragment) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(android.R.animator.fade_in,
-                android.R.animator.fade_out);
-        if (selectedFragment.isHidden()){
-            if (previousFragment!=null){
-                fragmentTransaction.hide(previousFragment);
+
+        int build = Build.VERSION.SDK_INT;
+        if (build >= Build.VERSION_CODES.N) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.setCustomAnimations(android.R.animator.fade_in,
+                    android.R.animator.fade_out);
+            if (selectedFragment.isHidden()){
+                if (previousFragment!=null){
+                    fragmentTransaction.hide(previousFragment);
+                }
+                fragmentTransaction.show(selectedFragment);
             }
-            fragmentTransaction.show(selectedFragment);
+            else{
+                if (previousFragment!=null){
+                    fragmentTransaction.hide(previousFragment);
+                }
+                fragmentTransaction.add(R.id.main_frame_layout, selectedFragment);
+            }
+            previousFragment = selectedFragment;
+            fragmentTransaction.commit();
+            navigationView.setOnNavigationItemSelectedListener(navListener);
         }
         else{
-            if (previousFragment!=null){
-                fragmentTransaction.hide(previousFragment);
-            }
-            fragmentTransaction.add(R.id.main_frame_layout, selectedFragment);
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.setCustomAnimations(android.R.animator.fade_in,
+                    android.R.animator.fade_out);
+            fragmentTransaction.replace(R.id.main_frame_layout, selectedFragment);
+            previousFragment = selectedFragment;
+            fragmentTransaction.commit();
+            navigationView.setOnNavigationItemSelectedListener(navListener);
         }
-        previousFragment = selectedFragment;
-        fragmentTransaction.commit();
-        navigationView.setOnNavigationItemSelectedListener(navListener);
+
+
     }
 
 
     private Fragment getArchMapFragment(){
 
-        if (archMapFragment==null){
-            archMapFragment = ArchMapFragment.newInstance();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (archMapFragment == null) {
+                archMapFragment = ArchMapFragment.newInstance();
+            }
+            return archMapFragment;
         }
-        return archMapFragment;
+        return ArchMapFragment.newInstance();
     }
 
     private Fragment getListedBuildingFragment(){
 
-        if (listedBuildingFragment == null){
-            listedBuildingFragment = new ListedBuildingMapFragment();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (listedBuildingFragment == null) {
+                listedBuildingFragment = new ListedBuildingMapFragment();
+            }
+            return listedBuildingFragment;
         }
-        return listedBuildingFragment;
+        return new ListedBuildingMapFragment();
     }
 
     private Fragment getBluePlaqueFragment(){
 
-        if (bluePlaqueFragment == null){
-            bluePlaqueFragment = new BluePlaqueMapFragment();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (bluePlaqueFragment == null) {
+                bluePlaqueFragment = new BluePlaqueMapFragment();
+            }
+            return bluePlaqueFragment;
         }
-        return bluePlaqueFragment;
+        return new BluePlaqueMapFragment();
     }
 
     private Fragment getHomeFragment(){
 
-        if (homeFragment == null){
-            homeFragment = new HomeFragment();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (homeFragment == null) {
+                homeFragment = new HomeFragment();
+            }
+            return homeFragment;
         }
-
-        return homeFragment;
+        return new HomeFragment();
     }
 
     @Override
