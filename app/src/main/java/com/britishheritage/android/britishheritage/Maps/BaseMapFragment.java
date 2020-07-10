@@ -141,12 +141,11 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         pixelDensityScale = getResources().getDisplayMetrics().density;
         iconBmapWidthHeight = (int)(pixelDensityScale * 20 + 0.5f);
 
-        if (supportMapFragment == null) {
-            supportMapFragment =
+        supportMapFragment =
                     (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map_archaeology);
 
-            supportMapFragment.getMapAsync(this);
-        }
+        supportMapFragment.getMapAsync(this);
+
         currentLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
         if (currentLatLng== null){
             currentLatLng = Constants.DEFAULT_LATLNG;
@@ -214,7 +213,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     @Override
     public void onResume() {
         super.onResume();
-        currentLatLng = MyLocationProvider.getLastLocationLatLng(getActivity());
     }
 
 

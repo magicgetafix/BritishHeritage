@@ -124,7 +124,7 @@ public class DatabaseInteractor {
     }
 
     private void appHasBeenRun(){
-        sharedPrefs.edit().putBoolean(FIRST_RUN_KEY, false).commit();
+        sharedPrefs.edit().putBoolean(FIRST_RUN_KEY, false).apply();
     }
 
     public void addAllLandmarks(List<Landmark> landmarks){
