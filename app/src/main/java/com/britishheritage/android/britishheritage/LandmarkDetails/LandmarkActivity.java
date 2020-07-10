@@ -17,6 +17,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RotateDrawable;
 import android.location.Location;
 import android.location.LocationListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -480,7 +481,13 @@ public class LandmarkActivity extends BaseActivity implements WikiLandmarkAdapte
         if (lastLocation != null){
             userLatLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
         }
-        gMap.setMyLocationEnabled(true);
+        boolean locationPermissions = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            locationPermissions = MyLocationProvider.hasLocationPermissions(this);
+        }
+        if (locationPermissions) {
+            gMap.setMyLocationEnabled(true);
+        }
         LatLng locationLatLng = new LatLng(mainLandmark.getLatitude(), mainLandmark.getLongitude());
         gMap.setMinZoomPreference(13);
         gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);

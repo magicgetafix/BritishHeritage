@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -258,7 +259,13 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         }
 
         gMap.setInfoWindowAdapter(new MapInfoWindow(getContext()));
-        gMap.setMyLocationEnabled(true);
+        boolean locationPermissions = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            locationPermissions = MyLocationProvider.hasLocationPermissions(getContext());
+        }
+        if (locationPermissions) {
+            gMap.setMyLocationEnabled(true);
+        }
         setDragMapBehaviour(gMap);
 
         LatLng[] latLngs = getMapCorners(gMap);

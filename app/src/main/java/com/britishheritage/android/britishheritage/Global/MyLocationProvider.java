@@ -138,6 +138,15 @@ public class MyLocationProvider {
     }
 
     @TargetApi(23)
+    public static boolean hasLocationPermissions(Context context){
+        boolean permission = (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
+        if (!permission){
+            permission = (context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
+        }
+        return permission;
+    }
+
+    @TargetApi(23)
     private static boolean checkPermissions(){
 
         if (appContext.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && appContext.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
