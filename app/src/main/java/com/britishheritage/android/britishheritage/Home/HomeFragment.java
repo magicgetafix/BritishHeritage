@@ -81,6 +81,9 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
   private TextView userScoreTV;
   private TextView userRankTV;
 
+  private TextView placesVisitedTV;
+  private TextView favouritesTV;
+
   public HomeFragment() {
     // Required empty public constructor
   }
@@ -114,6 +117,8 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
     userScoreTV = view.findViewById(R.id.home_user_points_textview);
     userRankTV = view.findViewById(R.id.home_user_rank_textview);
     deleteFavouritesIV = view.findViewById(R.id.delete_favourites);
+    favouritesTV = view.findViewById(R.id.home_your_favourites_text);
+    placesVisitedTV = view.findViewById(R.id.home_places_you_have_visited_text);
     deleteCheckedInPropertiesIV = view.findViewById(R.id.delete_checked_in_places);
     mainViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel .class);
     favouritesLayoutManager = new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL, false);
@@ -225,6 +230,10 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
 
   private void onFavouritesUpdated(List<Landmark> landmarks) {
 
+    if (!landmarks.isEmpty()){
+      String favsText = getString(R.string.your_favourite_places)+" ("+landmarks.size()+") :";
+      favouritesTV.setText(favsText);
+    }
     if (landmarks.isEmpty()){
       Landmark tempLandmark = new Landmark();
       String tempFavText = getString(R.string.temp_favourite_text);
@@ -241,6 +250,10 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
 
   private void onCheckedInLandmarksUpdated(List<Landmark> landmarks){
 
+    if (!landmarks.isEmpty()){
+      String placesVistedText = getString(R.string.places_you_have_explored)+" ("+landmarks.size()+") :";
+      placesVisitedTV.setText(placesVistedText);
+    }
     if (landmarks.isEmpty()){
       Landmark tempLandmark = new Landmark();
       String tempFavText = getString(R.string.temp_checked_in_landmarks);
@@ -259,6 +272,7 @@ public class HomeFragment extends Fragment implements LandmarksAdapter.Listener 
     checkedInLandmarksAdapter = new LandmarksAdapter(landmarks, getContext(), this);
     checkedInLandmarksRecyclerView.setLayoutManager(checkedInLandmarksManager);
     checkedInLandmarksRecyclerView.setAdapter(checkedInLandmarksAdapter);
+
   }
 
   private void onTopScoringUsersUpdated(List<User> userList){

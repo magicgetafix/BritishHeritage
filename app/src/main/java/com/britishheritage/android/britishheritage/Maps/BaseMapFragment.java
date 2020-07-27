@@ -17,6 +17,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
 import com.britishheritage.android.britishheritage.Main.MainActivity;
@@ -33,6 +35,8 @@ import com.google.android.libraries.maps.model.BitmapDescriptorFactory;
 import com.google.android.libraries.maps.model.LatLng;
 import com.google.android.libraries.maps.model.Marker;
 import com.google.android.libraries.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 
 import java.util.Date;
@@ -54,12 +58,19 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     private static Bitmap buildingIcon;
     private static Bitmap parkIcon;
 
+    private static Bitmap redHillIcon;
+    private static Bitmap redMonumentIcon;
+    private static Bitmap redBattleIcon;
+    private static Bitmap redBuildingIcon;
+    private static Bitmap redParkIcon;
+
     private EditText searchText;
     private ImageView searchIcon;
     private ImageView resetLocationButton;
     private LatLngQuery latLngQuery;
     private float pixelDensityScale = 1.0f;
     private int iconBmapWidthHeight = 20;
+    private int redIconBmapWidthHeight = 25;
     private ImageView mapLayerButton;
     private static Marker tempMarker;
 
@@ -152,6 +163,42 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
         }
         //setting up icon size
         BitmapDrawable bitmapDrawable = null;
+        try {
+            bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_hill_silhouette_small_red);
+            redHillIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), redIconBmapWidthHeight, iconBmapWidthHeight, false);
+        }
+        catch(OutOfMemoryError outOfMemoryError){
+            Timber.e(outOfMemoryError);
+        }
+        try {
+            bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_battlefield_red);
+            redBattleIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), redIconBmapWidthHeight, iconBmapWidthHeight, false);
+        }
+        catch(OutOfMemoryError outOfMemoryError){
+            Timber.e(outOfMemoryError);
+        }
+        try {
+            bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_menhir_red);
+            redMonumentIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), redIconBmapWidthHeight, iconBmapWidthHeight, false);
+        }
+        catch(OutOfMemoryError outOfMemoryError){
+            Timber.e(outOfMemoryError);
+        }
+        try {
+            bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_museum_medium_red);
+            redBuildingIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), redIconBmapWidthHeight, iconBmapWidthHeight, false);
+        }
+        catch(OutOfMemoryError outOfMemoryError){
+            Timber.e(outOfMemoryError);
+        }
+        try {
+            bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_park_red);
+            redParkIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), redIconBmapWidthHeight, iconBmapWidthHeight, false);
+        }
+        catch(OutOfMemoryError outOfMemoryError){
+            Timber.e(outOfMemoryError);
+        }
+
         try {
             bitmapDrawable = (BitmapDrawable) getResources().getDrawable(R.drawable.icon_hill_silhouette_small);
             hillIcon = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), iconBmapWidthHeight, iconBmapWidthHeight, false);
@@ -322,6 +369,17 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             }
         });
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user!=null) {
+            DatabaseInteractor
+                    .getInstance(getActivity())
+                    .getCheckedInLandmarks(user).observe(this, landmarks -> {
+                        for (Landmark landmark: landmarks){
+                            setUpMarker(landmark, true);
+                        }
+            });
+        }
+
     }
 
 
@@ -337,6 +395,10 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     }
 
     private void setUpMarker(Landmark landmark){
+        setUpMarker(landmark, false);
+    }
+
+    private void setUpMarker(Landmark landmark, boolean useRedMarkers){
 
         if (landmark == null){
             Timber.d("Landmark is null in BaseMapFragment");
@@ -363,7 +425,13 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             type = getString(R.string.scheduled_monument);
             csvData +=type+"@@"+webUrl;
             if (monumentIcon!=null) {
-                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(monumentIcon);
+                BitmapDescriptor bitmapDescriptor;
+                if (useRedMarkers){
+                    bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(redMonumentIcon);
+                }
+                else {
+                    bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(monumentIcon);
+                }
                 tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .icon(bitmapDescriptor)
                         .snippet(csvData).draggable(false));
@@ -380,7 +448,13 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             type = getString(R.string.hillfort);
             csvData +=type+"@@"+webUrl;
             if (hillIcon!=null) {
-                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(hillIcon);
+                BitmapDescriptor bitmapDescriptor;
+                if (useRedMarkers){
+                    bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(redHillIcon);
+                }
+                else {
+                    bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(hillIcon);
+                }
                 tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .icon(bitmapDescriptor)
                         .snippet(csvData).draggable(false));
@@ -397,7 +471,13 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             type = getString(R.string.battlefield);
             csvData +=type+"@@"+webUrl;
             if (battleIcon!=null) {
-                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(battleIcon);
+                BitmapDescriptor bitmapDescriptor;
+                if (useRedMarkers){
+                    bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(redBattleIcon);
+                }
+                else {
+                    bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(battleIcon);
+                }
                 tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .icon(bitmapDescriptor)
                         .snippet(csvData).draggable(false));
@@ -414,7 +494,13 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             type = getString(R.string.listedbuilding);
             csvData +=type+"@@"+webUrl;
             if (buildingIcon!=null) {
-                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(buildingIcon);
+                BitmapDescriptor bitmapDescriptor;
+                if (useRedMarkers){
+                    bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(redBuildingIcon);
+                }
+                else {
+                    bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(buildingIcon);
+                }
                 tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .icon(bitmapDescriptor)
                         .snippet(csvData).draggable(false));
@@ -431,7 +517,13 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
             type = getString(R.string.park);
             csvData +=type+"@@"+webUrl;
             if (parkIcon!=null) {
-                BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(parkIcon);
+                BitmapDescriptor bitmapDescriptor;
+                if (useRedMarkers){
+                    bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(redParkIcon);
+                }
+                else {
+                    bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(parkIcon);
+                }
                 tempMarker = gMap.addMarker(new MarkerOptions().position(entLatLng)
                         .icon(bitmapDescriptor)
                         .snippet(csvData).draggable(false));
@@ -446,8 +538,14 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
 
             type = getString(R.string.blue_plaque);
             csvData +=type+"@@"+webUrl;
-            tempMarker = gMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).position(entLatLng)
+            if (useRedMarkers){
+                tempMarker = gMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).position(entLatLng)
                         .snippet(csvData).draggable(false));
+            }
+            else {
+                tempMarker = gMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).position(entLatLng)
+                        .snippet(csvData).draggable(false));
+            }
 
         }
         try {
