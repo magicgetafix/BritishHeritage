@@ -10,8 +10,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -30,6 +32,7 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
     private RealmResults<FavouriteLandmarkRealmObj> favouriteLandmarkRealmObjRealmResults;
     private MutableLiveData<List<Landmark>> checkedInLandmarksLiveData = new MutableLiveData<>();
     private MutableLiveData<List<User>> topScoringUserLiveData = new MutableLiveData<>();
+    public Set<String> checkedInLandmarkIdSet = new HashSet<>();
 
     public MainViewModel(@NonNull Application application) {
         super(application);
@@ -59,6 +62,9 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
             favouriteLandmarkRealmObjRealmResults.addChangeListener(this);
             databaseInteractor.getCheckedInLandmarks(user).observeForever(landmarks -> {
                 checkedInLandmarksLiveData.setValue(landmarks);
+                landmarks.iterator().forEachRemaining(landmark -> {
+                    checkedInLandmarkIdSet.add(landmark.getId());
+                });
             });
         }
     }

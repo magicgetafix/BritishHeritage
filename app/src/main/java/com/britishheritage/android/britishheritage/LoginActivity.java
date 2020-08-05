@@ -53,6 +53,7 @@ public class LoginActivity extends BaseActivity {
     private TextView emailErrorTV;
     private TextView passwordErrorTV;
     private ProgressBar progressBar;
+    private TextView forgotPasswordTV;
 
     private GoogleSignInClient googleSignInClient;
     private static final int SIGN_IN_CODE = 583;
@@ -98,6 +99,7 @@ public class LoginActivity extends BaseActivity {
         emailErrorTV = findViewById(R.id.splash_email_error);
         passwordErrorTV = findViewById(R.id.splash_password_error);
         progressBar = findViewById(R.id.splash_progressbar);
+        forgotPasswordTV = findViewById(R.id.login_forgot_password);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(GooglePlayKeys.CLIENT_ID)
@@ -105,6 +107,14 @@ public class LoginActivity extends BaseActivity {
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
         setUpButtons();
+
+        forgotPasswordTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent forgotPasswordIntent = new Intent(getApplicationContext(), ForgotPasswordActivity.class);
+                startActivity(forgotPasswordIntent);
+            }
+        });
     }
 
     public void setUpButtons(){

@@ -80,6 +80,14 @@
     <string name="cancel">Cancel</string>
     <string name="login_silently">Continuing without signing up will mean that you won\'t be able to retrieve your favourite landmarks or the places you have visited should you switch devices or sign-out. Is this ok?</string>
     <string name="ignore_sign_in">Don\'t Sign In?</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="enter_your_email2">Enter your email</string>
+    <string name="please_enter_a_valid_email">Please Enter A Valid Email Address</string>
+    <string name="password_has_been_reset">Your Password Has Been Reset</string>
+    <string name="please_check_your_email">Please check your email to reset your password</string>
+    <string name="reset_password">Reset Your Password</string>
+    <string name="reset_your_password">Reset Your Password</string>
+    <string name="enter_password">Enter password...</string>
 
 
 </resources>

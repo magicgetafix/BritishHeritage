@@ -66,6 +66,7 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
   private ProgressBar progressBar;
   private TextView navigateToLoginTV;
   private TextView skipLoginTV;
+  private TextView forgotPassword;
 
   private GoogleSignInClient googleSignInClient;
   private static final int SIGN_IN_CODE = 583;
@@ -131,6 +132,7 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
     splashViewGroup = findViewById(R.id.splash_viewgroup);
     navigateToLoginTV = findViewById(R.id.switch_to_login_screen_text);
     skipLoginTV = findViewById(R.id.skip_login_text);
+    forgotPassword = findViewById(R.id.forgot_password);
     progressBar.setVisibility(View.INVISIBLE);
 
 
@@ -197,6 +199,14 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
         if (checkUsernameValidity()){
           googleSignIn();
         }
+      }
+    });
+
+    forgotPassword.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Intent forgotPasswordIntent = new Intent(getApplicationContext(), ForgotPasswordActivity.class);
+        startActivity(forgotPasswordIntent);
       }
     });
 
@@ -478,17 +488,6 @@ public class SplashActivity extends BaseActivity implements DialogInterface.OnCl
     finishAffinity();
   }
 
-  public void showDialog(String title, String message, DialogInterface.OnClickListener positiveClickListener){
-
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setTitle(title);
-    builder.setMessage(message);
-    String yes = getString(R.string.ok);
-    builder.setPositiveButton(yes, positiveClickListener);
-    AlertDialog alert = builder.create();
-    alert.show();
-
-  }
 
   public void showDialog(String title, String message, DialogInterface.OnClickListener positiveClickListener, DialogInterface.OnClickListener negativeClickListener){
 

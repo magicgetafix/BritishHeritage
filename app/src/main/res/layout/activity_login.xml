@@ -95,7 +95,7 @@
         android:background="@drawable/white_circle_coloraccent_outline"
         android:id="@+id/splash_password"
         style="@style/SearchBar"
-        android:hint="@string/choose_a_password"
+        android:hint="@string/enter_password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
@@ -197,6 +197,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:textColor="@color/colorPrimary"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:id="@+id/login_forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="24dp"
+        android:text="@string/forgot_password"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
