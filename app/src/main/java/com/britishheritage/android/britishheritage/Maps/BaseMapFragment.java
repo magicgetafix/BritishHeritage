@@ -1,8 +1,6 @@
 package com.britishheritage.android.britishheritage.Maps;
 
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
@@ -18,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.britishheritage.android.britishheritage.Database.DatabaseInteractor;
 import com.britishheritage.android.britishheritage.Global.Constants;
 import com.britishheritage.android.britishheritage.Global.MyLocationProvider;
 import com.britishheritage.android.britishheritage.Main.MainActivity;
@@ -36,11 +33,7 @@ import com.google.android.libraries.maps.model.BitmapDescriptorFactory;
 import com.google.android.libraries.maps.model.LatLng;
 import com.google.android.libraries.maps.model.Marker;
 import com.google.android.libraries.maps.model.MarkerOptions;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
-
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -74,7 +67,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     private LatLngQuery latLngQuery;
     private float pixelDensityScale = 1.0f;
     private int iconBmapWidthHeight = 20;
-    private int redIconBmapWidthHeight = 25;
     private ImageView mapLayerButton;
     private static Marker tempMarker;
     private Set<String> checkedInIdSet = new HashSet<>();
@@ -392,10 +384,6 @@ public class BaseMapFragment extends Fragment implements OnMapReadyCallback, Lat
     }
 
     private void setUpMarker(Landmark landmark){
-        setUpMarker(landmark, false);
-    }
-
-    private void setUpMarker(Landmark landmark, boolean useRedMarkers){
 
         if (landmark == null){
             Timber.d("Landmark is null in BaseMapFragment");

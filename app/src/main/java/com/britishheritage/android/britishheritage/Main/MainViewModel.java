@@ -62,9 +62,11 @@ public class MainViewModel extends AndroidViewModel implements RealmChangeListen
             favouriteLandmarkRealmObjRealmResults.addChangeListener(this);
             databaseInteractor.getCheckedInLandmarks(user).observeForever(landmarks -> {
                 checkedInLandmarksLiveData.setValue(landmarks);
-                landmarks.iterator().forEachRemaining(landmark -> {
+                Iterator<Landmark> iterator = landmarks.iterator();
+                while (iterator.hasNext()){
+                    Landmark landmark = iterator.next();
                     checkedInLandmarkIdSet.add(landmark.getId());
-                });
+                }
             });
         }
     }
