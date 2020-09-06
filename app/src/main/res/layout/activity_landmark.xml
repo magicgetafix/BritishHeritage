@@ -215,6 +215,7 @@
                 tools:visibility="visible"
                 android:visibility="visible"
                 android:textSize="18sp"
+                android:textColor="@color/white"
                 android:text="@string/press_the_button_to_check_in"
                 android:id="@+id/landmark_check_in_button_text"
                 android:layout_width="match_parent"
@@ -254,6 +255,7 @@
                 tools:visibility="visible"
                 android:visibility="gone"
                 android:textSize="18sp"
+                android:textColor="@color/white"
                 android:text="@string/point_of_interest"
                 android:id="@+id/landmark_point_of_interest"
                 android:layout_width="match_parent"
@@ -291,6 +293,7 @@
                 android:paddingEnd="100dp"
                 android:text="@string/landmark_user_description"
                 android:textSize="18sp"
+                android:textColor="@color/white"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/landmark_geonames_recylerview" />
 
